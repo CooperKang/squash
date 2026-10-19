@@ -71,13 +71,17 @@ describe('샷 계획기', () => {
     }
   })
 
-  it('누른 곳으로 샷이 정해진다', () => {
-    // 오른쪽 벽 가까운 공: 가운데는 스트레이트, 오른쪽 옆면(벽 쪽)은 크로스
+  it('라켓이 때린 곳으로 샷이 정해진다', () => {
+    // 오른쪽 벽 가까운 공: 왼쪽(안쪽)은 보스트, 가운데는 스트레이트, 오른쪽(벽 쪽)은 크로스
+    expect(kindFor(intentFrom(2.4, -0.7, 0), back, false)).toBe('boast')
     expect(kindFor(intentFrom(2.4, 0, 0), back, false)).toBe('drive')
     expect(kindFor(intentFrom(2.4, 0.7, 0), back, false)).toBe('cross')
     expect(kindFor(intentFrom(2.4, 0, -0.7), back, false)).toBe('drop')
     expect(kindFor(intentFrom(2.4, 0.7, 0.7), back, false)).toBe('cross-lob')
     expect(kindFor(intentFrom(2.4, 0, -0.7), { x: 2.4, y: 1.4, z: 5 }, false)).toBe('kill')
+    // 왼쪽 벽 가까운 공은 좌우가 바뀐다
+    expect(kindFor(intentFrom(-2.4, 0.7, 0), back, false)).toBe('boast')
+    expect(kindFor(intentFrom(-2.4, -0.7, 0), back, false)).toBe('cross')
     expect(kindFor(intentFrom(1.6, 0, 0), back, true)).toBe('serve-lob')
   })
 })

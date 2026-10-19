@@ -15,7 +15,7 @@ import {
 } from './physics'
 import { status, winner, type Score, type Status } from './score'
 import type { RuleKey } from './hints'
-import { SHOT_NAME, canBoast, cpuReturnChance, cpuShot, intentFrom, kindFor, newShot, playerShot, sharpness, type ShotKind } from './shots'
+import { SHOT_NAME, ZONE, cpuReturnChance, cpuShot, intentFrom, kindFor, newShot, playerShot, sharpness, type ShotKind } from './shots'
 
 export type HudState = {
   score: Score
@@ -27,7 +27,6 @@ export type HudState = {
   result: Hitter | null
   hint: RuleKey | null
   paused: boolean
-  boastSide: -1 | 1 | null // 보스트를 칠 수 있으면 공이 있는 쪽(화면 왼쪽 -1, 오른쪽 1)
   lastShot: { by: Hitter; name: string } | null // 방금 친 샷 이름
   status: Status // 듀스·게임볼
 }
@@ -78,6 +77,8 @@ export class Engine {
   private pointer: { x: number; y: number } | null = null
   private flashes: { text: string; t: number; color: string; scale: number }[] = []
   private audio: AudioContext | null = null
+  private master: DynamicsCompressorNode | null = null
+  private noise: AudioBuffer | null = null
   // 카메라는 공이 화면 밖으로 나가지 않을 만큼만 따라간다(좁은 폰 화면에서 특히 필요)
   private cam = { x: CAM.x, y: CAM.y }
   // 점수가 날 때 관련 규칙을 한 번씩 물어본다. 다음 랠리가 시작되면 사라진다
@@ -85,7 +86,7 @@ export class Engine {
   private asked = new Set<RuleKey>()
   private paused = false
   private rallySaw = { boast: false, backWall: false }
-  private boastSide: -1 | 1 | null = null
+  private warp = 1 // 쉬움 모드에서 칠 차례에 느려지는 시간 배율
   private lastStatus: Status = null
   public difficulty: Difficulty = 'normal'
   public sound = true
@@ -185,7 +186,7 @@ export class Engine {
     if (this.phase === 'ready' || this.phase === 'over' || this.paused) return
     const yourTurn = this.phase === 'serve-you' || (this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot))
     const s = this.project(this.ball.p)
-    const r = s ? Math.max(48, s.r * 3.2) : 0
+    const r = s ? this.hitRadius(s.r) : 0
     const near = s && Math.hypot(x - s.x, y - s.y) <= r
     if (!yourTurn || !s || !near) {
       this.swings.push({ x, y, t: 0, good: false })
@@ -195,39 +196,33 @@ export class Engine {
     const dy = clamp((y - s.y) / r, -1, 1)
     const serve = this.phase === 'serve-you'
     const q = serve ? 0.9 : timingQuality(this.ball.p, this.shot.backWall, this.shot.boast || this.shot.short)
-    // 누른 곳으로 샷 종류를 고른다: 벽 쪽 옆면은 크로스, 윗면은 드롭(높은 공은 킬), 아랫면은 로브
+    // 누른 곳 = 라켓이 공을 때린 곳: 안쪽은 보스트, 가운데는 드라이브, 벽 쪽은 크로스, 윗면은 드롭, 아랫면은 로브
     this.strike(kindFor(intentFrom(this.ball.p.x, dx, dy), this.ball.p, serve), serve, q)
     this.swings.push({ x, y, t: 0, good: true })
     navigator.vibrate?.(12)
     this.emit()
   }
 
-  /** 보스트 버튼(또는 B 키): 옆벽 가까이 뒤쪽에 온 공을 옆벽으로 쳐서 보스트 */
-  boast() {
-    if (this.paused || this.boastSide == null) return false
-    this.unlockAudio()
-    const q = timingQuality(this.ball.p, this.shot.backWall)
-    if (!this.strike('boast', false, q)) return false
-    this.rallySaw.boast = true
-    const s = this.project(this.ball.p)
-    if (s) this.swings.push({ x: s.x, y: s.y, t: 0, good: true })
-    navigator.vibrate?.(12)
-    this.emit()
-    return true
+  /** 공 둘레에서 칠 수 있는 범위(px). 쉬움 모드는 더 넓다 */
+  private hitRadius(ballR: number) {
+    return this.difficulty === 'easy' ? Math.max(84, ballR * 4) : Math.max(48, ballR * 3.2)
   }
 
-  /** 계획한 샷을 친다. 그 자리에서 안 되는 샷이면 드라이브(서브는 로브 서브)로 */
+  private yourBallNow() {
+    return this.phase === 'serve-you' || (this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot))
+  }
+
+  /** 계획한 샷을 친다. 그 자리에서 안 되는 샷(앞 코트의 보스트 등)이면 드라이브(서브는 로브 서브)로 */
   private strike(kind: ShotKind, serve: boolean, q: number) {
     const from = { ...this.ball.p }
     let hit = playerShot(kind, from, q)
-    if (!hit && kind === 'boast') return false
     if (!hit) hit = playerShot(serve ? 'serve-lob' : 'drive', from, q)
     const k = hit?.kind ?? 'drive'
     const v = hit?.v ?? aimAt(from, { x: from.x * 0.8, y: 2.2, z: 0 }, 13)
     this.ball.v = v
     this.shot = newShot('you', k, from, serve)
     this.hint = null
-    this.boastSide = null
+    if (k === 'boast') this.rallySaw.boast = true
     const sharp = sharpness(k, v, from, 'you', serve).score
     this.lastShot = { by: 'you', kind: k, sharp }
     this.flash(sharp > 0.7 && !serve ? `${SHOT_NAME[k]} · 예리해요!` : SHOT_NAME[k], sharp > 0.7 ? C.tealBright : '#ffffff', 0.75)
@@ -287,7 +282,7 @@ export class Engine {
       }
     }
 
-    const dt = (realDt * TIME_SCALE[this.difficulty]) / 4
+    const dt = (realDt * TIME_SCALE[this.difficulty] * this.warp) / 4
     for (let i = 0; i < 4; i++) this.physics(dt)
 
     // 상대는 공을 따라 움직이고, 내 차례에는 T 근처로 돌아간다
@@ -296,12 +291,9 @@ export class Engine {
     this.cpu.x += (clamp(targetX, -2.9, 2.9) - this.cpu.x) * Math.min(1, realDt * 5)
     this.cpu.z += (targetZ - this.cpu.z) * Math.min(1, realDt * 3)
 
-    const yourBall = this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot) && !this.shot.boast
-    const side = yourBall && canBoast(this.ball.p) ? (Math.sign(this.ball.p.x - this.cam.x) >= 0 ? 1 : -1) : null
-    if (side !== this.boastSide) {
-      this.boastSide = side
-      this.emit()
-    }
+    // 쉬움 모드: 내가 칠 수 있는 동안 시간을 느리게 해서 칠 곳을 고를 여유를 준다
+    const slow = this.difficulty === 'easy' && this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot)
+    this.warp += ((slow ? 0.32 : 1) - this.warp) * Math.min(1, realDt * 8)
 
     const t = this.camTarget()
     const k = Math.min(1, realDt * 7)
@@ -314,7 +306,9 @@ export class Engine {
     // 공이 화면 폭의 38% 안, 점수판 아래~화면 아래 여백 위에 들어오게.
     // 뒷벽 근처(카메라 바로 앞)까지 온 공도 놓치지 않도록 실제 거리로 계산한다
     const dz = Math.max(1.3, CAM.z - Math.max(b.z, 6))
-    const maxOff = (this.w * 0.38 * dz) / this.f
+    // 쉬움 모드에서 칠 차례면 공 둘레의 칸 표시가 화면 밖으로 나가지 않게 여백을 더 둔다
+    const margin = this.difficulty === 'easy' && this.yourBallNow() ? this.hitRadius((this.f * BALL_R) / dz) + 10 : this.w * 0.12
+    const maxOff = (Math.max(20, this.w / 2 - margin) * dz) / this.f
     const x = clamp(Math.sign(b.x) * Math.max(0, Math.abs(b.x) - maxOff), -2.6, 2.6)
     const above = ((this.horizon - HUD_TOP) * dz) / this.f
     const below = ((this.h - 56 - this.horizon) * dz) / this.f
@@ -336,7 +330,7 @@ export class Engine {
     if (this.trail.length > 14) this.trail.shift()
 
     for (const e of events) {
-      if (e.hit !== 'floor') this.sfx('wall', 0.5)
+      this.sfx(e.hit === 'floor' ? 'floor' : 'wall', clamp(Math.hypot(this.ball.v.x, this.ball.v.y, this.ball.v.z) / 15, 0, 1))
       // 상대 공이 뒷벽을 맞고 나오면 아직 칠 수 있다고 알려 준다
       if (e.hit === 'back' && this.shot.by === 'cpu' && this.shot.frontOk && !this.shot.backWall && this.shot.floorAfterFront <= 1 && e.at.y <= COURT.backOut) {
         this.rallySaw.backWall = true
@@ -419,7 +413,7 @@ export class Engine {
     if (st && st !== this.lastStatus) {
       const msg = { deuce: ['듀스! 2점 앞서야 이겨요', '#f2c230'], 'game-ball-you': ['게임볼! 1점이면 이겨요', C.tealBright], 'game-ball-cpu': ['상대 게임볼! 지키세요', '#ff8a7a'] }[st]
       this.flash(msg[0], msg[1], 0.8, 0.75)
-      this.sfx('win', 0.5)
+      this.sfx('alert', 1)
     }
     this.lastStatus = st
     if (winner(this.score)) {
@@ -446,7 +440,6 @@ export class Engine {
       result: winner(this.score),
       hint: this.hint,
       paused: this.paused,
-      boastSide: this.boastSide,
       lastShot: this.lastShot ? { by: this.lastShot.by, name: SHOT_NAME[this.lastShot.kind] } : null,
       status: status(this.score),
     })
@@ -586,15 +579,17 @@ export class Engine {
     })
     const s = this.project(b)
     if (!s) return
-    const reach = (this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot)) || this.phase === 'serve-you'
-    if (reach) {
-      // 칠 수 있을 때 공 둘레에 틸 링
-      const pulse = 1 + Math.sin(performance.now() / 90) * 0.08
-      c.strokeStyle = C.tealBright
-      c.lineWidth = 3
-      c.beginPath()
-      c.arc(s.x, s.y, Math.max(48, s.r * 3.2) * 0.55 * pulse, 0, Math.PI * 2)
-      c.stroke()
+    if (this.yourBallNow()) {
+      if (this.difficulty === 'easy') this.drawZones(s.x, s.y, this.hitRadius(s.r), s.r)
+      else {
+        // 칠 수 있을 때 공 둘레에 틸 링
+        const pulse = 1 + Math.sin(performance.now() / 90) * 0.08
+        c.strokeStyle = C.tealBright
+        c.lineWidth = 3
+        c.beginPath()
+        c.arc(s.x, s.y, this.hitRadius(s.r) * 0.55 * pulse, 0, Math.PI * 2)
+        c.stroke()
+      }
     }
     c.fillStyle = C.ink
     c.beginPath()
@@ -607,6 +602,88 @@ export class Engine {
     c.arc(s.x - s.r * 0.35, s.y - s.r * 0.3, d, 0, Math.PI * 2)
     c.arc(s.x + s.r * 0.05, s.y - s.r * 0.45, d, 0, Math.PI * 2)
     c.fill()
+  }
+
+  /**
+   * 쉬움 모드: 공 둘레를 칠 곳별로 나눠 무슨 샷이 나가는지 보여 준다.
+   * 공이 오른쪽에 있으면 왼쪽 칸이 보스트, 가운데가 드라이브, 오른쪽 칸이 크로스(왼쪽이면 반대).
+   */
+  private drawZones(cx: number, cy: number, R: number, ballR: number) {
+    const c = this.ctx
+    const s = Math.sign(this.ball.p.x) || 1
+    const serve = this.phase === 'serve-you'
+    const cw = ZONE.col * R
+    const rh = ZONE.row * R
+    c.save()
+    c.beginPath()
+    c.arc(cx, cy, R, 0, Math.PI * 2)
+    c.fillStyle = 'rgb(20 22 24 / 0.42)'
+    c.fill()
+    c.clip()
+    // 마우스가 올라간 칸을 칠해 둔다
+    if (this.pointer && Math.hypot(this.pointer.x - cx, this.pointer.y - cy) <= R) {
+      const dx = (this.pointer.x - cx) / R
+      const dy = (this.pointer.y - cy) / R
+      const col = Math.abs(dx) <= ZONE.col ? 0 : Math.sign(dx)
+      const row = dy < -ZONE.row ? -1 : dy > ZONE.row ? 1 : 0
+      const inner = !serve && col !== 0 && col !== s
+      c.fillStyle = 'rgb(25 163 174 / 0.35)'
+      const x0 = col === 0 ? cx - cw : col < 0 ? cx - R : cx + cw
+      const x1 = col === 0 ? cx + cw : col < 0 ? cx - cw : cx + R
+      const y0 = inner || serve ? cy - R : row === 0 ? cy - rh : row < 0 ? cy - R : cy + rh
+      const y1 = inner || serve ? cy + R : row === 0 ? cy + rh : row < 0 ? cy - rh : cy + R
+      if (serve) c.fillRect(cx - R, row < 0 ? cy - R : cy - rh, 2 * R, row < 0 ? R - rh : R + rh)
+      else c.fillRect(x0, y0, x1 - x0, y1 - y0)
+    }
+    c.strokeStyle = 'rgb(255 255 255 / 0.5)'
+    c.lineWidth = 1.2
+    c.beginPath()
+    if (!serve) {
+      for (const x of [cx - cw, cx + cw]) {
+        c.moveTo(x, cy - R)
+        c.lineTo(x, cy + R)
+      }
+    }
+    // 가로줄: 서브는 위(하드 서브)/나머지(로브 서브), 랠리는 안쪽 칸(보스트)을 빼고
+    const innerX = s > 0 ? cx - cw : cx + cw
+    for (const y of serve ? [cy - rh] : [cy - rh, cy + rh]) {
+      c.moveTo(serve ? cx - R : s > 0 ? innerX : cx - R, y)
+      c.lineTo(serve ? cx + R : s > 0 ? cx + R : innerX, y)
+    }
+    c.stroke()
+    c.restore()
+    c.beginPath()
+    c.arc(cx, cy, R, 0, Math.PI * 2)
+    c.strokeStyle = C.tealBright
+    c.lineWidth = 2.5
+    c.stroke()
+
+    const size = clamp(R / 6, 12, 15)
+    const label = (text: string, x: number, y: number, strong = false) => {
+      c.font = `${strong ? 800 : 700} ${size}px 'Pretendard Variable', sans-serif`
+      c.textAlign = 'center'
+      text.split('\n').forEach((line, i, all) => {
+        const ly = y + (i - (all.length - 1) / 2) * size * 1.1 + size * 0.35
+        c.fillStyle = strong ? '#ffffff' : 'rgb(255 255 255 / 0.92)'
+        c.fillText(line, x, ly)
+      })
+    }
+    if (serve) {
+      label('하드 서브', cx, cy - (R + rh) / 2)
+      label('로브 서브', cx, cy + R * 0.45, true)
+      return
+    }
+    const mid = (R + cw) / 2
+    const outerX = cx + s * mid
+    const innerLX = cx - s * mid
+    const rowY = [cy - (R + rh) / 2 + size * 0.2, cy, cy + (R + rh) / 2 - size * 0.2]
+    label('드롭', cx, rowY[0])
+    label('드라이브', cx, cy - Math.max(size * 1.1, ballR + size * 0.7), true)
+    label('로브', cx, rowY[2])
+    label('크로스\n드롭', outerX, rowY[0])
+    label('크로스', outerX, rowY[1], true)
+    label('크로스\n로브', outerX, rowY[2])
+    label('보스트', innerLX, cy, true)
   }
 
   // 헤로우 Response 115 모양 라켓: 실버 프레임, 틸 포인트, 흰 그립
@@ -681,31 +758,83 @@ export class Engine {
 
   // ---------- 소리 ----------
 
-  private unlockAudio() {
-    if (!this.sound || this.audio) return
+  /**
+   * 소리를 켠다. 브라우저는 사용자가 누른 순간에만 소리를 허락하므로 시작 버튼과 첫 터치에서 부른다.
+   * 아이폰은 무음 스위치가 켜져 있으면 Web Audio가 꺼지는데, 오디오 세션을 '재생'으로 두면 들린다.
+   */
+  unlockAudio() {
+    if (!this.sound) return
     try {
-      this.audio = new AudioContext()
+      const nav = navigator as Navigator & { audioSession?: { type: string } }
+      if (nav.audioSession) nav.audioSession.type = 'playback'
+      if (!this.audio) {
+        this.audio = new AudioContext()
+        this.master = this.audio.createDynamicsCompressor()
+        this.master.connect(this.audio.destination)
+        // 짧은 잡음(공 맞는 소리 재료)을 한 번만 만들어 둔다
+        const len = Math.floor(this.audio.sampleRate * 0.12)
+        this.noise = this.audio.createBuffer(1, len, this.audio.sampleRate)
+        const d = this.noise.getChannelData(0)
+        for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2)
+      }
+      if (this.audio.state === 'suspended') void this.audio.resume()
     } catch {
       this.audio = null
     }
   }
 
-  private sfx(kind: 'hit' | 'wall' | 'win' | 'lose', strength: number) {
+  private sfx(kind: 'hit' | 'wall' | 'floor' | 'win' | 'lose' | 'alert', strength: number) {
     const a = this.audio
-    if (!this.sound || !a) return
+    if (!this.sound || !a || !this.master || a.state !== 'running') return
     const t = a.currentTime
-    const o = a.createOscillator()
-    const g = a.createGain()
-    o.connect(g).connect(a.destination)
-    const freq = { hit: 520 + strength * 260, wall: 180, win: 880, lose: 220 }[kind]
-    const len = { hit: 0.06, wall: 0.04, win: 0.22, lose: 0.28 }[kind]
-    o.type = kind === 'hit' ? 'triangle' : kind === 'wall' ? 'square' : 'sine'
-    o.frequency.setValueAtTime(freq, t)
-    if (kind === 'win') o.frequency.exponentialRampToValueAtTime(1320, t + len)
-    if (kind === 'lose') o.frequency.exponentialRampToValueAtTime(140, t + len)
-    g.gain.setValueAtTime(kind === 'wall' ? 0.05 : 0.18, t)
-    g.gain.exponentialRampToValueAtTime(0.001, t + len)
-    o.start(t)
-    o.stop(t + len + 0.02)
+    const out = this.master
+    // 잡음을 걸러 "탁" 하는 타구음·벽 소리를 만든다
+    const burst = (freq: number, q: number, gain: number, len: number) => {
+      if (!this.noise) return
+      const src = a.createBufferSource()
+      src.buffer = this.noise
+      const f = a.createBiquadFilter()
+      f.type = 'bandpass'
+      f.frequency.value = freq
+      f.Q.value = q
+      const g = a.createGain()
+      g.gain.setValueAtTime(gain, t)
+      g.gain.exponentialRampToValueAtTime(0.001, t + len)
+      src.connect(f).connect(g).connect(out)
+      src.start(t)
+      src.stop(t + len + 0.02)
+    }
+    const tone = (from: number, to: number, type: OscillatorType, gain: number, len: number, at = 0) => {
+      const o = a.createOscillator()
+      const g = a.createGain()
+      o.type = type
+      o.frequency.setValueAtTime(from, t + at)
+      o.frequency.exponentialRampToValueAtTime(to, t + at + len)
+      g.gain.setValueAtTime(0.0001, t + at)
+      g.gain.exponentialRampToValueAtTime(gain, t + at + 0.01)
+      g.gain.exponentialRampToValueAtTime(0.001, t + at + len)
+      o.connect(g).connect(out)
+      o.start(t + at)
+      o.stop(t + at + len + 0.02)
+    }
+    if (kind === 'hit') {
+      // 라켓 줄에 맞는 날카로운 소리 + 짧은 울림
+      burst(1800 + strength * 900, 1.2, 0.9, 0.07)
+      tone(260, 140, 'triangle', 0.35, 0.06)
+    } else if (kind === 'wall') {
+      // 앞벽·옆벽에 맞는 둔탁한 소리
+      burst(650, 0.9, 0.55 * strength + 0.25, 0.09)
+      tone(120, 70, 'sine', 0.35, 0.08)
+    } else if (kind === 'floor') {
+      burst(420, 1.1, 0.25, 0.05)
+    } else if (kind === 'win') {
+      tone(660, 660, 'sine', 0.25, 0.12)
+      tone(990, 990, 'sine', 0.25, 0.22, 0.1)
+    } else if (kind === 'lose') {
+      tone(330, 220, 'sine', 0.25, 0.32)
+    } else {
+      tone(880, 880, 'square', 0.12, 0.08)
+      tone(1175, 1175, 'square', 0.12, 0.14, 0.11)
+    }
   }
 }

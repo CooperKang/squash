@@ -48,14 +48,6 @@ export default function Game() {
     if (engineRef.current) engineRef.current.askRules = askRules
   }, [askRules])
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'b' || e.key === 'B') engineRef.current?.boast()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
-
   const openHint = (k: RuleKey) => {
     setReading(k)
     engineRef.current?.pause()
@@ -116,20 +108,6 @@ export default function Game() {
           <p className="pointer-events-none absolute inset-x-0 bottom-5 text-center text-[14px] font-semibold text-white/85">
             내 서브예요. 떠오른 공을 눌러 치세요
           </p>
-        )}
-
-        {hud?.boastSide != null && (
-          <button
-            type="button"
-            onPointerDown={(e) => {
-              e.preventDefault()
-              engineRef.current?.boast()
-            }}
-            className={`absolute bottom-6 grid size-[76px] place-items-center rounded-full border-2 border-white/80 bg-teal text-[15px] font-extrabold text-white shadow-xl active:scale-95 ${hud.boastSide > 0 ? 'right-4' : 'left-4'}`}
-          >
-            보스트
-            <span className="sr-only">: 옆벽으로 쳐서 앞 구석에 떨어뜨리기</span>
-          </button>
         )}
 
         {lastHint && (
@@ -200,7 +178,7 @@ export default function Game() {
                   <p className="mt-3 text-[14px] leading-relaxed text-muted">공 둘레에 청록 링이 보이면 공을 눌러 치세요. 누르는 곳이 샷을 정해요.</p>
                   <ShotPad />
                   <ul className="mt-3 space-y-1 text-[13.5px] leading-relaxed text-muted">
-                    <li>· 옆벽 가까이 뒤쪽으로 공이 오면 보스트 버튼이 나와요(PC는 B 키).</li>
+                    <li>· 쉬움 모드는 칠 차례에 느려지고, 공 둘레에 칸마다 무슨 샷이 나가는지 보여 줘요.</li>
                     <li>· 뒤쪽 허리 높이에서 제때 칠수록 샷이 예리하게 들어가요. 11점 먼저 내면 이겨요.</li>
                   </ul>
                 </>
@@ -231,7 +209,11 @@ export default function Game() {
               </label>
               <button
                 type="button"
-                onClick={() => engineRef.current?.newMatch()}
+                onClick={() => {
+                  // 누른 순간에 소리를 켠다(브라우저 정책)
+                  engineRef.current?.unlockAudio()
+                  engineRef.current?.newMatch()
+                }}
                 className="mt-5 w-full rounded-2xl bg-teal py-3.5 text-[16px] font-bold text-white transition hover:bg-teal-deep active:scale-[0.99]"
               >
                 {hud?.result ? '다시 하기' : '시작하기'}
@@ -256,25 +238,31 @@ function ScoreChip({ label, value, serving, accent }: { label: string; value: nu
   )
 }
 
-/** 공의 어디를 누르면 어떤 샷이 나가는지(오른쪽 벽 가까운 공 기준) */
+/** 라켓으로 공의 어디를 때리면 어떤 샷이 나가는지(오른쪽 벽 가까운 공 기준) */
 function ShotPad() {
-  const cells = [
-    ['드롭', '드롭', '크로스 드롭'],
-    ['드라이브', '드라이브', '크로스'],
-    ['로브', '로브', '크로스 로브'],
-  ]
   return (
     <div className="mt-3 flex items-center gap-3">
-      <div className="relative grid size-[150px] shrink-0 grid-cols-3 grid-rows-3 overflow-hidden rounded-[26px] border-2 border-teal-bright bg-court text-[11px] leading-tight font-bold text-ink">
-        {cells.flat().map((c, i) => (
-          <span key={i} className={`grid place-items-center text-center ${i % 3 === 2 ? 'text-teal-deep' : ''}`}>
-            {i === 4 ? '' : c}
-          </span>
-        ))}
+      <div className="relative grid size-[156px] shrink-0 grid-cols-3 grid-rows-3 overflow-hidden rounded-[30px] border-2 border-teal-bright bg-court text-[11px] leading-tight font-bold text-ink">
+        <span className="row-span-3 grid place-items-center border-r border-teal-bright/50 bg-teal-soft text-teal-deep">보스트</span>
+        <span className="grid place-items-end justify-center pb-1">드롭</span>
+        <span className="grid place-items-end justify-center border-l border-teal-bright/50 pb-1 text-center">
+          크로스
+          <br />
+          드롭
+        </span>
+        <span className="grid place-items-start justify-center pt-1">드라이브</span>
+        <span className="grid place-items-center border-l border-teal-bright/50">크로스</span>
+        <span className="grid place-items-start justify-center pt-1">로브</span>
+        <span className="grid place-items-start justify-center border-l border-teal-bright/50 pt-1 text-center">
+          크로스
+          <br />
+          로브
+        </span>
         <span className="absolute top-1/2 left-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink" aria-hidden="true" />
       </div>
       <p className="text-[13px] leading-relaxed text-muted">
-        공이 <b className="text-ink">오른쪽 벽</b> 가까이 있을 때예요. 가운데는 벽을 따라 가는 스트레이트, 벽 쪽 옆면은 크로스, 윗면은 드롭(높은 공은 킬), 아랫면은 로브. 왼쪽 벽이면 좌우가 바뀌어요.
+        누른 곳이 <b className="text-ink">라켓이 공을 때리는 곳</b>이에요. 공이 오른쪽 벽 가까이 있으면 왼쪽을 때리면 오른쪽 벽으로 가는 보스트, 가운데는 벽을 따라 가는 드라이브, 오른쪽을 때리면 크로스.
+        윗부분은 낮게(드롭), 아랫부분은 높게(로브). 왼쪽 벽이면 좌우가 바뀌어요.
       </p>
     </div>
   )

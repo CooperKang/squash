@@ -228,28 +228,31 @@ export function sharpness(kind: ShotKind, v: Vec, from: Vec, by: Hitter, serve =
 
 // ---------- 내 샷 ----------
 
-export type Intent = { cross: boolean; height: 'low' | 'mid' | 'high' }
+// 누른 곳 = 라켓이 공을 때리는 곳. 공이 오른쪽 벽 가까이 있으면
+// 공의 왼쪽(안쪽)을 때리면 오른쪽 옆벽으로 가는 보스트, 가운데는 벽을 따라 가는 드라이브, 오른쪽(벽 쪽)을 때리면 크로스.
+// 공의 윗부분을 때리면 낮게(드롭, 높은 공은 킬), 아랫부분을 때리면 높게(로브).
+export type Intent = { col: 'inner' | 'center' | 'outer'; height: 'low' | 'mid' | 'high' }
 
-/**
- * 공의 어디를 눌렀는지로 샷을 고른다.
- * dx, dy: 공 중심 기준 -1~1(화면 오른쪽, 아래가 +). 공의 벽 쪽 옆면을 치면 크로스, 윗면은 드롭(공이 높으면 킬), 아랫면은 로브.
- */
+export const ZONE = { col: 0.33, row: 0.35 } // 공 둘레 원의 반지름에 대한 비율
+
+/** dx, dy: 공 중심 기준 -1~1(화면 오른쪽, 아래가 +) */
 export function intentFrom(ballX: number, dx: number, dy: number): Intent {
   const s = Math.sign(ballX) || 1
-  // 공의 왼쪽을 치면 공은 오른쪽(+x)으로 간다. 가는 방향이 내 쪽 벽이 아니면 크로스
-  const cross = Math.abs(dx) > 0.25 && -Math.sign(dx) !== s
-  const height = dy < -0.35 ? 'low' : dy > 0.35 ? 'high' : 'mid'
-  return { cross, height }
+  const col = Math.abs(dx) <= ZONE.col ? 'center' : Math.sign(dx) === s ? 'outer' : 'inner'
+  const height = dy < -ZONE.row ? 'low' : dy > ZONE.row ? 'high' : 'mid'
+  return { col, height }
 }
 
 export function kindFor(intent: Intent, ball: Vec, serve: boolean): ShotKind {
   if (serve) return intent.height === 'low' ? 'serve-hard' : 'serve-lob'
-  if (intent.height === 'high') return intent.cross ? 'cross-lob' : 'lob'
+  if (intent.col === 'inner') return 'boast'
+  const cross = intent.col === 'outer'
+  if (intent.height === 'high') return cross ? 'cross-lob' : 'lob'
   if (intent.height === 'low') {
     if (ball.y > 1.15 && ball.z < 7) return 'kill'
-    return intent.cross ? 'cross-drop' : 'drop'
+    return cross ? 'cross-drop' : 'drop'
   }
-  return intent.cross ? 'cross' : 'drive'
+  return cross ? 'cross' : 'drive'
 }
 
 /** 내가 친 샷: 타이밍이 좋을수록 계획한 대로, 나쁠수록 흔들린다 */
