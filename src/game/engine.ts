@@ -71,7 +71,7 @@ export class Engine {
   private trail: Vec[] = []
   private swings: { x: number; y: number; t: number; good: boolean }[] = []
   private pointer: { x: number; y: number } | null = null
-  private flashes: { text: string; t: number; color: string }[] = []
+  private flashes: { text: string; t: number; color: string; scale: number }[] = []
   private audio: AudioContext | null = null
   // 카메라는 공이 화면 밖으로 나가지 않을 만큼만 따라간다(좁은 폰 화면에서 특히 필요)
   private cam = { x: CAM.x, y: CAM.y }
@@ -139,7 +139,7 @@ export class Engine {
   debugTarget() {
     const reach = this.phase === 'serve-you' || (this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot))
     const s = this.project(this.ball.p)
-    return reach && s ? { x: s.x, y: s.y, z: this.ball.p.z, y3: this.ball.p.y } : null
+    return reach && s ? { x: s.x, y: s.y, z: this.ball.p.z, y3: this.ball.p.y, back: this.shot.backWall } : null
   }
 
   // ---------- 입력 ----------
@@ -166,7 +166,7 @@ export class Engine {
     const dx = clamp((x - s.x) / r, -1, 1)
     const dy = clamp((y - s.y) / r, -1, 1)
     const serve = this.phase === 'serve-you'
-    const q = serve ? 0.9 : timingQuality(this.ball.p)
+    const q = serve ? 0.9 : timingQuality(this.ball.p, this.shot.backWall)
     const { v } = yourShot(this.ball.p, dx, dy, q)
     this.ball.v = v
     this.shot = new Shot('you', serve)
@@ -240,12 +240,14 @@ export class Engine {
 
   private camTarget() {
     const b = this.ball.p
-    // 칠 수 있는 깊이(z≈8)에서 공이 화면 폭의 38% 안에 들어오게
-    const dz = Math.max(2.2, CAM.z - Math.max(b.z, 6))
+    // 공이 화면 폭의 38% 안, 점수판 아래~화면 아래 여백 위에 들어오게.
+    // 뒷벽 근처(카메라 바로 앞)까지 온 공도 놓치지 않도록 실제 거리로 계산한다
+    const dz = Math.max(1.3, CAM.z - Math.max(b.z, 6))
     const maxOff = (this.w * 0.38 * dz) / this.f
     const x = clamp(Math.sign(b.x) * Math.max(0, Math.abs(b.x) - maxOff), -2.6, 2.6)
     const above = ((this.horizon - HUD_TOP) * dz) / this.f
-    const y = clamp(b.y - above, CAM.y, 2.6)
+    const below = ((this.h - 56 - this.horizon) * dz) / this.f
+    const y = clamp(clamp(CAM.y, b.y - above, b.y + below), 0.5, 2.6)
     return { x, y }
   }
 
@@ -264,6 +266,9 @@ export class Engine {
 
     for (const e of events) {
       if (e.hit !== 'floor') this.sfx('wall', 0.5)
+      // 상대 공이 뒷벽을 맞고 나오면 아직 칠 수 있다고 알려 준다
+      if (e.hit === 'back' && this.shot.by === 'cpu' && this.shot.frontOk && !this.shot.backWall && this.shot.floorAfterFront <= 1 && e.at.y <= COURT.backOut)
+        this.flash('뒷벽! 나오는 공을 치세요', C.tealBright, 0.9)
       if (e.hit === 'front' && !this.shot.frontOk) this.lastShotInfo.frontY = e.at.y
       const r = this.shot.apply(e)
       if (!r) continue
@@ -272,7 +277,7 @@ export class Engine {
       if (r === 'double') {
         this.endRally(by, by === 'you' ? '위너!' : '놓쳤어요')
       } else {
-        const label = { down: '바닥에 먼저 닿았어요', tin: '틴!', out: '아웃!', 'serve-fault': '서브 폴트' }[r]
+        const label = { down: '바닥에 먼저 닿았어요', tin: '틴!', out: e.hit === 'front' ? '아웃!' : '아웃! (벽 아웃 라인 위)', 'serve-fault': '서브 폴트' }[r]
         this.endRally(other, label)
       }
       return
@@ -321,8 +326,8 @@ export class Engine {
     this.emit()
   }
 
-  private flash(text: string, color: string) {
-    this.flashes.push({ text, t: 0, color })
+  private flash(text: string, color: string, scale = 1) {
+    this.flashes.push({ text, t: 0, color, scale })
   }
 
   private emit() {
@@ -555,7 +560,7 @@ export class Engine {
     for (const f of this.flashes) {
       const k = f.t / 1.1
       c.globalAlpha = 1 - k
-      c.font = `800 ${clamp(this.w / 14, 22, 40)}px 'Pretendard Variable', sans-serif`
+      c.font = `800 ${clamp(this.w / 14, 22, 40) * f.scale}px 'Pretendard Variable', sans-serif`
       c.textAlign = 'center'
       c.fillStyle = f.color
       c.fillText(f.text, this.w / 2, this.h * 0.42 - k * 40)

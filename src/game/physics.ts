@@ -73,6 +73,7 @@ export type ShotFault = 'down' | 'tin' | 'out' | 'serve-fault'
 export class Shot {
   frontOk = false
   floorAfterFront = 0
+  backWall = false // 앞벽을 맞고 온 공이 뒷벽에도 맞았는지
   by: Hitter
   serve: boolean
   constructor(by: Hitter, serve = false) {
@@ -82,6 +83,8 @@ export class Shot {
 
   /** 반칙이면 사유를, 두 번 튀었으면 'double'을, 아니면 null */
   apply(e: BallEvent): ShotFault | 'double' | null {
+    // 옆벽·뒷벽의 아웃 라인 위에 맞으면 언제든 친 사람의 아웃
+    if ((e.hit === 'side' || e.hit === 'back') && e.at.y > outLineAt(e.at.z)) return 'out'
     if (!this.frontOk) {
       if (e.hit === 'floor') return 'down'
       if (e.hit === 'front') {
@@ -92,6 +95,7 @@ export class Shot {
       }
       return null
     }
+    if (e.hit === 'back') this.backWall = true
     if (e.hit === 'floor') {
       this.floorAfterFront++
       if (this.floorAfterFront >= 2) return 'double'
@@ -100,9 +104,30 @@ export class Shot {
   }
 }
 
-// 받는 쪽(카메라 쪽, 뒤 코트)이 칠 수 있는 범위
+/** 옆벽 아웃 라인 높이: 앞 4.57m에서 뒤 2.13m로 비스듬히 내려온다(뒷벽은 2.13m) */
+export function outLineAt(z: number) {
+  const k = clamp(z / COURT.length, 0, 1)
+  return COURT.frontOut + (COURT.backOut - COURT.frontOut) * k
+}
+
+/** 샷 하나를 끝까지 굴려 어떻게 끝나는지 */
+export function outcome(ball: Ball, shot: Shot, maxT = 5, dt = 1 / 120) {
+  const b: Ball = { p: { ...ball.p }, v: { ...ball.v } }
+  const s = Object.assign(new Shot(shot.by, shot.serve), shot)
+  for (let t = 0; t < maxT; t += dt) {
+    for (const e of step(b, dt)) {
+      const r = s.apply(e)
+      if (r) return r
+    }
+  }
+  return null
+}
+
+// 받는 쪽(카메라 쪽, 뒤 코트)이 칠 수 있는 범위.
+// 뒷벽을 맞고 앞으로 튀어나오는 공도 두 번 튀기 전이면 칠 수 있고, 그때는 공을 따라 조금 더 앞까지 나간다
 export function inYourReach(b: Ball, shot: Shot) {
-  return shot.frontOk && shot.floorAfterFront <= 1 && b.p.z >= 5.3 && b.p.y <= 2.4 && b.v.z > -1
+  if (!shot.frontOk || shot.floorAfterFront > 1 || b.p.y > 2.4) return false
+  return b.p.z >= (shot.backWall ? 3.8 : 5.3)
 }
 
 export type Window = { start: number; length: number; at: Vec }
@@ -142,6 +167,8 @@ export function cpuShot(from: Vec, diff: Difficulty, serve: boolean, rand = Math
     const shot = new Shot('cpu', serve)
     const w = findReachWindow({ p: { ...from }, v: { ...v } }, shot, inYourReach)
     if (!w || w.length < CPU_MIN_WINDOW[diff]) continue
+    // 내가 안 쳐도 아웃이 되는 공은 고르지 않는다
+    if (outcome({ p: { ...from }, v: { ...v } }, new Shot('cpu', serve)) !== 'double') continue
     const tight = Math.abs(w.at.x) / COURT.halfWidth
     const score =
       diff === 'easy'
@@ -169,9 +196,9 @@ export function yourShot(from: Vec, dx: number, dy: number, quality: number, ran
   return { v: aimVelocity(from, tx, ty, speed), target: { x: tx, y: ty } }
 }
 
-/** 타이밍 품질: 공이 허리 높이, 뒤 코트 깊숙이 왔을 때 칠수록 좋다 */
-export function timingQuality(p: Vec) {
-  const depth = 1 - Math.min(1, Math.abs(p.z - 8) / 2.4)
+/** 타이밍 품질: 공이 허리 높이, 뒤 코트 깊숙이 왔을 때 칠수록 좋다(뒷벽에서 나온 공은 조금 앞에서 쳐도 된다) */
+export function timingQuality(p: Vec, offBackWall = false) {
+  const depth = 1 - Math.min(1, Math.abs(p.z - (offBackWall ? 7.4 : 8)) / (offBackWall ? 3 : 2.4))
   const height = 1 - Math.min(1, Math.abs(p.y - 0.9) / 1.4)
   return clamp(0.25 + depth * 0.45 + height * 0.3, 0, 1)
 }
