@@ -9,7 +9,9 @@ import {
   loadData,
   loadLiveResults,
   mergeMatches,
+  findVideo,
   roundLabel,
+  youtubeSearch,
   tierLabel,
   type Calendar,
   type Korea,
@@ -17,6 +19,8 @@ import {
   type PsaEvent,
   type Rankings,
   type Results,
+  type Video,
+  type Videos,
 } from '../data/live'
 
 type Tab = 'world' | 'korea' | 'results' | 'rankings'
@@ -57,6 +61,8 @@ export default function Live() {
   const calendar = useData<Calendar>('calendar.json')
   const korea = useData<Korea>('korea.json')
   const results = useData<Results>('results.json')
+  const videos = useData<Videos>('videos.json')
+  const [playing, setPlaying] = useState<Video | null>(null)
   const rankings = useData<Rankings>('rankings.json')
 
   // 결과는 접속할 때 PSA에서 한 번 더 받아 최신 경기까지 합친다
@@ -108,10 +114,13 @@ export default function Live() {
         <div className="mt-4" role="tabpanel">
           {tab === 'world' && <WorldEvents s={calendar} />}
           {tab === 'korea' && <KoreaEvents s={korea} />}
-          {tab === 'results' && <ResultsView matches={matches} loading={!results.data && !results.error && !fresh} />}
+          {tab === 'results' && (
+            <ResultsView matches={matches} videos={videos.data?.videos ?? []} onPlay={setPlaying} loading={!results.data && !results.error && !fresh} />
+          )}
           {tab === 'rankings' && <RankingsView s={rankings} korea={korea.data} />}
         </div>
       </div>
+      {playing && <Player video={playing} onClose={() => setPlaying(null)} />}
     </>
   )
 }
@@ -307,6 +316,7 @@ function KoreaEvents({ s }: { s: State<Korea> }) {
                       결과 PDF <External className="size-3" />
                     </a>
                   )}
+                  {st.state !== 'upcoming' && <YoutubeSearch q={`${e.title} 스쿼시`} />}
                 </div>
               </div>
             </li>
@@ -327,6 +337,9 @@ function KoreaEvents({ s }: { s: State<Korea> }) {
                     <span className="min-w-0 flex-1 truncate text-[15px] font-semibold">{e.title}</span>
                     <External className="size-4 shrink-0 text-muted" />
                   </a>
+                  <div className="-mt-1.5 px-4 pb-3">
+                    <YoutubeSearch q={`${e.title} 스쿼시`} />
+                  </div>
                 </li>
               ))}
           </ul>
@@ -336,15 +349,37 @@ function KoreaEvents({ s }: { s: State<Korea> }) {
   )
 }
 
-function ResultsView({ matches, loading }: { matches: Match[]; loading: boolean }) {
+function ResultsView({ matches, videos, onPlay, loading }: { matches: Match[]; videos: Video[]; onPlay: (v: Video) => void; loading: boolean }) {
   const [korOnly, setKorOnly] = useState(false)
   if (loading) return <Skeleton rows={6} />
+  const highlights = videos.filter((v) => /highlight/i.test(v.title)).slice(0, 10)
   if (matches.length === 0) return <Failed />
   const list = korOnly ? matches.filter((m) => m.players.some((p) => p.country === 'KOR')) : matches
   const byTournament = new Map<string, Match[]>()
   for (const m of list) byTournament.set(m.tournament, [...(byTournament.get(m.tournament) ?? []), m])
   return (
     <>
+      {highlights.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-end justify-between">
+            <h3 className="text-[18px] font-extrabold">최신 하이라이트</h3>
+            <a href="https://www.youtube.com/user/psasquashtv" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[13px] font-semibold text-muted hover:text-ink">
+              PSA SQUASHTV 채널 <External className="size-3.5" />
+            </a>
+          </div>
+          <ul className="-mx-4 mt-3 flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none]">
+            {highlights.map((v) => (
+              <li key={v.id} className="w-[72%] shrink-0 snap-start sm:w-[300px]">
+                <button type="button" onClick={() => onPlay(v)} className="group block w-full text-left">
+                  <Thumb id={v.id} />
+                  <p className="mt-2 line-clamp-2 text-[14px] leading-snug font-semibold">{v.title}</p>
+                  <p className="mt-0.5 text-[12px] text-muted">{new Date(v.published).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}</p>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <div className="flex items-center">
         <p className="text-[13px] text-muted">PSA 투어 경기 결과, 최근 경기부터</p>
         <label className="ml-auto flex items-center gap-1.5 text-[13.5px] text-muted">
@@ -358,7 +393,7 @@ function ResultsView({ matches, loading }: { matches: Match[]; loading: boolean 
           <h3 className="text-[17px] font-extrabold">{name}</h3>
           <ul className="mt-2 grid gap-2 md:grid-cols-2">
             {ms.slice(0, 8).map((m) => (
-              <MatchCard key={m.id} m={m} />
+              <MatchCard key={m.id} m={m} video={findVideo(m, videos)} onPlay={onPlay} />
             ))}
           </ul>
           {ms.length > 8 && <p className="mt-2 text-[13px] text-muted">외 {ms.length - 8}경기</p>}
@@ -368,9 +403,11 @@ function ResultsView({ matches, loading }: { matches: Match[]; loading: boolean 
   )
 }
 
-function MatchCard({ m }: { m: Match }) {
+function MatchCard({ m, video, onPlay }: { m: Match; video: Video | null; onPlay: (v: Video) => void }) {
   const win = m.players[0].games >= m.players[1]?.games ? 0 : 1
   const final = /final/i.test(m.round) && !/quarter|semi/i.test(m.round)
+  const big = /final/i.test(m.round) // 8강 이상
+  const surname = (n: string) => n.trim().split(/\s+/).at(-1)
   return (
     <li className={`rounded-[20px] border bg-card p-4 ${final ? 'border-teal' : 'border-line/80'}`}>
       <div className="flex items-center justify-between text-[12px] text-muted">
@@ -395,6 +432,23 @@ function MatchCard({ m }: { m: Match }) {
       <p className="mt-1 text-right text-[11.5px] tracking-wider text-muted sm:hidden">
         {m.players[0].scores.map((s, i) => `${s}-${m.players[1]?.scores[i] ?? ''}`).join(', ')}
       </p>
+      {video ? (
+        <button
+          type="button"
+          onClick={() => onPlay(video)}
+          className="mt-3 flex w-full items-center gap-2 rounded-xl bg-ink px-3 py-2.5 text-left text-[13.5px] font-bold text-white hover:bg-teal-deep"
+        >
+          <PlayIcon className="size-5 shrink-0 text-[#ff3d3d]" />
+          하이라이트 보기
+        </button>
+      ) : (
+        big &&
+        m.players.length === 2 && (
+          <div className="mt-2">
+            <YoutubeSearch q={`${surname(m.players[0].name)} v ${surname(m.players[1].name)} ${m.tournament.replace(/\s*\d{4}$/, '')} highlights`} />
+          </div>
+        )
+      )}
     </li>
   )
 }
@@ -489,6 +543,79 @@ function Avatar({ name, src }: { name: string; src: string | null }) {
   if (!src || broken)
     return <span className="grid size-9 shrink-0 place-items-center rounded-full bg-silver-soft font-wide text-[10px] text-teal-deep">{initials}</span>
   return <img src={src} alt="" loading="lazy" onError={() => setBroken(true)} className="size-9 shrink-0 rounded-full bg-silver-soft object-cover" />
+}
+
+function Thumb({ id }: { id: string }) {
+  return (
+    <span className="relative block aspect-video overflow-hidden rounded-2xl bg-ink">
+      <img src={`https://i.ytimg.com/vi/${id}/mqdefault.jpg`} alt="" loading="lazy" className="size-full object-cover transition group-hover:scale-[1.03]" />
+      <span className="absolute inset-0 grid place-items-center bg-black/10 transition group-hover:bg-black/25">
+        <span className="grid size-12 place-items-center rounded-full bg-white/95 shadow-lg">
+          <PlayIcon className="ml-0.5 size-6 text-ink" />
+        </span>
+      </span>
+    </span>
+  )
+}
+
+function PlayIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+      <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" />
+    </svg>
+  )
+}
+
+function YoutubeSearch({ q }: { q: string }) {
+  return (
+    <a
+      href={youtubeSearch(q)}
+      target="_blank"
+      rel="noreferrer"
+      className="inline-flex items-center gap-1 rounded-full border border-line bg-white px-2.5 py-1 text-[12px] font-semibold text-muted hover:border-ink hover:text-ink"
+    >
+      <PlayIcon className="size-3.5 text-[#e62117]" />
+      유튜브에서 찾기
+    </a>
+  )
+}
+
+/** 페이지 안에서 바로 보는 유튜브 플레이어 */
+function Player({ video, onClose }: { video: Video; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
+  }, [onClose])
+  return (
+    <div role="dialog" aria-modal="true" aria-label={video.title} className="fixed inset-0 z-50 grid place-items-center bg-black/80 p-3 backdrop-blur-sm md:p-8" onClick={onClose}>
+      <div className="w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-3 flex items-start gap-3 text-white">
+          <p className="min-w-0 flex-1 text-[15px] leading-snug font-semibold md:text-[17px]">{video.title}</p>
+          <button type="button" onClick={onClose} className="shrink-0 rounded-full bg-white/15 px-3.5 py-1.5 text-[13px] font-bold hover:bg-white/25" autoFocus>
+            닫기
+          </button>
+        </div>
+        <div className="aspect-video overflow-hidden rounded-2xl bg-black shadow-2xl">
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&rel=0&playsinline=1`}
+            title={video.title}
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowFullScreen
+            className="size-full"
+          />
+        </div>
+        <a href={`https://www.youtube.com/watch?v=${video.id}`} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-white/75 hover:text-white">
+          유튜브에서 열기 <External className="size-3.5" />
+        </a>
+      </div>
+    </div>
+  )
 }
 
 function Change({ n }: { n: number }) {

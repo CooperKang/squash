@@ -173,7 +173,7 @@ function decode(s) {
     .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
     .replace(/&amp;/g, '&')
     .replace(/&quot;/g, '"')
-    .replace(/&#039;|&apos;/g, "'")
+    .replace(/&#0?39;|&apos;/g, "'")
 }
 
 // ---------- 대한스쿼시연맹 ----------
@@ -275,12 +275,32 @@ async function ksfRanking() {
   return out
 }
 
+// ---------- PSA 공식 유튜브(SQUASHTV) 영상 ----------
+
+// 채널 RSS는 키 없이 최근 15개만 주므로, 실행할 때마다 지난 목록과 합쳐 쌓는다
+const SQUASHTV = 'UCklie6BM0fhFvzWYqQVoCTA'
+
+async function videos(prev) {
+  const res = await get(`https://www.youtube.com/feeds/videos.xml?channel_id=${SQUASHTV}`, 'raw')
+  const xml = await res.text()
+  const fresh = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].map(([, e]) => ({
+    id: /<yt:videoId>([^<]+)/.exec(e)?.[1],
+    title: decode(/<title>([^<]*)/.exec(e)?.[1] ?? '').replace(/&lt;/g, '<').replace(/&gt;/g, '>'),
+    published: /<published>([^<]+)/.exec(e)?.[1],
+  }))
+  if (fresh.length === 0) throw new Error('empty feed')
+  const byId = new Map((prev?.videos ?? []).map((v) => [v.id, v]))
+  for (const v of fresh) if (v.id) byId.set(v.id, v)
+  return { channel: SQUASHTV, videos: [...byId.values()].sort((a, b) => b.published.localeCompare(a.published)).slice(0, 300) }
+}
+
 // ---------- 실행 ----------
 
 const jobs = [
   ['rankings.json', async () => rankings()],
   ['results.json', async () => results(await previous('results.json'))],
   ['calendar.json', async () => calendar()],
+  ['videos.json', async () => videos(await previous('videos.json'))],
   ['korea.json', async () => ({ ...(await ksfEvents()), ranking: await ksfRanking() })],
 ]
 

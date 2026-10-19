@@ -5,7 +5,7 @@
 - **스쿼시란 / 경기 규칙**: 코트 그림을 눌러 보며 익히는 선 이름, PAR 11 점수, 서브, 렛·스트로크
 - **장비**: 라켓 무게·밸런스·헤드 모양, 브랜드별 성향, 공의 점 색깔, 세계 랭커들이 쓰는 라켓 브랜드
 - **라켓 찾기**: 질문 네 개로 영산스포츠(ysretail.com) 판매 라켓 중에서 추천하고 구매 페이지로 연결
-- **대회 현황판**: PSA 월드 투어 일정, 최근 경기 결과, 세계 랭킹, 대한스쿼시연맹 국내 대회와 랭킹
+- **대회 현황판**: PSA 월드 투어 일정, 최근 경기 결과(하이라이트 영상이 있으면 바로 재생), 세계 랭킹, 대한스쿼시연맹 국내 대회와 랭킹
 - **터치 스쿼시**: 날아오는 공을 마우스나 손가락으로 눌러 치는 미니 게임(PAR 11, 난이도 3단계)
 
 디자인은 Harrow Response 115 라켓의 색(실버 프레임, 딥 틸, 검정 링, 흰 그립)에서 가져왔습니다.
@@ -27,6 +27,7 @@ npm run build
 | `public/data/calendar.json` | PSA 투어 사이트의 WordPress REST API | GitHub Actions가 3시간마다 |
 | `public/data/results.json` | PSA 결과 API(최근 1주일치를 받아 지난 결과와 합침) | 3시간마다 + 화면을 열 때 브라우저에서 한 번 더 |
 | `public/data/rankings.json` | PSA 랭킹 API | 3시간마다 |
+| `public/data/videos.json` | PSA 공식 유튜브(SQUASHTV) 채널 RSS(최근 15개를 받아 지난 목록과 합침) | 3시간마다 |
 | `public/data/korea.json` | 대한스쿼시연맹(koreasquash.or.kr) 대회 일정·랭킹 | 3시간마다 |
 | `src/data/rackets.ts` | 영산스포츠 스쿼시 라켓 목록 | 손으로(판매처 robots.txt가 자동 수집을 막아 둠) |
 

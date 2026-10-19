@@ -142,3 +142,35 @@ export function roundLabel(r: string) {
   const m = /Round (\d+)/i.exec(r)
   return m ? `${m[1]}회전` : r
 }
+
+export type Video = { id: string; title: string; published: string }
+export type Videos = { updated: string; channel: string; videos: Video[] }
+
+const fold = (s: string) =>
+  s
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+
+/**
+ * 경기와 SQUASHTV 하이라이트 영상을 잇는다.
+ * 제목에 두 선수의 성이 모두 있고(“Asal v Elias | … | FINAL HIGHLIGHTS”), 경기 뒤 6일 안에 올라온 영상.
+ */
+export function findVideo(m: Match, videos: Video[]): Video | null {
+  if (m.players.length < 2 || m.players.some((p) => !p.name || p.name === '미정')) return null
+  const surnames = m.players.map((p) => fold(p.name.trim().split(/\s+/).at(-1)!))
+  const at = Date.parse(m.date)
+  const hits = videos.filter((v) => {
+    const t = fold(v.title)
+    if (!/\bvs?\.?\b/.test(t)) return false
+    const dt = Date.parse(v.published) - at
+    if (dt < -12 * 3600e3 || dt > 6 * 864e5) return false
+    return surnames.every((s) => new RegExp(`\\b${s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(t))
+  })
+  // 하이라이트 영상을 프리뷰·분석 영상보다 먼저
+  return hits.find((v) => /highlight/i.test(v.title)) ?? hits[0] ?? null
+}
+
+export function youtubeSearch(q: string) {
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`
+}
