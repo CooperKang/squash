@@ -21,6 +21,7 @@ npm install
 npm run dev      # http://localhost:5173
 npm test
 npm run data     # 현황판 데이터를 public/data/에 새로 받기
+npm run courts   # 코트 목록을 public/data/courts.json에 새로 받기(새 센터만 상세 요청)
 npm run build
 ```
 
@@ -33,7 +34,7 @@ npm run build
 | `public/data/rankings.json` | PSA 랭킹 API | 3시간마다 |
 | `public/data/videos.json` | PSA 공식 유튜브(SQUASHTV) 채널 RSS(최근 15개를 받아 지난 목록과 합침) | 3시간마다 |
 | `public/data/korea.json` | 대한스쿼시연맹(koreasquash.or.kr) 대회 일정·랭킹 | 3시간마다 |
-| `public/data/courts.json` | [스쿼시 센터(코트) 안내](https://www.squash.pe.kr/)(목록·좌표·코트 수·전화) + 대한스쿼시연맹 공인 코트 현황. 샤워·주차 등 시설과 수용 인원은 출처에 없어 비워 둠 | 3시간마다(새 센터 상세만 요청 간격을 두고 받음) |
+| `public/data/courts.json` | [스쿼시 센터(코트) 안내](https://www.squash.pe.kr/)(목록·좌표·코트 수·전화) + 대한스쿼시연맹 공인 코트 현황. 샤워·주차 등 시설과 수용 인원은 출처에 없어 비워 둠 | 수동(`npm run courts`). 출처가 GitHub Actions 서버의 접속을 막아(403) 자동 갱신에서 뺌 |
 | `src/data/rackets.ts` | 영산스포츠 스쿼시 라켓 목록 | 손으로(판매처 robots.txt가 자동 수집을 막아 둠) |
 
 수집 스크립트는 `scripts/fetch-data.mjs`입니다. 출처 하나가 실패하면 지금 배포된 파일을 그대로 씁니다.
