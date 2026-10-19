@@ -5,7 +5,7 @@ import { FrameStripe } from '../components/ui'
 const TILES: { id: Route; title: string; body: string }[] = [
   { id: 'about', title: '스쿼시란?', body: '네 벽으로 둘러싸인 코트에서 벽에 공을 번갈아 치는 실내 라켓 스포츠예요.' },
   { id: 'rules', title: '경기 규칙', body: '서브, 틴, 렛·스트로크, 11점 랠리 포인트에 동호회에서 많이 하는 ㄱ자 게임까지.' },
-  { id: 'shots', title: '기술과 샷 이름', body: '드라이브, 보스트, 뒷벽치기, 커트까지. 공이 벽을 맞는 순서를 그림으로 봐요.' },
+  { id: 'shots', title: '기술 백과', body: '드라이브부터 스키드 보스트, 백월 샷까지 3D로 보고, 규칙·장비·전술 용어를 사전처럼 찾아봐요.' },
   { id: 'practice', title: '혼자 연습', body: '공 하나로 하는 연습을 입문·초급·중급별로. 30분 루틴과 내 기록까지.' },
   { id: 'gear', title: '장비 고르기', body: '라켓 무게와 밸런스, 브랜드별 성향, 공의 점 색깔이 뜻하는 것.' },
   { id: 'finder', title: '내 라켓 찾기', body: '네 가지 질문에 답하면 영산스포츠 판매 라켓 중에서 골라 드려요.' },

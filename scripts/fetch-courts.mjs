@@ -104,6 +104,34 @@ export function typeOf(name) {
   if (university && !nationalUniv) return '민간'
   return PUBLIC_NAME.test(n) ? '공공' : '민간'
 }
+// 이용 대상: 학교·회사·아파트·기관 시설로 읽히는 이름(추정). 일반 시설이면 null
+const ACCESS = [
+  ['학교', /고등학교|중학교|초등학교|국제학교|대학교|대학$|캠퍼스|스쿼시부|드리미학교|중등센터/],
+  ['회사', /사옥|본사|연수원|인재개발원|연구소|기술연구|사업장|공장|유틸리티센터|대덕비즈센터|카지노|KT&G|KT\s|삼성전자|삼성중공업|SK하이닉스|SK텔레콤|LG화학|현대기아|기아자동차|포스코 한마당|한국도로공사|한국토지주택공사|한울원자력|동국제강|이녹스|위델소재|서연이화/],
+  ['아파트·주민', /아파트(?!먼트)|(?<!복합)커뮤니티\s*(센터|홀)|커뮤니센터|빌리지|타운하우스|사택|S클래스|롯데캐슬|드림캐슬|자이|힐스테이트|아이파크 삼성동|노블랜드|메가시티|에코타운|쉐르빌|에버빌|리츠빌|노블카운티/],
+  ['기관', /육군|해군|공군|국군|부대|선수촌|외교관|생활관|병원|청소년\s*수련원|경찰/],
+]
+export function accessOf(name) {
+  const n = name ?? ''
+  return ACCESS.find(([, re]) => re.test(n))?.[0] ?? null
+}
+
+// 코트 정보: '단식코트 : 3 / 복식코트 (가변형 포함) : 1 / 틴보드 : 43cm'
+export function courtDetailOf(courtText, info) {
+  const num = (re) => {
+    const m = (courtText ?? '').match(re)
+    return m ? Number(m[1]) : null
+  }
+  return {
+    singles: num(/단식코트\s*:\s*(\d+)/),
+    doubles: num(/복식코트[^:]*:\s*(\d+)/),
+    tin: num(/틴보드\s*:\s*(\d+)\s*cm/),
+    glass: /유리\s*코트|유리코트|글라스/.test(info ?? '') || null,
+    // 안내 문구에 규격이 아니라고 적힌 곳(세미 코트)
+    nonstandard: /정식\s*규격에\s*맞지|비규격|세미\s*코트/.test(info ?? '') || null,
+  }
+}
+
 export function restrictedOf(name) {
   const n = name ?? ''
   return RESTRICTED_NAME.test(n) && !/아파트먼트/.test(n)
@@ -217,6 +245,9 @@ export function record(m, d) {
     lat: m.lat ?? null,
     lng: m.lng ?? null,
     courts: courtsOf(d?.courtText),
+    ...courtDetailOf(d?.courtText, info),
+    certified: false, // 대한스쿼시연맹 공인 코트 목록에 있으면 mergeKsf가 true로
+    access: accessOf(m.name),
     capacity: null, // 출처에 수용 인원 항목이 없다
     facilities: facilitiesOf(info),
     rental: rentalOf(info),
@@ -284,6 +315,13 @@ function ksfRecord(k, i) {
     rental: null,
     type: typeOf(k.name),
     restricted: restrictedOf(k.name),
+    singles: null,
+    doubles: null,
+    tin: null,
+    glass: null,
+    nonstandard: null,
+    certified: true,
+    access: accessOf(k.name),
     phone: k.phone,
     link: null,
     source: KSF_URL,
@@ -296,18 +334,21 @@ const roadKey = (a) => {
   return m ? `${m[1]} ${m[2]}` : null
 }
 
+// 연맹 공인 코트와 같은 곳(전화, 도로명 주소, 이름으로 비교)은 certified로 표시하고, 목록에 없는 곳만 새로 돌려준다
 export function mergeKsf(list, ksf) {
-  const phones = new Set(list.map((c) => digits(c.phone)).filter((p) => p.length >= 9))
-  const roads = new Set(list.map((c) => c.region + ' ' + roadKey(c.address)).filter((r) => !r.endsWith('null')))
-  const names = list.map((c) => squeeze(c.name))
   const extra = []
   ksf.forEach((k, i) => {
     const p = digits(k.phone)
-    if (p.length >= 9 && phones.has(p)) return
-    if (roadKey(k.address) && roads.has(k.region + ' ' + roadKey(k.address))) return
+    const road = roadKey(k.address)
     const n = squeeze(k.name)
-    if (n.length >= 2 && names.some((x) => x && (x.includes(n) || n.includes(x)))) return
-    extra.push(ksfRecord(k, i))
+    const same = list.find(
+      (c) =>
+        (p.length >= 9 && digits(c.phone) === p) ||
+        (road && c.region === k.region && roadKey(c.address) === road) ||
+        (n.length >= 2 && squeeze(c.name) && (squeeze(c.name).includes(n) || n.includes(squeeze(c.name)))),
+    )
+    if (same) same.certified = true
+    else extra.push(ksfRecord(k, i))
   })
   return extra
 }
@@ -334,7 +375,7 @@ export async function courts(prev, opts = {}) {
     if (old && !pendingBefore.has(id) && !process.env.COURTS_REFRESH_ALL) {
       // 상세에서 온 값은 지난 것을 그대로, 목록에서 온 이름·주소·좌표·지역만 새로
       const fresh = record(m, null)
-      list.push({ ...old, name: fresh.name, region: fresh.region, district: fresh.district, address: fresh.address, lat: fresh.lat, lng: fresh.lng, type: fresh.type, restricted: fresh.restricted })
+      list.push({ ...old, name: fresh.name, region: fresh.region, district: fresh.district, address: fresh.address, lat: fresh.lat, lng: fresh.lng, type: fresh.type, restricted: fresh.restricted, access: fresh.access, certified: false })
       continue
     }
     let d = null
@@ -357,6 +398,7 @@ export async function courts(prev, opts = {}) {
   } catch (err) {
     console.warn(`  연맹 공인 코트 목록 실패: ${err.message}`)
     ksfExtra = (prev?.courts ?? []).filter((c) => c.id.startsWith('ksf-'))
+    for (const c of list) c.certified = known.get(c.id)?.certified ?? false
   }
   list.push(...ksfExtra)
 

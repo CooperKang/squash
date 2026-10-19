@@ -18,6 +18,13 @@ type Court = {
   rental: string | null
   type: '공공' | '민간'
   restricted?: boolean
+  access?: Access | null // 학교·회사·아파트·기관 시설(이름으로 추정). 일반 시설은 null
+  certified?: boolean // 대한스쿼시연맹 공인 코트 = 정식 규격
+  nonstandard?: boolean | null // 안내에 정식 규격이 아니라고 적힌 곳
+  singles?: number | null
+  doubles?: number | null
+  tin?: number | null
+  glass?: boolean | null
   phone: string | null
   link: string | null
   source: string
@@ -38,6 +45,23 @@ const FACILITY_LABEL: Record<Facility, string> = {
 }
 const PAGE = 24
 
+type Access = '학교' | '회사' | '아파트·주민' | '기관'
+type Who = 'open' | 'all' | Access
+const WHO: { id: Who; label: string }[] = [
+  { id: 'open', label: '일반 시설' },
+  { id: 'all', label: '전체' },
+  { id: '학교', label: '학교' },
+  { id: '회사', label: '회사' },
+  { id: '아파트·주민', label: '아파트·주민' },
+  { id: '기관', label: '기관' },
+]
+const ACCESS_NOTE: Record<Access, string> = {
+  학교: '학교 시설 · 외부인 이용 확인 필요',
+  회사: '회사 시설 · 임직원 전용일 수 있음',
+  '아파트·주민': '아파트 주민 시설 · 세미 코트가 많음',
+  기관: '기관 시설 · 일반 이용 어려움',
+}
+
 type Sort = 'courts' | 'name' | 'near'
 
 /** 바깥 자료의 링크는 http(s)만 연다 */
@@ -57,7 +81,8 @@ export default function Courts() {
   const [error, setError] = useState(false)
   const [region, setRegion] = useState<string | null>(null)
   const [query, setQuery] = useState('')
-  const [hideRestricted, setHideRestricted] = useState(true)
+  const [who, setWho] = useState<Who>('open')
+  const [certifiedOnly, setCertifiedOnly] = useState(false)
   const [publicOnly, setPublicOnly] = useState(false)
   const [sort, setSort] = useState<Sort>('courts')
   const [here, setHere] = useState<{ lat: number; lng: number } | null>(null)
@@ -68,7 +93,14 @@ export default function Courts() {
     loadData<CourtsData>('courts.json').then(setData, () => setError(true))
   }, [])
 
-  const base = useMemo(() => (data?.courts ?? []).filter((c) => (!hideRestricted || !c.restricted) && (!publicOnly || c.type === '공공')), [data, hideRestricted, publicOnly])
+  const base = useMemo(
+    () =>
+      (data?.courts ?? []).filter(
+        (c) =>
+          (who === 'all' || (who === 'open' ? !c.access && !c.restricted : c.access === who)) && (!publicOnly || c.type === '공공') && (!certifiedOnly || c.certified),
+      ),
+    [data, who, publicOnly, certifiedOnly],
+  )
 
   const counts = useMemo(() => {
     const m = new Map<string, number>()
@@ -148,10 +180,28 @@ export default function Courts() {
         </div>
         {locating === 'denied' && <p className="mt-2 text-[14px] text-tin">위치를 가져오지 못했어요. 브라우저의 위치 권한을 허용하거나 지역을 직접 골라 주세요.</p>}
 
+        <div className="mt-4 flex flex-wrap items-center gap-2" role="group" aria-label="이용 대상">
+          <span className="mr-1 text-[14px] font-semibold text-muted">이용 대상</span>
+          {WHO.map((w) => (
+            <button
+              key={w.id}
+              type="button"
+              aria-pressed={who === w.id}
+              onClick={() => {
+                setWho(w.id)
+                setShown(PAGE)
+              }}
+              className="rounded-full border border-line bg-card px-3 py-1.5 text-[13.5px] font-semibold transition aria-pressed:border-teal aria-pressed:bg-teal-soft aria-pressed:text-teal-deep"
+            >
+              {w.label}
+            </button>
+          ))}
+        </div>
+
         <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px] text-muted">
           <label className="flex items-center gap-2">
-            <input type="checkbox" checked={hideRestricted} onChange={(e) => setHideRestricted(e.target.checked)} className="size-4 accent-teal" />
-            회원·주민 전용으로 보이는 곳 숨기기
+            <input type="checkbox" checked={certifiedOnly} onChange={(e) => setCertifiedOnly(e.target.checked)} className="size-4 accent-teal" />
+            정식 규격(연맹 공인)만
           </label>
           <label className="flex items-center gap-2">
             <input type="checkbox" checked={publicOnly} onChange={(e) => setPublicOnly(e.target.checked)} className="size-4 accent-teal" />
@@ -206,6 +256,29 @@ export default function Courts() {
         )}
       </Section>
 
+      <Section kicker="COURT TYPES" title="정식 코트와 세미 코트">
+        <div className="grid gap-3 md:grid-cols-3">
+          <Card>
+            <h3 className="font-extrabold">정식 코트</h3>
+            <p className="mt-1.5 text-[15px] leading-relaxed text-muted">
+              길이 9.75m, 폭 6.4m, 앞벽 아웃 라인 4.57m, 틴 48cm인 세계스쿼시연맹 규격 코트예요. 대한스쿼시연맹 공인 코트는 모두 이 규격이라 <b className="text-ink">연맹 공인</b>으로 표시했어요.
+            </p>
+          </Card>
+          <Card>
+            <h3 className="font-extrabold">세미 코트</h3>
+            <p className="mt-1.5 text-[15px] leading-relaxed text-muted">
+              공간에 맞춰 길이나 폭을 줄인 비규격 코트예요. 아파트 커뮤니티, 피트니스, 학교에 많아요. 공이 빨리 돌아와서 정식 코트에서는 길이 감각을 다시 맞춰야 해요. 안내에 비규격이라고 적힌 곳만 표시할 수 있었어요.
+            </p>
+          </Card>
+          <Card>
+            <h3 className="font-extrabold">학교·회사 전용 코트</h3>
+            <p className="mt-1.5 text-[15px] leading-relaxed text-muted">
+              학교, 회사, 아파트, 군·기관 코트는 재학생·임직원·주민만 쓸 수 있는 경우가 많아요. 이름으로 짐작해 따로 표시했고, 기본 목록에서는 뺐어요. 위의 이용 대상에서 골라 볼 수 있어요.
+            </p>
+          </Card>
+        </div>
+      </Section>
+
       <Section kicker="ABOUT THE DATA" title="자료에 대해">
         <div className="grid gap-3 md:grid-cols-2">
           <Card>
@@ -227,7 +300,7 @@ export default function Courts() {
               ))}
             </ul>
             <p className="mt-2 text-[14px] text-muted">
-              {data ? `${data.asOf} 기준. ` : ''}출처 사이트가 자동 수집 서버의 접속을 막고 있어, 목록은 손으로 새로 받아 반영해요. 공공·민간, 회원 전용 여부는 이름으로 짐작한 값이라 틀릴 수 있어요.
+              {data ? `${data.asOf} 기준. ` : ''}출처 사이트가 자동 수집 서버의 접속을 막고 있어, 목록은 손으로 새로 받아 반영해요. 공공·민간과 학교·회사·아파트 같은 이용 대상은 이름으로 짐작한 값이라 틀릴 수 있어요. 정식 규격은 대한스쿼시연맹 공인 코트 목록과 맞춰 본 결과예요.
             </p>
           </Card>
         </div>
@@ -282,7 +355,16 @@ function CourtCard({ c, distance }: { c: Court; distance: number | null }) {
 
       <div className="mt-3 flex flex-wrap gap-1.5 text-[12.5px] font-semibold">
         <span className={`rounded-full px-2.5 py-0.5 ${c.type === '공공' ? 'bg-teal-soft text-teal-deep' : 'bg-silver-soft text-ink'}`}>{c.type}</span>
-        {c.restricted && <span className="rounded-full bg-[#fbecea] px-2.5 py-0.5 text-tin">회원·주민 전용일 수 있음</span>}
+        {c.certified && <span className="rounded-full bg-ink px-2.5 py-0.5 text-white">정식 규격 · 연맹 공인</span>}
+        {c.nonstandard && <span className="rounded-full bg-[#fdf3d7] px-2.5 py-0.5 text-[#6b5310]">비규격(세미)</span>}
+        {c.access ? (
+          <span className="rounded-full bg-[#fbecea] px-2.5 py-0.5 text-tin">{ACCESS_NOTE[c.access]}</span>
+        ) : (
+          c.restricted && <span className="rounded-full bg-[#fbecea] px-2.5 py-0.5 text-tin">회원 전용일 수 있음</span>
+        )}
+        {c.doubles ? <span className="rounded-full bg-court px-2.5 py-0.5 text-muted">단식 {c.singles ?? '?'} · 복식 {c.doubles}</span> : null}
+        {c.glass && <span className="rounded-full bg-court px-2.5 py-0.5 text-muted">유리 코트</span>}
+        {c.tin === 43 && <span className="rounded-full bg-court px-2.5 py-0.5 text-muted">프로용 틴 43cm</span>}
         {c.courts != null && <span className="rounded-full bg-court px-2.5 py-0.5 text-muted">동시 {c.courts * 2}명</span>}
         {known.map((f) => (
           <span key={f} className={`rounded-full px-2.5 py-0.5 ${c.facilities[f] ? 'bg-teal-soft text-teal-deep' : 'bg-court text-muted line-through'}`}>

@@ -9,7 +9,7 @@ export const ROUTES: { id: Route; label: string; short: string; parent?: Route; 
   { id: 'about', label: '스쿼시란', short: '소개', desktopOnly: true },
   { id: 'rules', label: '경기 규칙', short: '규칙' },
   { id: 'giyeok', label: 'ㄱ자 게임', short: 'ㄱ자', parent: 'rules' },
-  { id: 'shots', label: '기술', short: '기술' },
+  { id: 'shots', label: '기술 백과', short: '기술' },
   { id: 'practice', label: '혼자 연습', short: '연습', parent: 'shots' },
   { id: 'gear', label: '장비', short: '장비' },
   { id: 'finder', label: '라켓 찾기', short: '라켓', parent: 'gear' },

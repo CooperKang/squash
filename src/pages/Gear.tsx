@@ -166,11 +166,34 @@ export default function Gear() {
             </p>
           </Card>
         </div>
-        <a href={href('finder')} className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-teal px-5 py-3.5 text-[15px] font-bold text-white hover:bg-teal-deep">
+        <a id="finder-cta" href={href('finder')} className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-teal px-5 py-3.5 text-[15px] font-bold text-white hover:bg-teal-deep">
           내 스타일에 맞는 라켓 찾기 <Arrow className="size-4" />
         </a>
       </Section>
+      <FinderFab />
     </>
+  )
+}
+
+/** 화면을 내리는 동안 늘 떠 있는 라켓 찾기 버튼. 맨 아래 같은 버튼이 보이면 숨는다 */
+function FinderFab() {
+  const [hidden, setHidden] = useState(false)
+  useEffect(() => {
+    const el = document.getElementById('finder-cta')
+    if (!el) return
+    const io = new IntersectionObserver(([e]) => setHidden(e.isIntersecting))
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  return (
+    <a
+      href={href('finder')}
+      aria-hidden={hidden}
+      tabIndex={hidden ? -1 : 0}
+      className={`fixed right-4 bottom-[calc(76px+env(safe-area-inset-bottom)+14px)] z-30 inline-flex items-center gap-2 rounded-full bg-teal py-3.5 pr-4 pl-5 text-[15px] font-bold text-white shadow-[0_14px_30px_-12px_rgb(0_77_87/0.75)] transition duration-300 hover:bg-teal-deep lg:right-8 lg:bottom-8 ${hidden ? 'pointer-events-none translate-y-4 opacity-0' : 'opacity-100'}`}
+    >
+      나에게 맞는 라켓 찾기 <Arrow className="size-4" />
+    </a>
   )
 }
 

@@ -90,8 +90,15 @@ export default function Game() {
         {hud && (
           <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3 md:p-4">
             <ScoreChip label="나" value={hud.score.you} serving={hud.server === 'you'} accent />
-            <div className="mt-1 rounded-full bg-black/45 px-3 py-1.5 text-center text-[12px] font-semibold text-white/90 backdrop-blur">
-              랠리 {hud.rally} · 최고 {hud.bestRally}
+            <div className="mt-1 flex flex-col items-center gap-1.5">
+              <div className="rounded-full bg-black/45 px-3 py-1.5 text-center text-[12px] font-semibold text-white/90 backdrop-blur">
+                랠리 {hud.rally} · 최고 {hud.bestRally}
+              </div>
+              {hud.lastShot && hud.phase === 'rally' && (
+                <div className="rounded-full bg-white/85 px-3 py-1 text-[12px] font-bold text-ink">
+                  {hud.lastShot.by === 'you' ? '나' : '상대'}: {hud.lastShot.name}
+                </div>
+              )}
             </div>
             <ScoreChip label="상대" value={hud.score.cpu} serving={hud.server === 'cpu'} />
           </div>
@@ -169,7 +176,7 @@ export default function Game() {
 
         {showMenu && (
           <div className="absolute inset-0 grid place-items-center bg-ink/70 p-5 backdrop-blur-[2px]">
-            <div className="w-full max-w-sm rounded-[26px] bg-white p-6 text-ink shadow-2xl">
+            <div className="max-h-full w-full max-w-sm overflow-y-auto rounded-[26px] bg-white p-6 text-ink shadow-2xl">
               {hud?.result ? (
                 <>
                   <p className="font-wide text-[11px] tracking-[0.2em] text-teal">GAME</p>
@@ -182,12 +189,11 @@ export default function Game() {
                 <>
                   <p className="font-wide text-[11px] tracking-[0.2em] text-teal">MINI GAME</p>
                   <h2 className="mt-2 text-[26px] font-extrabold leading-tight">터치 스쿼시</h2>
-                  <ul className="mt-3 space-y-1.5 text-[14px] leading-relaxed text-muted">
-                    <li>· 공 둘레에 청록 링이 보이면 공을 눌러 치세요.</li>
-                    <li>· 공의 <b className="text-ink">왼쪽</b>을 치면 오른쪽으로, <b className="text-ink">아래쪽</b>을 치면 높이 날아가요.</li>
-                    <li>· 윗부분을 치면 낮게 깔리지만 틴(빨간 선 아래)에 걸릴 수 있어요.</li>
-                    <li>· 옆벽 가까이 뒤쪽으로 공이 오면 <b className="text-ink">보스트</b> 버튼이 나와요(PC는 B 키). 옆벽을 먼저 맞혀 앞 구석으로 보내요.</li>
-                    <li>· 뒤쪽 허리 높이에서 칠수록 정확해요. 11점 먼저 내면 이겨요.</li>
+                  <p className="mt-3 text-[14px] leading-relaxed text-muted">공 둘레에 청록 링이 보이면 공을 눌러 치세요. 누르는 곳이 샷을 정해요.</p>
+                  <ShotPad />
+                  <ul className="mt-3 space-y-1 text-[13.5px] leading-relaxed text-muted">
+                    <li>· 옆벽 가까이 뒤쪽으로 공이 오면 보스트 버튼이 나와요(PC는 B 키).</li>
+                    <li>· 뒤쪽 허리 높이에서 제때 칠수록 샷이 예리하게 들어가요. 11점 먼저 내면 이겨요.</li>
                   </ul>
                 </>
               )}
@@ -238,6 +244,30 @@ function ScoreChip({ label, value, serving, accent }: { label: string; value: nu
         {serving && <span className="rounded-full bg-white/20 px-1.5 text-[10px] text-white">서브</span>}
       </div>
       <div className="font-wide text-[26px] leading-tight">{value}</div>
+    </div>
+  )
+}
+
+/** 공의 어디를 누르면 어떤 샷이 나가는지(오른쪽 벽 가까운 공 기준) */
+function ShotPad() {
+  const cells = [
+    ['드롭', '드롭', '크로스 드롭'],
+    ['드라이브', '드라이브', '크로스'],
+    ['로브', '로브', '크로스 로브'],
+  ]
+  return (
+    <div className="mt-3 flex items-center gap-3">
+      <div className="relative grid size-[150px] shrink-0 grid-cols-3 grid-rows-3 overflow-hidden rounded-[26px] border-2 border-teal-bright bg-court text-[11px] leading-tight font-bold text-ink">
+        {cells.flat().map((c, i) => (
+          <span key={i} className={`grid place-items-center text-center ${i % 3 === 2 ? 'text-teal-deep' : ''}`}>
+            {i === 4 ? '' : c}
+          </span>
+        ))}
+        <span className="absolute top-1/2 left-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink" aria-hidden="true" />
+      </div>
+      <p className="text-[13px] leading-relaxed text-muted">
+        공이 <b className="text-ink">오른쪽 벽</b> 가까이 있을 때예요. 가운데는 벽을 따라 가는 스트레이트, 벽 쪽 옆면은 크로스, 윗면은 드롭(높은 공은 킬), 아랫면은 로브. 왼쪽 벽이면 좌우가 바뀌어요.
+      </p>
     </div>
   )
 }
