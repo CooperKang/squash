@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Card, LevelBadge, PageHead, Section } from '../components/ui'
-import { Court3D } from '../components/Court3D'
+import { Court3D, ViewControls } from '../components/Court3D'
 import { VIEWS, contacts } from '../components/shotView'
 import { SHOTS, shotSim, type ShotInfo } from '../data/shots'
 import { CATEGORIES, GLOSSARY, type Category } from '../data/glossary'
-import { hashParam, href, setHashParam } from '../router'
+import { hashParam, href, setHashParams } from '../router'
 
 const GROUPS: ShotInfo['group'][] = ['기본 샷', '앞 코트', '보스트와 벽 샷', '서브']
 
@@ -18,11 +18,12 @@ export default function Shots() {
   })
   const shot = SHOTS.find((s) => s.id === id)!
   const [view, setView] = useState<{ yaw: number; pitch: number }>(() => viewFor(shot))
-  const sim = useMemo(() => shotSim(shot), [shot])
+  const [backhand, setBackhand] = useState(hashParam('hand') === 'back')
+  const segments = useMemo(() => shotSim(shot, backhand), [shot, backhand])
 
   const pick = (next: string, scroll = false) => {
     setId(next)
-    setHashParam('shots', 's', next)
+    setHashParams('shots', { s: next })
     setView(viewFor(SHOTS.find((x) => x.id === next)!))
     if (scroll) document.getElementById('viewer')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -30,7 +31,7 @@ export default function Shots() {
   return (
     <>
       <PageHead eyebrow="ENCYCLOPEDIA" title="기술 백과">
-        샷마다 공이 어느 벽을 어떤 높이로, 어떤 순서로 맞는지 3D로 보여 줘요. 게임과 같은 물리로 굴린 공이라 높이(Z축)도 실제처럼 보여요. 오른손잡이가 오른쪽(포핸드 쪽)에서 치는 기준이에요.
+        샷마다 공이 어느 벽을 어떤 높이로, 어떤 순서로 맞는지 3D로 보여 줘요. 게임과 같은 물리로 굴린 공이라 높이(Z축)도 실제처럼 보여요. 오른손잡이 기준으로 포핸드는 오른쪽, 백핸드는 왼쪽에서 쳐요(왼손잡이는 반대예요).
       </PageHead>
 
       <Section kicker="3D SHOTS" title="샷을 3D로 보기" id="viewer">
@@ -59,24 +60,26 @@ export default function Shots() {
           <Card className="min-w-0 p-3 md:p-5">
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_1fr]">
               <div className="min-w-0">
-                <div className="mb-2 flex flex-wrap gap-1.5" role="group" aria-label="보는 방향">
-                  {Object.values(VIEWS).map((v) => (
-                    <button
-                      key={v.label}
-                      type="button"
-                      onClick={() => setView({ yaw: v.yaw, pitch: v.pitch })}
-                      aria-pressed={view.yaw === v.yaw && view.pitch === v.pitch}
-                      className="rounded-full border border-line px-3 py-1.5 text-[13px] font-semibold text-muted aria-pressed:border-teal aria-pressed:bg-teal-soft aria-pressed:text-teal-deep"
-                    >
-                      {v.label}
-                    </button>
-                  ))}
-                </div>
-                {sim ? (
+                <ViewControls
+                  view={view}
+                  views={Object.values(VIEWS)}
+                  onView={setView}
+                  backhand={backhand}
+                  onHand={(b) => {
+                    setBackhand(b)
+                    setHashParams('shots', { hand: b ? 'back' : 'fore' })
+                  }}
+                />
+                {segments.length ? (
                   <>
-                    <Court3D sim={sim} from={shot.from} view={view} onViewChange={setView} label={`${shot.name}: 공이 벽과 바닥에 닿는 순서를 3D로 보여 주는 그림`} />
+                    <Court3D
+                      segments={segments}
+                      view={view}
+                      onViewChange={setView}
+                      label={`${shot.name}(${backhand ? '백핸드' : '포핸드'}): 공이 벽과 바닥에 닿는 순서를 3D로 보여 주는 그림`}
+                    />
                     <ol className="mt-3 space-y-1 text-[14px]">
-                      {contacts(sim).map((c, i) => (
+                      {contacts(segments[0].sim, segments[0].end).map((c, i) => (
                         <li key={i} className="flex gap-2">
                           <span className={`grid size-5 shrink-0 place-items-center rounded-full text-[11px] font-bold ${c.hit === 'floor' ? 'bg-ink text-white' : 'border-2 border-teal bg-white text-ink'}`}>
                             {i + 1}

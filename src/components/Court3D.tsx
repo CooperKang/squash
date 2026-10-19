@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { COURT, type Sim, type Vec } from '../game/physics'
-import { contacts, type View } from './shotView'
+import { COURT } from '../game/physics'
+import type { Segment } from '../game/sequence'
+import { contacts, type FloorTarget, type View } from './shotView'
 
 // 게임과 같은 물리로 굴린 샷을 3D 코트에 그린다. 좌표는 게임과 같다:
-// x 가운데 0 기준 좌우, y 바닥에서 높이(화면에서는 "높이(Z축)"로 부른다), z 앞벽 0 ~ 뒷벽 9.75
+// x 가운데 0 기준 좌우, y 바닥에서 높이(화면에서는 "높이(Z축)"로 부른다), z 앞벽 0 ~ 뒷벽 9.75.
+// 샷 하나(기술 백과)도, 이어지는 여러 샷(혼자 연습)도 같은 방법으로 그린다.
 
 const W = COURT.halfWidth
 const L = COURT.length
@@ -29,27 +31,45 @@ function useReducedMotion() {
   return reduced
 }
 
-export function Court3D({ sim, from, view, label, onViewChange }: { sim: Sim; from: Vec; view: View; label: string; onViewChange?: (v: View) => void }) {
+export function Court3D({
+  segments,
+  targets = [],
+  view,
+  label,
+  onViewChange,
+}: {
+  segments: Segment[]
+  targets?: FloorTarget[]
+  view: View
+  label: string
+  onViewChange?: (v: View) => void
+}) {
   const ref = useRef<HTMLCanvasElement>(null)
   const reduced = useReducedMotion()
   const [sticks, setSticks] = useState(true)
   const [slow, setSlow] = useState(true)
   const state = useRef({ view, t0: 0, drag: null as null | { x: number; y: number; view: View } })
+  const single = segments.length === 1
 
   useEffect(() => {
     state.current.view = view
   }, [view])
   useEffect(() => {
     state.current.t0 = performance.now()
-  }, [sim])
+  }, [segments])
 
   useEffect(() => {
     const canvas = ref.current!
     const ctx = canvas.getContext('2d')!
     let raf = 0
-    const pts = sim.points
-    const hits = contacts(sim)
-    const end = hits.length ? hits[hits.length - 1].t : sim.duration
+    // 샷마다 시작 시각을 이어 붙인다
+    const starts: number[] = []
+    let total = 0
+    for (const s of segments) {
+      starts.push(total)
+      total += s.end
+    }
+    const hits = segments.map((s) => contacts(s.sim, s.end))
 
     const draw = (now: number) => {
       const r = canvas.getBoundingClientRect()
@@ -104,6 +124,30 @@ export function Court3D({ sim, from, view, label, onViewChange }: { sim: Sim; fr
         ctx.fillStyle = color
         ctx.fillText(s, at[0], at[1])
       }
+      const path = (pts: { p: { x: number; y: number; z: number } }[], color: string, lw: number, floor = false) => {
+        ctx.beginPath()
+        pts.forEach((q, i) => {
+          const [x, y] = P(q.p.x, floor ? 0 : q.p.y, q.p.z)
+          if (i) ctx.lineTo(x, y)
+          else ctx.moveTo(x, y)
+        })
+        ctx.strokeStyle = color
+        ctx.lineWidth = lw
+        ctx.lineJoin = 'round'
+        ctx.stroke()
+      }
+      const person = (x: number, z: number, alpha: number) => {
+        const foot = P(x, 0, z + 0.35)
+        const head = P(x, 1.75, z + 0.35)
+        ctx.strokeStyle = `rgb(20 22 24 / ${alpha})`
+        ctx.lineWidth = Math.max(4, (foot[1] - head[1]) * 0.18)
+        ctx.lineCap = 'round'
+        ctx.beginPath()
+        ctx.moveTo(foot[0], foot[1])
+        ctx.lineTo(head[0], head[1])
+        ctx.stroke()
+        ctx.lineCap = 'butt'
+      }
 
       ctx.clearRect(0, 0, w, h)
       const H = 5.4
@@ -114,6 +158,11 @@ export function Court3D({ sim, from, view, label, onViewChange }: { sim: Sim; fr
       for (const s of [-1, 1]) {
         line(P(s * (W - 1.6), 0, COURT.shortLine), P(s * (W - 1.6), 0, COURT.shortLine + 1.6), '#c8402f')
         line(P(s * (W - 1.6), 0, COURT.shortLine + 1.6), P(s * W, 0, COURT.shortLine + 1.6), '#c8402f')
+      }
+      // 바닥에 놓는 수건·테이프 표시
+      for (const t of targets) {
+        poly([P(t.x0, 0.01, t.z0), P(t.x1, 0.01, t.z0), P(t.x1, 0.01, t.z1), P(t.x0, 0.01, t.z1)], 'rgb(242 194 48 / 0.4)', '#b8901a', 1.2)
+        if (t.label) text(t.label, P((t.x0 + t.x1) / 2, 0, (t.z0 + t.z1) / 2), '#6b5310', 10, 'center')
       }
       // 앞벽: 틴, 서비스 라인, 아웃 라인
       poly([P(-W, 0, 0), P(W, 0, 0), P(W, H, 0), P(-W, H, 0)], 'rgb(246 247 247 / 0.92)', '#141618', 1.5)
@@ -126,6 +175,9 @@ export function Court3D({ sim, from, view, label, onViewChange }: { sim: Sim; fr
       }
       poly([P(-W, 0, L), P(W, 0, L), P(W, 2.8, L), P(-W, 2.8, L)], 'rgb(220 226 225 / 0.14)', 'rgb(20 22 24 / 0.3)', 1)
       line(P(-W, COURT.backOut, L), P(W, COURT.backOut, L), '#c8402f', 1.5)
+      // 오른쪽·왼쪽 표시(포핸드/백핸드를 바꿔 볼 때 헷갈리지 않게)
+      text('오른쪽', P(W, 0, L + 0.3), '#5e6668', 10, 'center', 600)
+      text('왼쪽', P(-W, 0, L + 0.3), '#5e6668', 10, 'center', 600)
 
       // 높이 자: 앞벽 왼쪽 모서리에 1m 눈금
       for (let m = 1; m <= 4; m++) {
@@ -135,86 +187,71 @@ export function Court3D({ sim, from, view, label, onViewChange }: { sim: Sim; fr
       }
       text('높이(Z축)', P(-W, 4.9, 0), '#5e6668', 10, 'right', 700)
 
-      // 치는 사람
-      const foot = P(from.x, 0, from.z + 0.35)
-      const head = P(from.x, 1.75, from.z + 0.35)
-      ctx.strokeStyle = 'rgb(20 22 24 / 0.55)'
-      ctx.lineWidth = Math.max(4, (foot[1] - head[1]) * 0.18)
-      ctx.lineCap = 'round'
-      ctx.beginPath()
-      ctx.moveTo(foot[0], foot[1])
-      ctx.lineTo(head[0], head[1])
-      ctx.stroke()
-      ctx.lineCap = 'butt'
-
       const k = slow ? 0.45 : 1
-      const loop = end / k + 1.2
-      const tNow = reduced ? end : Math.min(end, (((now - state.current.t0) / 1000) % loop) * k)
-      const shown = pts.filter((p) => p.t <= tNow && p.t <= end)
+      const loop = total / k + 1.2
+      const tAll = reduced ? total : Math.min(total, (((now - state.current.t0) / 1000) % loop) * k)
+      // 지금 치고 있는 샷
+      let cur = segments.length - 1
+      for (let i = 0; i < segments.length; i++)
+        if (tAll < starts[i] + segments[i].end) {
+          cur = i
+          break
+        }
 
-      // 그림자(바닥에 비친 길)와 높이 막대
-      ctx.beginPath()
-      shown.forEach((p, i) => {
-        const [x, y] = P(p.p.x, 0, p.p.z)
-        if (i) ctx.lineTo(x, y)
-        else ctx.moveTo(x, y)
-      })
-      ctx.strokeStyle = 'rgb(20 22 24 / 0.22)'
-      ctx.lineWidth = 2
-      ctx.stroke()
-      if (sticks)
-        shown.forEach((p, i) => {
-          if (i % 6 || p.p.y < 0.2) return
-          line(P(p.p.x, p.p.y, p.p.z), P(p.p.x, 0, p.p.z), 'rgb(0 112 125 / 0.35)', 1, [2, 3])
-        })
-
-      // 공의 길
-      ctx.beginPath()
-      shown.forEach((p, i) => {
-        const [x, y] = P(p.p.x, p.p.y, p.p.z)
-        if (i) ctx.lineTo(x, y)
-        else ctx.moveTo(x, y)
-      })
-      ctx.strokeStyle = '#00707d'
-      ctx.lineWidth = 3
-      ctx.lineJoin = 'round'
-      ctx.stroke()
-
-      // 닿은 곳: 번호와 높이
-      hits
-        .filter((c) => c.t <= tNow)
-        .forEach((c, i) => {
-          const at = P(c.at.x, c.at.y, c.at.z)
-          ctx.beginPath()
-          ctx.arc(at[0], at[1], c.hit === 'floor' ? 4 : 6, 0, Math.PI * 2)
-          ctx.fillStyle = c.hit === 'floor' ? '#141618' : '#ffffff'
-          ctx.fill()
-          if (c.hit !== 'floor') {
-            ctx.strokeStyle = '#00707d'
-            ctx.lineWidth = 2.5
-            ctx.stroke()
+      segments.forEach((s, i) => {
+        if (i > cur) return
+        const tNow = i < cur ? s.end : tAll - starts[i]
+        const shown = s.sim.points.filter((p) => p.t <= tNow)
+        const faded = i < cur && !single
+        person(s.from.x, s.from.z, i === cur ? 0.55 : 0.18)
+        path(shown, faded ? 'rgb(20 22 24 / 0.1)' : 'rgb(20 22 24 / 0.22)', 2, true)
+        if (sticks && !faded)
+          shown.forEach((p, j) => {
+            if (j % 6 || p.p.y < 0.2) return
+            line(P(p.p.x, p.p.y, p.p.z), P(p.p.x, 0, p.p.z), 'rgb(0 112 125 / 0.35)', 1, [2, 3])
+          })
+        path(shown, faded ? 'rgb(0 112 125 / 0.3)' : '#00707d', faded ? 2 : 3)
+        hits[i]
+          .filter((c) => c.t <= tNow)
+          .forEach((c, j) => {
+            const at = P(c.at.x, c.at.y, c.at.z)
+            ctx.beginPath()
+            ctx.arc(at[0], at[1], c.hit === 'floor' ? 4 : 6, 0, Math.PI * 2)
+            ctx.fillStyle = c.hit === 'floor' ? (faded ? 'rgb(20 22 24 / 0.3)' : '#141618') : '#ffffff'
+            ctx.fill()
+            if (c.hit !== 'floor') {
+              ctx.strokeStyle = faded ? 'rgb(0 112 125 / 0.35)' : '#00707d'
+              ctx.lineWidth = 2.5
+              ctx.stroke()
+            }
+            if (single) text(`${j + 1}`, [at[0] + 8, at[1] - 6], '#141618', 12, 'left', 800)
+          })
+        if (i === cur && !reduced) {
+          const b = shown[shown.length - 1]
+          if (b) {
+            const [bx, by] = P(b.p.x, b.p.y, b.p.z)
+            ctx.beginPath()
+            ctx.arc(bx, by, 6, 0, Math.PI * 2)
+            ctx.fillStyle = '#141618'
+            ctx.fill()
+            ctx.beginPath()
+            ctx.arc(bx - 1.5, by - 1.5, 1.6, 0, Math.PI * 2)
+            ctx.fillStyle = '#f2c230'
+            ctx.fill()
           }
-          text(`${i + 1}`, [at[0] + 8, at[1] - 6], '#141618', 12, 'left', 800)
-        })
-
-      // 공
-      const cur = shown[shown.length - 1]
-      if (cur && !reduced) {
-        const [bx, by] = P(cur.p.x, cur.p.y, cur.p.z)
-        ctx.beginPath()
-        ctx.arc(bx, by, 6, 0, Math.PI * 2)
+        }
+      })
+      if (!single) {
+        ctx.font = "800 13px 'Pretendard Variable', Pretendard, sans-serif"
+        ctx.textAlign = 'left'
         ctx.fillStyle = '#141618'
-        ctx.fill()
-        ctx.beginPath()
-        ctx.arc(bx - 1.5, by - 1.5, 1.6, 0, Math.PI * 2)
-        ctx.fillStyle = '#f2c230'
-        ctx.fill()
+        ctx.fillText(`${cur + 1}/${segments.length}  ${segments[cur]?.label ?? ''}`, 14, 22)
       }
       if (!reduced) raf = requestAnimationFrame(draw)
     }
     raf = requestAnimationFrame(draw)
     return () => cancelAnimationFrame(raf)
-  }, [sim, from, sticks, slow, reduced, view])
+  }, [segments, targets, single, sticks, slow, reduced, view])
 
   const down = (e: React.PointerEvent) => {
     state.current.drag = { x: e.clientX, y: e.clientY, view: { ...state.current.view } }
@@ -233,6 +270,9 @@ export function Court3D({ sim, from, view, label, onViewChange }: { sim: Sim; fr
   const up = () => {
     if (state.current.drag) onViewChange?.(state.current.view)
     state.current.drag = null
+  }
+  const replay = () => {
+    state.current.t0 = performance.now()
   }
 
   return (
@@ -260,10 +300,56 @@ export function Court3D({ sim, from, view, label, onViewChange }: { sim: Sim; fr
           </label>
         )}
         {!reduced && (
-          <button type="button" onClick={() => (state.current.t0 = performance.now())} className="font-semibold text-teal underline underline-offset-4">
+          <button type="button" onClick={replay} className="font-semibold text-teal underline underline-offset-4">
             다시 보기
           </button>
         )}
+      </div>
+    </div>
+  )
+}
+
+/** 보는 방향 버튼 + 포핸드/백핸드 전환 */
+export function ViewControls({
+  view,
+  views,
+  onView,
+  backhand,
+  onHand,
+}: {
+  view: View
+  views: (View & { label: string })[]
+  onView: (v: View) => void
+  backhand: boolean
+  onHand: (b: boolean) => void
+}) {
+  return (
+    <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div className="flex rounded-full bg-court p-0.5" role="group" aria-label="포핸드 또는 백핸드">
+        {[false, true].map((b) => (
+          <button
+            key={String(b)}
+            type="button"
+            aria-pressed={backhand === b}
+            onClick={() => onHand(b)}
+            className="rounded-full px-3 py-1.5 text-[13px] font-bold text-muted aria-pressed:bg-ink aria-pressed:text-white"
+          >
+            {b ? '백핸드' : '포핸드'}
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-1.5" role="group" aria-label="보는 방향">
+        {views.map((v) => (
+          <button
+            key={v.label}
+            type="button"
+            onClick={() => onView({ yaw: v.yaw, pitch: v.pitch })}
+            aria-pressed={view.yaw === v.yaw && view.pitch === v.pitch}
+            className="rounded-full border border-line px-3 py-1.5 text-[13px] font-semibold text-muted aria-pressed:border-teal aria-pressed:bg-teal-soft aria-pressed:text-teal-deep"
+          >
+            {v.label}
+          </button>
+        ))}
       </div>
     </div>
   )

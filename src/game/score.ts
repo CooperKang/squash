@@ -6,3 +6,14 @@ export function winner(s: Score): 'you' | 'cpu' | null {
   if (top < 11 || Math.abs(s.you - s.cpu) < 2) return null
   return s.you > s.cpu ? 'you' : 'cpu'
 }
+
+export type Status = 'deuce' | 'game-ball-you' | 'game-ball-cpu' | null
+
+/** 듀스(10:10부터 동점) 또는 다음 1점이면 끝나는 게임볼 */
+export function status(s: Score): Status {
+  if (winner(s)) return null
+  if (s.you >= 10 && s.you === s.cpu) return 'deuce'
+  if (s.you >= 10 && s.you > s.cpu) return 'game-ball-you'
+  if (s.cpu >= 10 && s.cpu > s.you) return 'game-ball-cpu'
+  return null
+}

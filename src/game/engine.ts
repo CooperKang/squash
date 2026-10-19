@@ -13,7 +13,7 @@ import {
   type Hitter,
   type Vec,
 } from './physics'
-import { winner, type Score } from './score'
+import { status, winner, type Score, type Status } from './score'
 import type { RuleKey } from './hints'
 import { SHOT_NAME, canBoast, cpuReturnChance, cpuShot, intentFrom, kindFor, newShot, playerShot, sharpness, type ShotKind } from './shots'
 
@@ -29,6 +29,7 @@ export type HudState = {
   paused: boolean
   boastSide: -1 | 1 | null // 보스트를 칠 수 있으면 공이 있는 쪽(화면 왼쪽 -1, 오른쪽 1)
   lastShot: { by: Hitter; name: string } | null // 방금 친 샷 이름
+  status: Status // 듀스·게임볼
 }
 
 type Phase = 'ready' | 'serve-you' | 'serve-cpu' | 'rally' | 'point' | 'over'
@@ -85,6 +86,7 @@ export class Engine {
   private paused = false
   private rallySaw = { boast: false, backWall: false }
   private boastSide: -1 | 1 | null = null
+  private lastStatus: Status = null
   public difficulty: Difficulty = 'normal'
   public sound = true
   public askRules = true
@@ -152,6 +154,7 @@ export class Engine {
   newMatch() {
     this.paused = false
     this.hint = null
+    this.lastStatus = null
     this.score = { you: 0, cpu: 0 }
     this.server = 'you'
     this.side = 1
@@ -411,6 +414,14 @@ export class Engine {
       this.hint = order.find((k): k is RuleKey => !!k && !this.asked.has(k)) ?? null
       if (this.hint) this.asked.add(this.hint)
     }
+    // 점수 알림 뒤에 듀스·게임볼을 이어서 알린다(상태가 바뀔 때만)
+    const st = status(this.score)
+    if (st && st !== this.lastStatus) {
+      const msg = { deuce: ['듀스! 2점 앞서야 이겨요', '#f2c230'], 'game-ball-you': ['게임볼! 1점이면 이겨요', C.tealBright], 'game-ball-cpu': ['상대 게임볼! 지키세요', '#ff8a7a'] }[st]
+      this.flash(msg[0], msg[1], 0.8, 0.75)
+      this.sfx('win', 0.5)
+    }
+    this.lastStatus = st
     if (winner(this.score)) {
       this.phase = 'over'
     } else {
@@ -420,8 +431,8 @@ export class Engine {
     this.emit()
   }
 
-  private flash(text: string, color: string, scale = 1) {
-    this.flashes.push({ text, t: 0, color, scale })
+  private flash(text: string, color: string, scale = 1, delay = 0) {
+    this.flashes.push({ text, t: -delay, color, scale })
   }
 
   private emit() {
@@ -437,6 +448,7 @@ export class Engine {
       paused: this.paused,
       boastSide: this.boastSide,
       lastShot: this.lastShot ? { by: this.lastShot.by, name: SHOT_NAME[this.lastShot.kind] } : null,
+      status: status(this.score),
     })
   }
 
@@ -656,6 +668,7 @@ export class Engine {
   private drawFlashes() {
     const c = this.ctx
     for (const f of this.flashes) {
+      if (f.t < 0) continue // 아직 나올 차례가 아닌 알림
       const k = f.t / 1.1
       c.globalAlpha = 1 - k
       c.font = `800 ${clamp(this.w / 14, 22, 40) * f.scale}px 'Pretendard Variable', sans-serif`

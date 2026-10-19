@@ -94,6 +94,14 @@ export default function Game() {
               <div className="rounded-full bg-black/45 px-3 py-1.5 text-center text-[12px] font-semibold text-white/90 backdrop-blur">
                 랠리 {hud.rally} · 최고 {hud.bestRally}
               </div>
+              {hud.status && (
+                <div
+                  className={`rounded-full px-3 py-1 text-[12px] font-extrabold ${hud.status === 'deuce' ? 'bg-dot text-ink' : hud.status === 'game-ball-you' ? 'bg-teal-bright text-white' : 'bg-tin text-white'}`}
+                  aria-live="polite"
+                >
+                  {hud.status === 'deuce' ? '듀스' : hud.status === 'game-ball-you' ? '게임볼 · 나' : '게임볼 · 상대'}
+                </div>
+              )}
               {hud.lastShot && hud.phase === 'rally' && (
                 <div className="rounded-full bg-white/85 px-3 py-1 text-[12px] font-bold text-ink">
                   {hud.lastShot.by === 'you' ? '나' : '상대'}: {hud.lastShot.name}

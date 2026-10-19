@@ -1,5 +1,6 @@
 import { simulate, type Vec } from '../game/physics'
 import { newShot, plan, type ShotKind } from '../game/shots'
+import type { Segment } from '../game/sequence'
 
 export type Level = '입문' | '초급' | '중급'
 export const LEVELS: Level[] = ['입문', '초급', '중급']
@@ -256,9 +257,13 @@ function seeded(text: string) {
   }
 }
 
-export function shotSim(s: ShotInfo) {
+/** 기술 백과의 3D 장면: 백핸드면 좌우를 뒤집어 왼쪽에서 친다 */
+export function shotSim(s: ShotInfo, backhand = false): Segment[] {
+  const from = backhand ? { ...s.from, x: -s.from.x } : s.from
   const serve = s.kind.startsWith('serve')
-  const [best] = plan(s.kind, s.from, { by: 'you', serve, samples: 900, rand: seeded(s.id) })
-  if (!best) return null
-  return simulate({ p: { ...s.from }, v: best.v }, newShot('you', s.kind, s.from, serve), 6, 1 / 240, true)
+  const [best] = plan(s.kind, from, { by: 'you', serve, samples: 900, rand: seeded(s.id + (backhand ? 'b' : '')) })
+  if (!best) return []
+  const sim = simulate({ p: { ...from }, v: best.v }, newShot('you', s.kind, from, serve), 6, 1 / 240, true)
+  const floors = sim.events.filter((e) => e.hit === 'floor' && e.afterFront)
+  return [{ label: s.name, sim, from, end: floors[1]?.t ?? sim.duration }]
 }

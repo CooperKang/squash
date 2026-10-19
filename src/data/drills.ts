@@ -1,4 +1,6 @@
-import type { PathPoint, Target } from '../components/CourtPath'
+import type { Vec } from '../game/physics'
+import type { Step } from '../game/sequence'
+import type { FloorTarget } from '../components/shotView'
 import type { Level } from './shots'
 
 export type Drill = {
@@ -10,8 +12,9 @@ export type Drill = {
   steps: string[]
   goal: string // 정확도·횟수 기준
   measure: 'count' | 'ratio' // 연속 개수 or 10개 중 몇 개
-  path: PathPoint[]
-  targets?: Target[]
+  start: Vec // 처음 치는 자리(게임 좌표, 포핸드 기준)
+  sequence: Step[] // 3D로 보여 줄 샷의 이어짐
+  targets?: FloorTarget[] // 바닥에 놓는 수건·테이프(게임 좌표)
 }
 
 // 모두 공 하나로 혼자 하는 연습. 오른손잡이 포핸드(오른쪽) 기준이고, 백핸드는 좌우를 바꿔서 해요
@@ -25,12 +28,8 @@ export const DRILLS: Drill[] = [
     steps: ['앞벽 서비스 라인 근처에 부드럽게 쳐요.', '한 번 튄 공을 다시 같은 곳으로 쳐요. 세게 치지 말고 공이 내 앞으로 돌아오게.', '포핸드 10번, 백핸드 10번씩 바꿔 가며.'],
     goal: '끊기지 않고 연속 30개',
     measure: 'count',
-    path: [
-      { x: 3.6, z: 3.4, kind: 'start' },
-      { x: 3.4, z: 0, h: 1.9, kind: 'front' },
-      { x: 3.5, z: 2.6, kind: 'floor' },
-      { x: 3.6, z: 3.4, kind: 'start' },
-    ],
+    start: { x: 0.6, y: 0.8, z: 3.2 },
+    sequence: [1, 2, 3].map((n) => ({ label: `${n}번째`, to: { x: 0.6, z: 3.2 }, front: { x: [-0.2, 1.4], y: [1.0, 2.2] }, speed: [5, 10], hit: { mode: 'bounce' } })),
   },
   {
     id: 'rail',
@@ -46,12 +45,8 @@ export const DRILLS: Drill[] = [
     ],
     goal: '연속 20개, 그다음 50개',
     measure: 'count',
-    path: [
-      { x: 5.1, z: 6.4, kind: 'start' },
-      { x: 5.6, z: 0, h: 2.1, kind: 'front' },
-      { x: 5.6, z: 5.8, kind: 'floor' },
-      { x: 5.1, z: 6.4, kind: 'start' },
-    ],
+    start: { x: 2.2, y: 0.8, z: 6.6 },
+    sequence: [1, 2, 3].map((n) => ({ label: `드라이브 ${n}`, to: { x: 2.3, z: 6.6 }, front: { x: [1.6, 3.0], y: [1.4, 2.8] }, speed: [9, 16], hit: { mode: 'bounce' } })),
   },
   {
     id: 'serve',
@@ -62,13 +57,9 @@ export const DRILLS: Drill[] = [
     steps: ['앞벽 서비스 라인 위, 가운데보다 조금 왼쪽을 노려 높고 부드럽게 쳐요.', '공이 왼쪽 옆벽 높은 곳을 맞고 상대 서비스 박스 뒤쪽 구석에 떨어지면 성공.', '10개를 친 뒤 왼쪽 박스로 옮겨 반대로 해요.'],
     goal: '10개 중 7개가 상대 뒤 코트 안으로',
     measure: 'ratio',
-    path: [
-      { x: 5.6, z: 6.2, kind: 'start' },
-      { x: 2.6, z: 0, h: 3.6, kind: 'front' },
-      { x: 0, z: 6.4, kind: 'side' },
-      { x: 0.9, z: 8.6, kind: 'floor' },
-    ],
-    targets: [{ x: 0, z: 7.4, w: 3.2, d: 2.35, label: '상대 뒤 코트' }],
+    start: { x: 2.2, y: 1.1, z: 6.3 },
+    sequence: [{ label: '로브 서브', kind: 'serve-lob' }],
+    targets: [{ x0: -3.2, x1: 0, z0: 5.44, z1: 9.75, label: '상대 뒤 코트' }],
   },
   {
     id: 'rail-target',
@@ -79,13 +70,9 @@ export const DRILLS: Drill[] = [
     steps: ['연속 스트레이트 드라이브를 하면서 첫 바운드가 띠 안에 떨어지는지 세요.', '띠 밖으로 나간 공도 계속 이어 치되, 성공만 세요.', '띠 폭을 좁히거나 서비스 박스 뒤쪽으로 길이 조건을 더해 난도를 올려요.'],
     goal: '10개 중 7개가 띠 안에',
     measure: 'ratio',
-    path: [
-      { x: 5.0, z: 7.0, kind: 'start' },
-      { x: 5.75, z: 0, h: 2.2, kind: 'front' },
-      { x: 6.0, z: 6.6, kind: 'floor' },
-      { x: 5.0, z: 7.0, kind: 'start' },
-    ],
-    targets: [{ x: 5.7, z: 4.2, w: 0.7, d: 5.4, label: '띠' }],
+    start: { x: 2.4, y: 0.8, z: 7.0 },
+    sequence: [1, 2, 3].map((n) => ({ label: `드라이브 ${n}`, to: { x: 2.7, z: 7.0 }, front: { x: [2.2, 3.05], y: [1.5, 2.8] }, speed: [10, 16], hit: { mode: 'bounce' } })),
+    targets: [{ x0: 2.5, x1: 3.2, z0: 4.2, z1: 9.6, label: '띠' }],
   },
   {
     id: 'drop-feed',
@@ -100,13 +87,12 @@ export const DRILLS: Drill[] = [
     ],
     goal: '10개 중 6개가 틴 위 30cm 안, 두 번째 바운드가 수건 근처',
     measure: 'ratio',
-    path: [
-      { x: 4.4, z: 3.8, kind: 'start' },
-      { x: 5.8, z: 0, h: 0.65, kind: 'front' },
-      { x: 5.95, z: 0.9, kind: 'floor' },
-      { x: 6.1, z: 1.5, kind: 'floor' },
+    start: { x: 1.4, y: 0.9, z: 3.8 },
+    sequence: [
+      { label: '피드', to: { x: 1.5, z: 3.6 }, front: { x: [0.6, 2.0], y: [1.0, 1.9] }, speed: [5, 9], hit: { mode: 'bounce' } },
+      { label: '드롭', kind: 'drop' },
     ],
-    targets: [{ x: 5.0, z: 0.6, w: 1.4, d: 1.4, label: '수건' }],
+    targets: [{ x0: 2.0, x1: 3.2, z0: 0.4, z1: 1.8, label: '수건' }],
   },
   {
     id: 'volley',
@@ -117,11 +103,8 @@ export const DRILLS: Drill[] = [
     steps: ['앞벽 서비스 라인 위로 쳐서 공이 바닥에 닿기 전에 다시 쳐요.', '라켓은 늘 들어 올린 채로, 짧게 끊어 쳐요.', '공이 너무 빨라지면 힘을 빼서 속도를 일정하게 맞춰요.'],
     goal: '바닥에 안 떨어뜨리고 연속 20개',
     measure: 'count',
-    path: [
-      { x: 5.0, z: 5.0, kind: 'start' },
-      { x: 5.4, z: 0, h: 2.3, kind: 'front' },
-      { x: 5.0, z: 5.0, kind: 'start' },
-    ],
+    start: { x: 1.9, y: 1.5, z: 5.0 },
+    sequence: [1, 2, 3].map((n) => ({ label: `발리 ${n}`, to: { x: 1.9, z: 5.0 }, front: { x: [1.4, 2.8], y: [1.8, 3.0] }, speed: [9, 15], hit: { mode: 'volley', y: [1.1, 1.9] } })),
   },
   {
     id: 'figure8',
@@ -130,20 +113,18 @@ export const DRILLS: Drill[] = [
     focus: '포핸드·백핸드 전환, 손목과 반응 속도',
     setup: 'T 조금 앞, 코트 가운데에 서요.',
     steps: [
-      '앞벽 높은 곳의 오른쪽 구석 가까이를 쳐요. 공이 앞벽 → 오른쪽 옆벽을 맞고 내 왼쪽(백핸드)으로 와요.',
-      '백핸드 발리로 앞벽 높은 왼쪽 구석을 쳐요. 이번엔 공이 왼쪽 옆벽을 맞고 포핸드로 와요.',
+      '포핸드로 앞벽 높은 곳의 반대쪽(왼쪽) 구석 가까이를 쳐요. 공이 앞벽 → 왼쪽 옆벽을 맞고 내 왼쪽(백핸드)으로 와요.',
+      '백핸드 발리로 앞벽 높은 오른쪽 구석을 쳐요. 이번엔 공이 오른쪽 옆벽을 맞고 포핸드로 와요.',
       '공이 지나는 길이 8자를 그려요. 바닥에 떨어뜨리지 않고 이어 가요. 처음엔 한 번 튀고 쳐도 돼요.',
     ],
     goal: '발리로만 연속 20개',
     measure: 'count',
-    path: [
-      { x: 3.2, z: 4.4, kind: 'start' },
-      { x: 5.6, z: 0, h: 3.0, kind: 'front' },
-      { x: 6.4, z: 1.4, kind: 'side' },
-      { x: 2.7, z: 4.4, kind: 'start' },
-      { x: 0.8, z: 0, h: 3.0, kind: 'front' },
-      { x: 0, z: 1.4, kind: 'side' },
-      { x: 3.6, z: 4.4, kind: 'start' },
+    start: { x: 1.2, y: 1.5, z: 4.2 },
+    sequence: [
+      { label: '포핸드 발리', to: { x: -1.2, z: 4.2 }, front: { x: [-3.05, -2.0], y: [2.2, 3.6] }, speed: [9, 15], hit: { mode: 'volley', y: [1.0, 2.1] } },
+      { label: '백핸드 발리', to: { x: 1.2, z: 4.2 }, front: { x: [2.0, 3.05], y: [2.2, 3.6] }, speed: [9, 15], hit: { mode: 'volley', y: [1.0, 2.1] } },
+      { label: '포핸드 발리', to: { x: -1.2, z: 4.2 }, front: { x: [-3.05, -2.0], y: [2.2, 3.6] }, speed: [9, 15], hit: { mode: 'volley', y: [1.0, 2.1] } },
+      { label: '백핸드 발리', to: { x: 1.2, z: 4.2 }, front: { x: [2.0, 3.05], y: [2.2, 3.6] }, speed: [9, 15], hit: { mode: 'volley', y: [1.0, 2.1] } },
     ],
   },
   {
@@ -160,15 +141,12 @@ export const DRILLS: Drill[] = [
     ],
     goal: '끊기지 않고 보스트-크로스 5번 왕복',
     measure: 'count',
-    path: [
-      { x: 5.6, z: 8.0, kind: 'start' },
-      { x: 6.4, z: 6.6, kind: 'side' },
-      { x: 1.8, z: 0, h: 1.1, kind: 'front' },
-      { x: 0.9, z: 2.4, kind: 'floor' },
-      { x: 1.2, z: 2.8, kind: 'start' },
-      { x: 3.6, z: 0, h: 1.9, kind: 'front' },
-      { x: 5.4, z: 6.3, kind: 'floor' },
-      { x: 5.6, z: 8.0, kind: 'start' },
+    start: { x: 2.4, y: 0.7, z: 8.0 },
+    sequence: [
+      { label: '보스트', kind: 'boast' },
+      { label: '크로스 드라이브', to: { x: 2.4, z: 8.0 }, front: { x: [-0.6, 1.6], y: [1.5, 3.2] }, speed: [11, 18], hit: { mode: 'bounce' } },
+      { label: '보스트', kind: 'boast' },
+      { label: '크로스 드라이브', to: { x: 2.4, z: 8.0 }, front: { x: [-0.6, 1.6], y: [1.5, 3.2] }, speed: [11, 18], hit: { mode: 'bounce' } },
     ],
   },
   {
@@ -184,13 +162,11 @@ export const DRILLS: Drill[] = [
     ],
     goal: '드라이브 2개 + 드롭 1개 묶음을 연속 5번',
     measure: 'count',
-    path: [
-      { x: 5.2, z: 6.4, kind: 'start' },
-      { x: 5.7, z: 0, h: 2.0, kind: 'front' },
-      { x: 5.6, z: 4.6, kind: 'floor' },
-      { x: 5.2, z: 4.4, kind: 'start' },
-      { x: 5.9, z: 0, h: 0.7, kind: 'front' },
-      { x: 6.0, z: 1.1, kind: 'floor' },
+    start: { x: 2.2, y: 0.8, z: 5.0 },
+    sequence: [
+      { label: '드라이브', to: { x: 2.2, z: 4.8 }, front: { x: [1.6, 3.0], y: [1.2, 2.4] }, speed: [8, 14], hit: { mode: 'bounce' } },
+      { label: '드라이브', to: { x: 2.2, z: 4.6 }, front: { x: [1.6, 3.0], y: [1.2, 2.4] }, speed: [8, 14], hit: { mode: 'bounce' } },
+      { label: '드롭', kind: 'drop' },
     ],
   },
   {
@@ -202,13 +178,12 @@ export const DRILLS: Drill[] = [
     steps: ['앞벽 높은 곳에 부드럽게 쳐서 공이 높이 떠서 내 앞으로 오게 해요.', '허리 위로 내려오는 공을 위에서 아래로 쳐 틴 바로 위에 맞혀요.', '공이 쇼트 라인 앞에서 두 번 튀면 성공. 다시 띄워 반복해요.'],
     goal: '10개 중 5개가 틴 위 50cm 안',
     measure: 'ratio',
-    path: [
-      { x: 4.2, z: 4.4, kind: 'start' },
-      { x: 5.6, z: 0, h: 0.6, kind: 'front' },
-      { x: 5.8, z: 2.4, kind: 'floor' },
-      { x: 6.0, z: 3.6, kind: 'floor' },
+    start: { x: 1.3, y: 1.3, z: 4.4 },
+    sequence: [
+      { label: '높게 띄우기', to: { x: 1.4, z: 4.4 }, front: { x: [0.6, 2.0], y: [2.6, 4.0] }, speed: [7, 12], hit: { mode: 'bounce', y: [1.0, 1.6] } },
+      { label: '킬', kind: 'kill' },
     ],
-    targets: [{ x: 4.6, z: 1.4, w: 1.8, d: 2.6, label: '두 번째 바운드' }],
+    targets: [{ x0: 1.4, x1: 3.2, z0: 1.4, z1: 4.0, label: '두 번째 바운드' }],
   },
   {
     id: 'cut',
@@ -219,12 +194,8 @@ export const DRILLS: Drill[] = [
     steps: ['같은 높이로 앞벽에 공을 다섯 번은 평평하게, 다섯 번은 면을 열고 깎아 쳐요.', '깎아 친 공이 앞벽에서 덜 튀고 바닥에서 낮게 미끄러지는지 비교해요.', '차이가 느껴지면 깎아 치는 드롭과 발리에 섞어 써요.'],
     goal: '깎아 친 공의 두 번째 바운드가 무릎 아래로 낮게, 10개 중 7개',
     measure: 'ratio',
-    path: [
-      { x: 4.7, z: 4.4, kind: 'start' },
-      { x: 5.6, z: 0, h: 0.9, kind: 'front' },
-      { x: 5.8, z: 1.3, kind: 'floor' },
-      { x: 5.9, z: 1.8, kind: 'floor' },
-    ],
+    start: { x: 1.6, y: 0.9, z: 4.2 },
+    sequence: [{ label: '깎아 친 드롭', kind: 'drop' }],
   },
   {
     id: 'corners',
@@ -235,19 +206,18 @@ export const DRILLS: Drill[] = [
     steps: ['연속 랠리를 하면서 한 번은 길게, 한 번은 짧게 번갈아 수건을 노려요.', '수건에 닿으면 3점, 수건 근처 한 걸음 안이면 1점.', '5분 동안의 점수를 적어 두고 다음에 갱신해요.'],
     goal: '5분에 20점 이상',
     measure: 'count',
-    path: [
-      { x: 3.4, z: 5.4, kind: 'start' },
-      { x: 5.6, z: 0, h: 2.0, kind: 'front' },
-      { x: 5.8, z: 8.6, kind: 'floor' },
-      { x: 4.8, z: 7.2, kind: 'start' },
-      { x: 0.7, z: 0, h: 0.7, kind: 'front' },
-      { x: 0.5, z: 1.0, kind: 'floor' },
+    start: { x: 0.3, y: 0.8, z: 5.4 },
+    sequence: [
+      { label: '크로스 드라이브', kind: 'cross' },
+      { label: '보스트', kind: 'boast' },
+      { label: '스트레이트 드라이브', kind: 'drive' },
+      { label: '보스트', kind: 'boast' },
     ],
     targets: [
-      { x: 0, z: 0, w: 1.3, d: 1.3 },
-      { x: 5.1, z: 0, w: 1.3, d: 1.3 },
-      { x: 0, z: 8.45, w: 1.3, d: 1.3 },
-      { x: 5.1, z: 8.45, w: 1.3, d: 1.3 },
+      { x0: -3.2, x1: -1.9, z0: 0, z1: 1.3 },
+      { x0: 1.9, x1: 3.2, z0: 0, z1: 1.3 },
+      { x0: -3.2, x1: -1.9, z0: 8.45, z1: 9.75 },
+      { x0: 1.9, x1: 3.2, z0: 8.45, z1: 9.75 },
     ],
   },
 ]

@@ -60,7 +60,9 @@ export function hashParam(name: string) {
   return new URLSearchParams(q).get(name)
 }
 
-/** 화면을 다시 그리지 않고 주소의 값만 바꾼다(공유·새로고침용) */
-export function setHashParam(route: Route, name: string, value: string) {
-  history.replaceState(null, '', `${href(route)}?${name}=${encodeURIComponent(value)}`)
+/** 화면을 다시 그리지 않고 주소의 값만 바꾼다(공유·새로고침용). 다른 값은 그대로 둔다 */
+export function setHashParams(route: Route, values: Record<string, string>) {
+  const q = new URLSearchParams(location.hash.split('?')[1] ?? '')
+  for (const [k, v] of Object.entries(values)) q.set(k, v)
+  history.replaceState(null, '', `${href(route)}?${q}`)
 }

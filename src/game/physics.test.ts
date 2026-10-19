@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { COURT, Shot, findReachWindow, inCpuReach, inYourReach, simulate, step, type Ball, type Vec } from './physics'
 import { cpuShot, intentFrom, judge, kindFor, newShot, plan, playerShot, type ShotKind } from './shots'
-import { winner } from './score'
+import { status, winner } from './score'
 
 function seeded(seed: number) {
   return () => {
@@ -118,6 +118,16 @@ describe('규칙', () => {
     expect(winner({ you: 7, cpu: 3 })).toBeNull()
   })
 
+  it('듀스와 게임볼을 알아본다', () => {
+    expect(status({ you: 10, cpu: 10 })).toBe('deuce')
+    expect(status({ you: 12, cpu: 12 })).toBe('deuce')
+    expect(status({ you: 10, cpu: 7 })).toBe('game-ball-you')
+    expect(status({ you: 11, cpu: 10 })).toBe('game-ball-you')
+    expect(status({ you: 9, cpu: 10 })).toBe('game-ball-cpu')
+    expect(status({ you: 9, cpu: 9 })).toBeNull()
+    expect(status({ you: 11, cpu: 9 })).toBeNull()
+  })
+
   it('서브가 옆벽부터 맞거나 같은 쪽에 떨어지면 서브 폴트', () => {
     expect(new Shot('you', true, 1).apply({ hit: 'side', at: { x: 3.1, y: 1.5, z: 5 } })).toBe('serve-fault')
     const s = new Shot('you', true, 1)
@@ -200,14 +210,22 @@ describe('뒷벽', () => {
   })
 })
 
-describe('기술 백과', () => {
-  it('모든 샷의 3D 그림이 조건에 맞게 만들어진다', async () => {
+describe('기술 백과와 혼자 연습 3D', () => {
+  it('모든 샷의 3D 그림이 포핸드·백핸드 모두 조건에 맞게 만들어진다', async () => {
     const { SHOTS, shotSim } = await import('../data/shots')
-    for (const s of SHOTS) {
-      const sim = shotSim(s)
-      expect(sim, s.id).not.toBeNull()
-      expect(sim!.result, s.id).toBe('double')
-      expect(sim!.points.length, s.id).toBeGreaterThan(10)
-    }
+    for (const s of SHOTS)
+      for (const back of [false, true]) {
+        const [seg] = shotSim(s, back)
+        expect(seg, `${s.id} ${back}`).toBeTruthy()
+        expect(seg.sim.result, s.id).toBe('double')
+        expect(Math.sign(seg.from.x), '백핸드는 왼쪽에서').toBe(back ? -1 : 1)
+      }
+  })
+
+  it('모든 연습이 끝까지 이어진다', async () => {
+    const { DRILLS } = await import('../data/drills')
+    const { buildSequence } = await import('./sequence')
+    for (const d of DRILLS)
+      for (const back of [false, true]) expect(buildSequence(d.id, d.start, d.sequence, back).length, `${d.id} ${back}`).toBe(d.sequence.length)
   })
 })
