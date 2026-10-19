@@ -34,8 +34,8 @@ export default function Shots() {
       </PageHead>
 
       <Section kicker="3D SHOTS" title="샷을 3D로 보기" id="viewer">
-        <div className="grid gap-5 lg:grid-cols-[260px_1fr]">
-          <div className="space-y-3 lg:space-y-4">
+        <div className="grid gap-5 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <div className="min-w-0 space-y-3 lg:space-y-4">
             {GROUPS.map((g) => (
               <div key={g}>
                 <p className="text-[13px] font-semibold text-muted">{g}</p>
@@ -56,9 +56,9 @@ export default function Shots() {
             ))}
           </div>
 
-          <Card className="p-3 md:p-5">
+          <Card className="min-w-0 p-3 md:p-5">
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_1fr]">
-              <div>
+              <div className="min-w-0">
                 <div className="mb-2 flex flex-wrap gap-1.5" role="group" aria-label="보는 방향">
                   {Object.values(VIEWS).map((v) => (
                     <button
