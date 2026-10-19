@@ -1,0 +1,1959 @@
+{
+ "updated": "2026-10-19T07:53:13.192Z",
+ "season": "2026/2027",
+ "events": [
+  {
+   "id": 78939,
+   "name": "Lancaster Open 2026",
+   "start": "2026-10-04",
+   "end": "2026-10-05",
+   "location": "Lancaster, USA",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/lancaster-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79186,
+   "name": "Factory Of Champions Alex. Sat. 11 – 2026",
+   "start": "2026-10-05",
+   "end": "2026-10-07",
+   "location": "Alexandria , EGY",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/factory-of-champions-alex-sat-11-2026/",
+   "tv": false
+  },
+  {
+   "id": 79122,
+   "name": "1st Hashim Khan Satellite Squash Championship 2026",
+   "start": "2026-10-05",
+   "end": "2026-10-09",
+   "location": "Cantt, PAK",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/1st-hashim-khan-satellite-squash-championship-2026/",
+   "tv": false
+  },
+  {
+   "id": 79039,
+   "name": "Hamilton Open 2026",
+   "start": "2026-10-05",
+   "end": "2026-10-09",
+   "location": "Lancaster, USA",
+   "tier": "Challenger 15",
+   "group": "challenger",
+   "prize": 15000,
+   "draws": [
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/hamilton-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79106,
+   "name": "CIB Egyptian Squash Open 2026",
+   "start": "2026-10-06",
+   "end": "2026-10-16",
+   "location": "Giza, EGY",
+   "tier": "Diamond",
+   "group": "world",
+   "prize": 735000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/cib-egyptian-squash-open-2026/",
+   "tv": true
+  },
+  {
+   "id": 78682,
+   "name": "18th Sri Lanka Air Force Open Squash Championship 2026",
+   "start": "2026-10-06",
+   "end": "2026-10-10",
+   "location": "Ratmalana, SRI",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/18th-sri-lanka-air-force-open-squash-championship-2026/",
+   "tv": false
+  },
+  {
+   "id": 78832,
+   "name": "Albufeira PSA Cidade Europeia Desporto 2026",
+   "start": "2026-10-07",
+   "end": "2026-10-11",
+   "location": "Albufeira, POR",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 6000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/albufeira-psa-cidade-europeia-desporto-2026/",
+   "tv": false
+  },
+  {
+   "id": 79139,
+   "name": "Western Province Open PSA #2 2026",
+   "start": "2026-10-08",
+   "end": "2026-10-11",
+   "location": "Cape Town, RSA",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 3000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/western-province-open-psa-2-2026/",
+   "tv": false
+  },
+  {
+   "id": 79128,
+   "name": "Match Point Sat. 45 – 2026",
+   "start": "2026-10-08",
+   "end": "2026-10-11",
+   "location": "Nasr City, EGY",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/match-point-sat-45-2026/",
+   "tv": false
+  },
+  {
+   "id": 79038,
+   "name": "Astana Open Squash 2026",
+   "start": "2026-10-08",
+   "end": "2026-10-11",
+   "location": "Astana, KAZ",
+   "tier": "Challenger 6",
+   "group": "challenger",
+   "prize": 6000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/astana-open-squash-2026/",
+   "tv": false
+  },
+  {
+   "id": 78680,
+   "name": "Rompharm Cup Closed III 2026",
+   "start": "2026-10-08",
+   "end": "2026-10-09",
+   "location": "Otopeni, ROU",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/rompharm-cup-closed-iii-2026/",
+   "tv": false
+  },
+  {
+   "id": 79070,
+   "name": "Copa De SM La Reina Iberdrola De Squash 2026",
+   "start": "2026-10-09",
+   "end": "2026-10-11",
+   "location": "Palencia, ESP",
+   "tier": "Federation National Championships (Senior)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/copa-de-sm-la-reina-iberdrola-de-squash-2026/",
+   "tv": false
+  },
+  {
+   "id": 78996,
+   "name": "Hungarian Junior Open 2026",
+   "start": "2026-10-09",
+   "end": "2026-10-11",
+   "location": "Budapest, HUN",
+   "tier": "Federation National Open (U17) · Federation National Open (U19)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "W",
+    "M",
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/hungarian-junior-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79061,
+   "name": "Les Princesses 2026",
+   "start": "2026-10-10",
+   "end": "2026-10-11",
+   "location": "Charvieu-Chavagneux, FRA",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2950,
+   "draws": [
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/les-princesses-2026/",
+   "tv": false
+  },
+  {
+   "id": 78935,
+   "name": "US Challenger Series #3 2026",
+   "start": "2026-10-10",
+   "end": "2026-10-12",
+   "location": "Redwood City, USA",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 6000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/us-challenger-series-3-2026/",
+   "tv": false
+  },
+  {
+   "id": 79158,
+   "name": "QSF 4 PSA Challenger 2026",
+   "start": "2026-10-12",
+   "end": "2026-10-15",
+   "location": "Doha, QAT",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 3000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/qsf-4-psa-challenger-2026/",
+   "tv": false
+  },
+  {
+   "id": 79340,
+   "name": "Tennis & Racquet Club Boston Open 2026",
+   "start": "2026-10-14",
+   "end": "2026-10-18",
+   "location": "Boston, USA",
+   "tier": "Challenger 18",
+   "group": "challenger",
+   "prize": 18000,
+   "draws": [
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/tennis-racquet-club-boston-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 81815,
+   "name": "China National Squash Championships 2026",
+   "start": "2026-10-15",
+   "end": "2026-10-18",
+   "location": "Chengdu, CHN",
+   "tier": "Federation National Championships (Senior)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/china-national-squash-championships-2026/",
+   "tv": false
+  },
+  {
+   "id": 79046,
+   "name": "ESF European Squash Cup U23 2026",
+   "start": "2026-10-15",
+   "end": "2026-10-18",
+   "location": "Lisbon, POR",
+   "tier": "Federation Regional Championships (U23)",
+   "group": "other",
+   "prize": 4000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/esf-european-squash-cup-u23-2026/",
+   "tv": false
+  },
+  {
+   "id": 78950,
+   "name": "La Classique de Gatineau 2026",
+   "start": "2026-10-15",
+   "end": "2026-10-18",
+   "location": "Gatineau, CAN",
+   "tier": "Challenger 3 · Satellite",
+   "group": "challenger",
+   "prize": 3000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/la-classique-de-gatineau-2026/",
+   "tv": false
+  },
+  {
+   "id": 78922,
+   "name": "Match Point Sat. 46 – 2026",
+   "start": "2026-10-15",
+   "end": "2026-10-18",
+   "location": "Nasr City, EGY",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/match-point-sat-46-2026/",
+   "tv": false
+  },
+  {
+   "id": 79163,
+   "name": "Copa Morelos PSA 2026",
+   "start": "2026-10-16",
+   "end": "2026-10-18",
+   "location": "Morelia, MEX",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/copa-morelos-psa-2026/",
+   "tv": false
+  },
+  {
+   "id": 78963,
+   "name": "Romanian Junior Open 2026",
+   "start": "2026-10-16",
+   "end": "2026-10-18",
+   "location": "Bucharest, ROU",
+   "tier": "Federation National Open (U17) · Federation National Open (U19)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "M",
+    "W",
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/romanian-junior-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78859,
+   "name": "One More Game International 2026",
+   "start": "2026-10-17",
+   "end": "2026-10-18",
+   "location": "Krasnoyarsk, RUS",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/one-more-game-international-2026/",
+   "tv": false
+  },
+  {
+   "id": 79256,
+   "name": "Factory Of Champions Alex. Sat. 12 – 2026",
+   "start": "2026-10-19",
+   "end": "2026-10-21",
+   "location": "Alexandria , EGY",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/factory-of-champions-alex-sat-12-2026/",
+   "tv": false
+  },
+  {
+   "id": 79350,
+   "name": "HKS PSA Satellite Cup 2026-4th Leg 2026",
+   "start": "2026-10-20",
+   "end": "2026-10-24",
+   "location": "Shatin, HKG",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/hks-psa-satellite-cup-2026-4th-leg-2026/",
+   "tv": false
+  },
+  {
+   "id": 79286,
+   "name": "360 Summitt 2026",
+   "start": "2026-10-20",
+   "end": "2026-10-24",
+   "location": "Denver, USA",
+   "tier": "Challenger 9",
+   "group": "challenger",
+   "prize": 18000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/360-summitt-2026/",
+   "tv": false
+  },
+  {
+   "id": 78783,
+   "name": "Silicon Valley Open 2026 presented by Oracle NetSuite",
+   "start": "2026-10-20",
+   "end": "2026-10-24",
+   "location": "Redwood City, USA",
+   "tier": "Gold",
+   "group": "world",
+   "prize": 287000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/silicon-valley-open-2026/",
+   "tv": true
+  },
+  {
+   "id": 78704,
+   "name": "Assore Joburg Open 2026",
+   "start": "2026-10-20",
+   "end": "2026-10-24",
+   "location": "Johannesburg, RSA",
+   "tier": "Challenger 12 · Challenger 9",
+   "group": "challenger",
+   "prize": 21000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/assore-joburg-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79210,
+   "name": "Venus ABC Open 2026",
+   "start": "2026-10-21",
+   "end": "2026-10-25",
+   "location": "Karachi, PAK",
+   "tier": "Copper",
+   "group": "world",
+   "prize": 82000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/venus-abc-open-2026/",
+   "tv": true
+  },
+  {
+   "id": 78802,
+   "name": "PSNS 3K Challenger 2026",
+   "start": "2026-10-21",
+   "end": "2026-10-25",
+   "location": "Negeri Sembilan, MAS",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 6000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/psns-3k-challenger-2026/",
+   "tv": false
+  },
+  {
+   "id": 78728,
+   "name": "4ème Open PSA de Couzeix/Limoges 2026",
+   "start": "2026-10-21",
+   "end": "2026-10-25",
+   "location": "Couzeix, FRA",
+   "tier": "Challenger 15",
+   "group": "challenger",
+   "prize": 15000,
+   "draws": [
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/4eme-open-psa-de-couzeix-limoges-2026/",
+   "tv": false
+  },
+  {
+   "id": 78724,
+   "name": "CCSA Chicago Open 2026",
+   "start": "2026-10-21",
+   "end": "2026-10-25",
+   "location": "Lake Forest, USA",
+   "tier": "Challenger 18",
+   "group": "challenger",
+   "prize": 18000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/ccsa-chicago-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78776,
+   "name": "French Junior Open 2026",
+   "start": "2026-10-22",
+   "end": "2026-10-26",
+   "location": "Wambrechies, FRA",
+   "tier": "Federation National Open (U17) · Federation National Open (U19)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "W",
+    "M",
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/french-junior-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78778,
+   "name": "Match Point Sat. 47 – 2026",
+   "start": "2026-10-22",
+   "end": "2026-10-25",
+   "location": "Nasr City, EGY",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/match-point-sat-47-2026/",
+   "tv": false
+  },
+  {
+   "id": 79334,
+   "name": "Copenhagen Open 2026",
+   "start": "2026-10-23",
+   "end": "2026-10-25",
+   "location": "Copenhagen, DEN",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/copenhagen-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79037,
+   "name": "Lithuanian Junior Open 2026",
+   "start": "2026-10-23",
+   "end": "2026-10-25",
+   "location": "Kaunas,, LTU",
+   "tier": "Federation National Open (U17) · Federation National Open (U19)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "M",
+    "W",
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/lithuanian-junior-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78980,
+   "name": "Colombo Junior Open Squash Championship 2026",
+   "start": "2026-10-24",
+   "end": "2026-10-28",
+   "location": "Ratmalana, SRI",
+   "tier": "Federation National Championships (U17) · Federation National Championships (U19)",
+   "group": "other",
+   "prize": 546,
+   "draws": [
+    "M",
+    "W",
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/colombo-junior-open-squash-championship-2026/",
+   "tv": false
+  },
+  {
+   "id": 78919,
+   "name": "Smart Centres Canada Cup 2026",
+   "start": "2026-10-25",
+   "end": "2026-10-30",
+   "location": "Toronto, CAN",
+   "tier": "Silver",
+   "group": "world",
+   "prize": 114500,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/smart-centres-canada-cup-2026/",
+   "tv": true
+  },
+  {
+   "id": 78842,
+   "name": "Canadian Women’s Open 2026",
+   "start": "2026-10-25",
+   "end": "2026-10-30",
+   "location": "Toronto, CAN",
+   "tier": "Silver",
+   "group": "world",
+   "prize": 103750,
+   "draws": [
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/canadian-womens-open-2026/",
+   "tv": true
+  },
+  {
+   "id": 79009,
+   "name": "6eme Open International de Squash Lagord 2026",
+   "start": "2026-10-27",
+   "end": "2026-10-31",
+   "location": "Lagord, FRA",
+   "tier": "Challenger 12",
+   "group": "challenger",
+   "prize": 12000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/6eme-open-international-de-squash-lagord-2026/",
+   "tv": false
+  },
+  {
+   "id": 79179,
+   "name": "Swiss Open Lukas Gadola Memorial 2026",
+   "start": "2026-10-28",
+   "end": "2026-11-01",
+   "location": "Uster, SUI",
+   "tier": "Challenger 12 · Challenger 9 · Satellite",
+   "group": "challenger",
+   "prize": 23000,
+   "draws": [
+    "M",
+    "W",
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/swiss-open-lukas-gadola-memorial-2026/",
+   "tv": false
+  },
+  {
+   "id": 78826,
+   "name": "North Coast Open 2026",
+   "start": "2026-10-28",
+   "end": "2026-11-01",
+   "location": "Coffs Harbour, AUS",
+   "tier": "Challenger 6",
+   "group": "challenger",
+   "prize": 12000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/north-coast-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78914,
+   "name": "Czech Open 2026",
+   "start": "2026-10-29",
+   "end": "2026-11-02",
+   "location": "Brno, CZE",
+   "tier": "Challenger 9 · Copper",
+   "group": "world",
+   "prize": 44000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/czech-open-2026/",
+   "tv": true
+  },
+  {
+   "id": 78677,
+   "name": "Match Point Sat. 48 – 2026",
+   "start": "2026-10-29",
+   "end": "2026-11-01",
+   "location": "Nasr City, EGY",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/match-point-sat-48-2026/",
+   "tv": false
+  },
+  {
+   "id": 79238,
+   "name": "Moscow Squash Open 2026",
+   "start": "2026-10-30",
+   "end": "2026-11-01",
+   "location": "Moscow, RUS",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/moscow-squash-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79024,
+   "name": "Oregon State Championships 2026 (MAC Tournament Series 2026/27)",
+   "start": "2026-10-30",
+   "end": "2026-11-01",
+   "location": "Portland, USA",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/oregon-state-championships-2026-mac-tournament-series-2026-27/",
+   "tv": false
+  },
+  {
+   "id": 78967,
+   "name": "Belgian Junior Open 2026",
+   "start": "2026-10-30",
+   "end": "2026-11-01",
+   "location": "Liège, BEL",
+   "tier": "Federation National Open (U17) · Federation National Open (U19)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "M",
+    "M",
+    "W",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/belgian-junior-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78948,
+   "name": "2026 North Coast Open Satellite",
+   "start": "2026-10-30",
+   "end": "2026-11-01",
+   "location": "Coffs Harbour, AUS",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/2026-north-coast-open-satellite/",
+   "tv": false
+  },
+  {
+   "id": 78874,
+   "name": "Nallisport PSA Satellite 2026",
+   "start": "2026-10-31",
+   "end": "2026-11-01",
+   "location": "Oulu, FIN",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/nallisport-psa-satellite-2026/",
+   "tv": false
+  },
+  {
+   "id": 78811,
+   "name": "Belgium Junior Open 2026",
+   "start": "2026-10-31",
+   "end": "2026-11-02",
+   "location": "Herentals, BEL",
+   "tier": "Federation National Open (U17) · Federation National Open (U19)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "W",
+    "M",
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/belgium-junior-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79308,
+   "name": "Freshbox Cup 2026",
+   "start": "2026-11-01",
+   "end": "2026-11-02",
+   "location": "Brno, CZE",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/freshbox-cup-2026/",
+   "tv": false
+  },
+  {
+   "id": 78910,
+   "name": "US Open Squash Championships 2026 powered by Comcast Business",
+   "start": "2026-11-01",
+   "end": "2026-11-07",
+   "location": "Philadelphia, USA",
+   "tier": "Platinum",
+   "group": "world",
+   "prize": 478000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/u-s-open-2026/",
+   "tv": true
+  },
+  {
+   "id": 79259,
+   "name": "NSW Open 2026",
+   "start": "2026-11-03",
+   "end": "2026-11-07",
+   "location": "Sydney, AUS",
+   "tier": "Challenger 6",
+   "group": "challenger",
+   "prize": 12000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/nsw-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79239,
+   "name": "London Open 2026",
+   "start": "2026-11-04",
+   "end": "2026-11-08",
+   "location": "London, ENG",
+   "tier": "Challenger 18",
+   "group": "challenger",
+   "prize": 36000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/london-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78917,
+   "name": "Bern Squash Open 2026",
+   "start": "2026-11-04",
+   "end": "2026-11-08",
+   "location": "Bern, SUI",
+   "tier": "Challenger 12",
+   "group": "challenger",
+   "prize": 24000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/bern-squash-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79311,
+   "name": "Polish Junior Open 2026",
+   "start": "2026-11-05",
+   "end": "2026-11-08",
+   "location": "Wroclaw, POL",
+   "tier": "Federation National Open (U17) · Federation National Open (U19)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "M",
+    "W",
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/polish-junior-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79050,
+   "name": "Richardson Wealth Vancouver PSA Open 2026",
+   "start": "2026-11-05",
+   "end": "2026-11-09",
+   "location": "Vancouver, CAN",
+   "tier": "Copper",
+   "group": "world",
+   "prize": 33750,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/richardson-wealth-vancouver-psa-open-2026/",
+   "tv": true
+  },
+  {
+   "id": 79279,
+   "name": "GMS Accountants Sports Academy Open 2026",
+   "start": "2026-11-06",
+   "end": "2026-11-08",
+   "location": "Cambridgeshire, ENG",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2852,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/gms-accountants-sports-academy-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79174,
+   "name": "Khan Foundation X Elevate Squash Satellite Series #2 2026",
+   "start": "2026-11-06",
+   "end": "2026-11-08",
+   "location": "Malvern, USA",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/khan-foundation-x-elevate-squash-satellite-series-2-2026/",
+   "tv": false
+  },
+  {
+   "id": 78823,
+   "name": "PSA Boulat 2026",
+   "start": "2026-11-06",
+   "end": "2026-11-08",
+   "location": "Saint-Étienne, FRA",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 3000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/psa-boulat-2026/",
+   "tv": false
+  },
+  {
+   "id": 78797,
+   "name": "PSA Bergen Open 2026",
+   "start": "2026-11-06",
+   "end": "2026-11-08",
+   "location": "Sandsli, NOR",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/psa-bergen-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78955,
+   "name": "SACC Costa Rica Open 2026",
+   "start": "2026-11-10",
+   "end": "2026-11-14",
+   "location": "Santa Ana, CRC",
+   "tier": "Challenger 18",
+   "group": "challenger",
+   "prize": 36000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/sacc-costa-rica-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79318,
+   "name": "KemTek Kelowna Open 2026",
+   "start": "2026-11-11",
+   "end": "2026-11-15",
+   "location": "Kelowna, CAN",
+   "tier": "Challenger 9",
+   "group": "challenger",
+   "prize": 9000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/kemtek-kelowna-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79250,
+   "name": "Lausanne Open 2026 by Redsen",
+   "start": "2026-11-11",
+   "end": "2026-11-15",
+   "location": "Renens, SUI",
+   "tier": "Challenger 12",
+   "group": "challenger",
+   "prize": 24000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/lausanne-open-2026-by-redsen/",
+   "tv": false
+  },
+  {
+   "id": 79026,
+   "name": "ARDEX Open 2026 @ WeCare Squash Germering",
+   "start": "2026-11-11",
+   "end": "2026-11-15",
+   "location": "Germering, GER",
+   "tier": "Challenger 12 · Challenger 6",
+   "group": "challenger",
+   "prize": 18000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/ardex-open-2026-wecare-squash-germering/",
+   "tv": false
+  },
+  {
+   "id": 78976,
+   "name": "Pittsburgh Open 2026 presented by Spanos Group of Raymond James",
+   "start": "2026-11-11",
+   "end": "2026-11-15",
+   "location": "Pittsburgh, USA",
+   "tier": "Silver",
+   "group": "world",
+   "prize": 96000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/pittsburgh-open-2026-presented-by-spanos-group-of-raymond-james/",
+   "tv": true
+  },
+  {
+   "id": 78719,
+   "name": "UTU Singapore Classic 2026",
+   "start": "2026-11-11",
+   "end": "2026-11-15",
+   "location": "Singapore, SIN",
+   "tier": "Challenger 15",
+   "group": "challenger",
+   "prize": 30000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/utu-singapore-classic-2026/",
+   "tv": false
+  },
+  {
+   "id": 79295,
+   "name": "Irish Junior Open 2026",
+   "start": "2026-11-13",
+   "end": "2026-11-15",
+   "location": "Dublin, IRL",
+   "tier": "Federation National Open (U17) · Federation National Open (U19)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "M",
+    "W",
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/irish-junior-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79297,
+   "name": "SquashLife Tour powered by Dunlop Delft 2026",
+   "start": "2026-11-13",
+   "end": "2026-11-14",
+   "location": "Delft, NED",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/squashlife-tour-powered-by-dunlop-delft-2026/",
+   "tv": false
+  },
+  {
+   "id": 78999,
+   "name": "Campionati Italiani Assoluti Giovanili Individuali 2026",
+   "start": "2026-11-13",
+   "end": "2026-11-15",
+   "location": "Riccione, ITA",
+   "tier": "Federation National Championships (U19)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/campionati-italiani-assoluti-giovanili-individuali-2026/",
+   "tv": false
+  },
+  {
+   "id": 78900,
+   "name": "US Challenger Series #4 2026",
+   "start": "2026-11-13",
+   "end": "2026-11-15",
+   "location": "Washington, USA",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 6000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/us-challenger-series-4-2026/",
+   "tv": false
+  },
+  {
+   "id": 79116,
+   "name": "Nallisport PSA Satellite 2026",
+   "start": "2026-11-14",
+   "end": "2026-11-15",
+   "location": "Oulu, FIN",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/nallisport-psa-satellite-2026-2/",
+   "tv": false
+  },
+  {
+   "id": 79075,
+   "name": "Ararat Satellite 2026",
+   "start": "2026-11-14",
+   "end": "2026-11-15",
+   "location": "Yerevan, ARM",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/ararat-satellite-2026/",
+   "tv": false
+  },
+  {
+   "id": 78878,
+   "name": "QSF 3 PSA Copper 2026",
+   "start": "2026-11-15",
+   "end": "2026-11-19",
+   "location": "Doha, QAT",
+   "tier": "Copper",
+   "group": "world",
+   "prize": 40500,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/qsf-3-psa-copper-2026/",
+   "tv": false
+  },
+  {
+   "id": 78760,
+   "name": "Hong Kong Squash PSA Challenge Cup 2026",
+   "start": "2026-11-16",
+   "end": "2026-11-20",
+   "location": "Hong Kong, HKG",
+   "tier": "Challenger 12",
+   "group": "challenger",
+   "prize": 24000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/hks-psa-challenger-cup-2026/",
+   "tv": false
+  },
+  {
+   "id": 79310,
+   "name": "China Squash Open 2026",
+   "start": "2026-11-17",
+   "end": "2026-11-22",
+   "location": "Shanghai, CHN",
+   "tier": "Gold",
+   "group": "world",
+   "prize": 279000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/china-squash-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78918,
+   "name": "Open International Niort Venise Verte 2026",
+   "start": "2026-11-17",
+   "end": "2026-11-21",
+   "location": "Bessines, FRA",
+   "tier": "Challenger 15",
+   "group": "challenger",
+   "prize": 15000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/open-international-niort-venise-verte-2026/",
+   "tv": false
+  },
+  {
+   "id": 78770,
+   "name": "Istanbul Squash Open 2026",
+   "start": "2026-11-17",
+   "end": "2026-11-21",
+   "location": "İstanbul, TUR",
+   "tier": "Challenger 12",
+   "group": "challenger",
+   "prize": 12000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/istanbul-squash-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79042,
+   "name": "Northwestern Ontario Squash Open 2026",
+   "start": "2026-11-18",
+   "end": "2026-11-22",
+   "location": "Thunder Bay, CAN",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 3000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/northwestern-ontario-squash-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79313,
+   "name": "47º Campeonato Brasileiro de Squash 2026",
+   "start": "2026-11-19",
+   "end": "2026-11-22",
+   "location": "Brasilia, BRA",
+   "tier": "Federation National Championships (Senior)",
+   "group": "other",
+   "prize": 11788,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/47o-campeonato-brasileiro-de-squash-2026/",
+   "tv": false
+  },
+  {
+   "id": 78774,
+   "name": "Clarence Open 2026",
+   "start": "2026-11-19",
+   "end": "2026-11-22",
+   "location": "Hobart, AUS",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 3000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/clarence-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78759,
+   "name": "Bee Squash PSA Closed Satellite Event 2 2026",
+   "start": "2026-11-20",
+   "end": "2026-11-22",
+   "location": "Springfield, USA",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 0,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/bee-squash-psa-closed-satellite-event-2-2026/",
+   "tv": false
+  },
+  {
+   "id": 79196,
+   "name": "QSF 5 PSA Challenger 2026",
+   "start": "2026-11-23",
+   "end": "2026-11-26",
+   "location": "Doha, QAT",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 3000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/qsf-5-psa-challenger-2026/",
+   "tv": false
+  },
+  {
+   "id": 79055,
+   "name": "Monte Carlo Squash Classic 2026",
+   "start": "2026-11-23",
+   "end": "2026-11-27",
+   "location": "Monte Carlo, MON",
+   "tier": "Copper",
+   "group": "world",
+   "prize": 41500,
+   "draws": [
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/monte-carlo-squash-classic-2026/",
+   "tv": false
+  },
+  {
+   "id": 79132,
+   "name": "Les Elles de L’Est Challenger 2026",
+   "start": "2026-11-24",
+   "end": "2026-11-28",
+   "location": "Maxéville, FRA",
+   "tier": "Challenger 6",
+   "group": "challenger",
+   "prize": 6000,
+   "draws": [
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/les-elles-de-lest-challenger-2026/",
+   "tv": false
+  },
+  {
+   "id": 79133,
+   "name": "CAS International Squash Championships 2026",
+   "start": "2026-11-24",
+   "end": "2026-11-28",
+   "location": "Islamabad, PAK",
+   "tier": "Copper",
+   "group": "world",
+   "prize": 40000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/cas-international-squash-championships-2026/",
+   "tv": true
+  },
+  {
+   "id": 79011,
+   "name": "BDO Namibian Open 2026",
+   "start": "2026-11-24",
+   "end": "2026-11-28",
+   "location": "Windhoek, NAM",
+   "tier": "Challenger 15",
+   "group": "challenger",
+   "prize": 15000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/bdo-namibian-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78849,
+   "name": "Arrayanes Country Club Open 2026",
+   "start": "2026-11-24",
+   "end": "2026-11-28",
+   "location": "Quito, ECU",
+   "tier": "Challenger 9",
+   "group": "challenger",
+   "prize": 18000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/arrayanes-country-club-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78835,
+   "name": "Hong Kong Football Club Squash Open 2026",
+   "start": "2026-11-24",
+   "end": "2026-11-28",
+   "location": "Hong Kong, CHN",
+   "tier": "Silver",
+   "group": "world",
+   "prize": 193000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/hong-kong-football-club-squash-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 89580,
+   "name": "University of Victoria Open 2026",
+   "start": "2026-11-25",
+   "end": "2026-11-29",
+   "location": "Victoria, CAN",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 6000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/university-of-victoria-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 89583,
+   "name": "Lachwil Cambridge Open 2026",
+   "start": "2026-11-26",
+   "end": "2026-11-29",
+   "location": "Wembley, AUS",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 3000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/lachwil-cambridge-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 81717,
+   "name": "Danish U23 National Championship 2026",
+   "start": "2026-11-27",
+   "end": "2026-11-29",
+   "location": "Birkerod, DEN",
+   "tier": "Federation National Championships (U23)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/danish-u23-national-championship-2026/",
+   "tv": false
+  },
+  {
+   "id": 79371,
+   "name": "Les Elles de l’Est 2026",
+   "start": "2026-11-27",
+   "end": "2026-11-29",
+   "location": "Maxéville, FRA",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2318,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/les-elles-de-lest-2026/",
+   "tv": false
+  },
+  {
+   "id": 79333,
+   "name": "Milwaukee Hong Kong Squash Open 2026",
+   "start": "2026-11-30",
+   "end": "2026-12-06",
+   "location": "Hong Kong, CHN",
+   "tier": "Platinum",
+   "group": "world",
+   "prize": 479000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/hong-kong-squash-open-2026/",
+   "tv": true
+  },
+  {
+   "id": 79366,
+   "name": "17th CNS International Squash Championship 2026",
+   "start": "2026-12-01",
+   "end": "2026-12-05",
+   "location": "Karachi, PAK",
+   "tier": "Challenger 18",
+   "group": "challenger",
+   "prize": 18000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/17th-cns-international-squash-championship-2026/",
+   "tv": false
+  },
+  {
+   "id": 79337,
+   "name": "The City of Logan Open 2026",
+   "start": "2026-12-02",
+   "end": "2026-12-06",
+   "location": "Daisy Hill QLD, AUS",
+   "tier": "Challenger 9 · Satellite",
+   "group": "challenger",
+   "prize": 10000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/the-city-of-logan-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79422,
+   "name": "Greetings Squash PSA Challenger 2026 Ⅱ at Issaki Red Brick",
+   "start": "2026-12-03",
+   "end": "2026-12-06",
+   "location": "Isesaki, JPN",
+   "tier": "Challenger 6",
+   "group": "challenger",
+   "prize": 6000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/greetings-squash-psa-challenger-2026-%e2%85%b1-at-issaki-red-brick/",
+   "tv": false
+  },
+  {
+   "id": 78762,
+   "name": "Yoseph Al Abdulwahab Memorial 2026",
+   "start": "2026-12-03",
+   "end": "2026-12-05",
+   "location": "King Abdullah road, KSA",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 3000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/yoseph-al-abdulwahab-memorial-2026/",
+   "tv": false
+  },
+  {
+   "id": 79369,
+   "name": "Khan Foundation X Elevate Squash Satellite Series #3 2026",
+   "start": "2026-12-04",
+   "end": "2026-12-06",
+   "location": "Malvern, USA",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/khan-foundation-x-elevate-squash-satellite-series-3-2026/",
+   "tv": false
+  },
+  {
+   "id": 78699,
+   "name": "Sindh Open 2026",
+   "start": "2026-12-06",
+   "end": "2026-12-10",
+   "location": "Karachi, PAK",
+   "tier": "Bronze",
+   "group": "world",
+   "prize": 130000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/sindh-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 90177,
+   "name": "Madeira International Tournament 2026",
+   "start": "2026-12-07",
+   "end": "2026-12-11",
+   "location": "Madeira, POR",
+   "tier": "Challenger 15 · Challenger 6",
+   "group": "challenger",
+   "prize": 21000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/madeira-international-tournament-2027/",
+   "tv": false
+  },
+  {
+   "id": 79303,
+   "name": "Open Cognac Challenger 2026",
+   "start": "2026-12-08",
+   "end": "2026-12-12",
+   "location": "Cognac, FRA",
+   "tier": "Challenger 9",
+   "group": "challenger",
+   "prize": 9000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/open-cognac-challenger-2026/",
+   "tv": false
+  },
+  {
+   "id": 79260,
+   "name": "Radalla Squash Open 2026",
+   "start": "2026-12-08",
+   "end": "2026-12-12",
+   "location": "Kouvola, FIN",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 6000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/kouvola-psa-challenger-2026/",
+   "tv": false
+  },
+  {
+   "id": 79074,
+   "name": "81st CCI Western India 2026",
+   "start": "2026-12-08",
+   "end": "2026-12-13",
+   "location": "Mumbai, IND",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/81st-cci-western-india-2026/",
+   "tv": false
+  },
+  {
+   "id": 78799,
+   "name": "ONCOCARE Singapore Junior Open 2026",
+   "start": "2026-12-08",
+   "end": "2026-12-13",
+   "location": "Singapore, SIN",
+   "tier": "Federation National Open (U17) · Federation National Open (U19)",
+   "group": "other",
+   "prize": 1658,
+   "draws": [
+    "M",
+    "W",
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/oncocare-singapore-junior-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 89933,
+   "name": "VII Golan Squash Academy Open 2026",
+   "start": "2026-12-09",
+   "end": "2026-12-12",
+   "location": "Milladoiro, ESP",
+   "tier": "Challenger 3",
+   "group": "challenger",
+   "prize": 3000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/vii-golan-squash-academy-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 78921,
+   "name": "SquashLife Tour powered by Dunlop Houtrust-Den Haag 2026",
+   "start": "2026-12-11",
+   "end": "2026-12-12",
+   "location": "The Hague, NED",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/squashlife-tour-powered-by-dunlop-houtrust-den-haag-2026/",
+   "tv": false
+  },
+  {
+   "id": 79262,
+   "name": "World Teams 2026",
+   "start": "2026-12-14",
+   "end": "2026-12-19",
+   "location": "Cheongju, KOR",
+   "tier": "Federation",
+   "group": "world",
+   "prize": 0,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/world-teams-2026/",
+   "tv": false
+  },
+  {
+   "id": 79081,
+   "name": "The Georgia Open 2026",
+   "start": "2026-12-16",
+   "end": "2026-12-20",
+   "location": "Atlanta, USA",
+   "tier": "Challenger 6",
+   "group": "challenger",
+   "prize": 6000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/the-georgia-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79094,
+   "name": "Kingdom of Saudi Arabia Men’s Open 2026",
+   "start": "2026-12-25",
+   "end": "2026-12-26",
+   "location": "Riyadh, KSA",
+   "tier": "Federation National Championships (Senior)",
+   "group": "other",
+   "prize": 2666,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/kingdom-of-saudi-arabia-mens-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79027,
+   "name": "Scottish Junior Open 2026",
+   "start": "2026-12-28",
+   "end": "2026-12-30",
+   "location": "Edinburgh, SCO",
+   "tier": "Federation National Open (U17) · Federation National Open (U19)",
+   "group": "other",
+   "prize": 0,
+   "draws": [
+    "M",
+    "W",
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/scottish-junior-open-2026/",
+   "tv": false
+  },
+  {
+   "id": 79430,
+   "name": "Karachi Open 2027",
+   "start": "2027-01-05",
+   "end": "2027-01-10",
+   "location": "Karachi, PAK",
+   "tier": "Gold",
+   "group": "world",
+   "prize": 250000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/karachi-open-2027/",
+   "tv": false
+  },
+  {
+   "id": 89429,
+   "name": "SquashLife Tour powered by Dunlop All Inn Squash – Utrecht 2027",
+   "start": "2027-01-15",
+   "end": "2027-01-16",
+   "location": "Utrecht, NED",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 1000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/squashlife-tour-powered-by-dunlop-all-inn-squash-utrecht-2027/",
+   "tv": false
+  },
+  {
+   "id": 79424,
+   "name": "Sprott Tournament of Champions 2027 presented by Crowd Street",
+   "start": "2027-01-21",
+   "end": "2027-01-28",
+   "location": "New York City, USA",
+   "tier": "Platinum",
+   "group": "world",
+   "prize": 508000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/sprott-tournament-of-champions-2027-presented-by-crowd-street/",
+   "tv": true
+  },
+  {
+   "id": 89431,
+   "name": "Niort National Femmes PSA Satellite 2026",
+   "start": "2027-01-22",
+   "end": "2027-01-24",
+   "location": "Bessines, FRA",
+   "tier": "Satellite",
+   "group": "satellite",
+   "prize": 2892,
+   "draws": [
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/niort-national-femmes-psa-satellite-2026/",
+   "tv": false
+  },
+  {
+   "id": 89892,
+   "name": "Gas City Open 2027",
+   "start": "2027-01-27",
+   "end": "2027-01-31",
+   "location": "Medicine Hat, CAN",
+   "tier": "Challenger 6",
+   "group": "challenger",
+   "prize": 6000,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/gas-city-open-2027/",
+   "tv": false
+  },
+  {
+   "id": 79439,
+   "name": "Squash on Fire Open 2027",
+   "start": "2027-01-27",
+   "end": "2027-01-31",
+   "location": "Washington, USA",
+   "tier": "Bronze",
+   "group": "world",
+   "prize": 120000,
+   "draws": [
+    "M",
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/squash-on-fire-open-2027/",
+   "tv": false
+  },
+  {
+   "id": 79435,
+   "name": "DR 21 Motor City Open 2027",
+   "start": "2027-02-02",
+   "end": "2027-02-06",
+   "location": "Detroit, USA",
+   "tier": "Silver",
+   "group": "world",
+   "prize": 98500,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/dr-21-motor-city-open-2027/",
+   "tv": false
+  },
+  {
+   "id": 79429,
+   "name": "Cincinnati Gaynor Cup 2027",
+   "start": "2027-02-03",
+   "end": "2027-02-07",
+   "location": "Cincinnati, USA",
+   "tier": "Silver",
+   "group": "world",
+   "prize": 93750,
+   "draws": [
+    "W"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/cincinnati-gaynor-cup-2027/",
+   "tv": false
+  },
+  {
+   "id": 89468,
+   "name": "JSW Indian Open 2027",
+   "start": "2027-02-09",
+   "end": "2027-02-13",
+   "location": "Mumbai, IND",
+   "tier": "Copper · Silver",
+   "group": "world",
+   "prize": 120000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/jsw-indian-open-2027/",
+   "tv": false
+  },
+  {
+   "id": 79433,
+   "name": "Champion Fiberglass Texas Open 2027",
+   "start": "2027-02-09",
+   "end": "2027-02-14",
+   "location": "Houston, USA",
+   "tier": "Gold",
+   "group": "world",
+   "prize": 266000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/champion-fiberglass-texas-open-2027/",
+   "tv": false
+  },
+  {
+   "id": 89891,
+   "name": "McMillan Goodfellow Classic 2027",
+   "start": "2027-02-16",
+   "end": "2027-02-20",
+   "location": "Toronto, CAN",
+   "tier": "Bronze",
+   "group": "world",
+   "prize": 63750,
+   "draws": [
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/mcmillan-goodfellow-classic/",
+   "tv": false
+  },
+  {
+   "id": 79428,
+   "name": "New Zealand Open 2027",
+   "start": "2027-02-16",
+   "end": "2027-02-21",
+   "location": "NZL",
+   "tier": "Silver",
+   "group": "world",
+   "prize": 225000,
+   "draws": [
+    "W",
+    "M"
+   ],
+   "link": "https://www.psasquashtour.com/tournament/new-zealand-open-2027/",
+   "tv": false
+  }
+ ]
+}

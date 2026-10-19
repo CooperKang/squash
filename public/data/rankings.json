@@ -1,0 +1,605 @@
+{
+ "updated": "2026-10-19T07:53:13.192Z",
+ "male": {
+  "top": [
+   {
+    "rank": 1,
+    "change": 0,
+    "name": "Mostafa Asal",
+    "country": "EGY",
+    "points": 27305,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/88.jpg",
+    "id": "88"
+   },
+   {
+    "rank": 2,
+    "change": 0,
+    "name": "Paul Coll",
+    "country": "NZL",
+    "points": 19964,
+    "racket": "Head",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/233.jpg",
+    "id": "233"
+   },
+   {
+    "rank": 3,
+    "change": 0,
+    "name": "Diego Elias",
+    "country": "PER",
+    "points": 14527,
+    "racket": "Dunlop",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/312.jpg",
+    "id": "312"
+   },
+   {
+    "rank": 4,
+    "change": 0,
+    "name": "Karim Gawad",
+    "country": "EGY",
+    "points": 15257,
+    "racket": "Harrow",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/7.jpg",
+    "id": "7"
+   },
+   {
+    "rank": 5,
+    "change": 0,
+    "name": "Victor Crouin",
+    "country": "FRA",
+    "points": 14071,
+    "racket": "Dunlop",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/251.jpg",
+    "id": "251"
+   },
+   {
+    "rank": 6,
+    "change": 0,
+    "name": "Mohamad Zakaria",
+    "country": "EGY",
+    "points": 12863,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1337.jpg",
+    "id": "1337"
+   },
+   {
+    "rank": 7,
+    "change": 0,
+    "name": "Youssef Ibrahim",
+    "country": "EGY",
+    "points": 10538,
+    "racket": "Harrow",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/516.jpg",
+    "id": "516"
+   },
+   {
+    "rank": 8,
+    "change": 0,
+    "name": "Joel Makin",
+    "country": "WAL",
+    "points": 9828,
+    "racket": "Karakal Raw Pro 2",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/726.jpg",
+    "id": "726"
+   },
+   {
+    "rank": 9,
+    "change": 0,
+    "name": "Marwan ElShorbagy",
+    "country": "ENG",
+    "points": 10153,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/326.jpg",
+    "id": "326"
+   },
+   {
+    "rank": 10,
+    "change": 0,
+    "name": "Aly Abou Eleinen",
+    "country": "EGY",
+    "points": 7924,
+    "racket": "Dunlop",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/17.jpg",
+    "id": "17"
+   },
+   {
+    "rank": 11,
+    "change": 0,
+    "name": "Youssef Soliman",
+    "country": "EGY",
+    "points": 6505,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1154.jpg",
+    "id": "1154"
+   },
+   {
+    "rank": 12,
+    "change": 0,
+    "name": "Leonel Cardenas",
+    "country": "MEX",
+    "points": 6856,
+    "racket": "Head",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/191.jpg",
+    "id": "191"
+   },
+   {
+    "rank": 13,
+    "change": 0,
+    "name": "Mohamed ElShorbagy",
+    "country": "ENG",
+    "points": 6463,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/327.jpg",
+    "id": "327"
+   },
+   {
+    "rank": 14,
+    "change": 0,
+    "name": "Mohamed Abouelghar",
+    "country": "EGY",
+    "points": 6344,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/19.jpg",
+    "id": "19"
+   },
+   {
+    "rank": 15,
+    "change": 0,
+    "name": "Jonah Bryant",
+    "country": "ENG",
+    "points": 5358,
+    "racket": "Dunlop",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/169.jpg",
+    "id": "169"
+   },
+   {
+    "rank": 16,
+    "change": 0,
+    "name": "Yahya Elnawasany",
+    "country": "EGY",
+    "points": 6168,
+    "racket": "Head",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/316.jpg",
+    "id": "316"
+   },
+   {
+    "rank": 17,
+    "change": 0,
+    "name": "Gregoire Marche",
+    "country": "FRA",
+    "points": 5710,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/749.jpg",
+    "id": "749"
+   },
+   {
+    "rank": 18,
+    "change": 0,
+    "name": "Eain Yow Ng",
+    "country": "MAS",
+    "points": 5772,
+    "racket": "Dunlop",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/862.jpg",
+    "id": "862"
+   },
+   {
+    "rank": 19,
+    "change": 0,
+    "name": "Kareem El Torkey",
+    "country": "EGY",
+    "points": 5535,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1231.jpg",
+    "id": "1231"
+   },
+   {
+    "rank": 20,
+    "change": 0,
+    "name": "Baptiste Masotti",
+    "country": "FRA",
+    "points": 5030,
+    "racket": "Oliver",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/764.jpg",
+    "id": "764"
+   }
+  ],
+  "korea": [
+   {
+    "rank": 177,
+    "change": -1,
+    "name": "Jeongmin Ryu",
+    "country": "KOR",
+    "points": 422,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1035.jpg",
+    "id": "1035"
+   },
+   {
+    "rank": 313,
+    "change": 2,
+    "name": "Jooyoung Na",
+    "country": "KOR",
+    "points": 198,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/843.jpg",
+    "id": "843"
+   },
+   {
+    "rank": 348,
+    "change": -5,
+    "name": "Oh Seojin",
+    "country": "KOR",
+    "points": 171,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1084.jpg",
+    "id": "1084"
+   },
+   {
+    "rank": 509,
+    "change": -1,
+    "name": "Jonghyeok LEE",
+    "country": "KOR",
+    "points": 92,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/678.jpg",
+    "id": "678"
+   },
+   {
+    "rank": 528,
+    "change": -1,
+    "name": "Seungmin Park",
+    "country": "KOR",
+    "points": 86,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/909.jpg",
+    "id": "909"
+   },
+   {
+    "rank": 548,
+    "change": -1,
+    "name": "Minwoo Lee",
+    "country": "KOR",
+    "points": 78,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/680.jpg",
+    "id": "680"
+   },
+   {
+    "rank": 647,
+    "change": 0,
+    "name": "Ji Donghyun",
+    "country": "KOR",
+    "points": 55,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/278.jpg",
+    "id": "278"
+   },
+   {
+    "rank": 728,
+    "change": -1,
+    "name": "Lim Jaehyeon",
+    "country": "KOR",
+    "points": 38,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/538.jpg",
+    "id": "538"
+   },
+   {
+    "rank": 803,
+    "change": -8,
+    "name": "Jeong Sik Park",
+    "country": "KOR",
+    "points": 24,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/908.jpg",
+    "id": "908"
+   }
+  ]
+ },
+ "female": {
+  "top": [
+   {
+    "rank": 1,
+    "change": 0,
+    "name": "Amina Orfi",
+    "country": "EGY",
+    "points": 25645,
+    "racket": "Dunlop",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/892.jpg",
+    "id": "892"
+   },
+   {
+    "rank": 2,
+    "change": 0,
+    "name": "Hania El Hammamy",
+    "country": "EGY",
+    "points": 22940,
+    "racket": "Head",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/443.jpg",
+    "id": "443"
+   },
+   {
+    "rank": 3,
+    "change": 0,
+    "name": "Nour ElSherbini",
+    "country": "EGY",
+    "points": 18490,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/324.jpg",
+    "id": "324"
+   },
+   {
+    "rank": 4,
+    "change": 0,
+    "name": "Olivia Weaver",
+    "country": "USA",
+    "points": 14215,
+    "racket": "Head",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1295.jpg",
+    "id": "1295"
+   },
+   {
+    "rank": 5,
+    "change": 0,
+    "name": "Sivasangari Subramaniam",
+    "country": "MAS",
+    "points": 14968,
+    "racket": "Dunlop",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1171.jpg",
+    "id": "1171"
+   },
+   {
+    "rank": 6,
+    "change": 0,
+    "name": "Fayrouz Aboelkheir",
+    "country": "EGY",
+    "points": 11526,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/16.jpg",
+    "id": "16"
+   },
+   {
+    "rank": 7,
+    "change": 0,
+    "name": "Satomi Watanabe",
+    "country": "JPN",
+    "points": 11905,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1293.jpg",
+    "id": "1293"
+   },
+   {
+    "rank": 8,
+    "change": 0,
+    "name": "Georgina Kennedy",
+    "country": "ENG",
+    "points": 12295,
+    "racket": "Head speed 135",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/591.jpg",
+    "id": "591"
+   },
+   {
+    "rank": 9,
+    "change": 0,
+    "name": "Tinne Gilis",
+    "country": "BEL",
+    "points": 9015,
+    "racket": "Dunlop",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/394.jpg",
+    "id": "394"
+   },
+   {
+    "rank": 10,
+    "change": 0,
+    "name": "Amanda Sobhy",
+    "country": "USA",
+    "points": 8702,
+    "racket": "Head",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1150.jpg",
+    "id": "1150"
+   },
+   {
+    "rank": 11,
+    "change": 0,
+    "name": "Jasmine Hutton",
+    "country": "ENG",
+    "points": 7701,
+    "racket": "Titan",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/510.jpg",
+    "id": "510"
+   },
+   {
+    "rank": 12,
+    "change": 0,
+    "name": "Nele Gilis",
+    "country": "BEL",
+    "points": 7436,
+    "racket": "Stellar",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/395.jpg",
+    "id": "395"
+   },
+   {
+    "rank": 13,
+    "change": 0,
+    "name": "Salma Hany",
+    "country": "EGY",
+    "points": 6795,
+    "racket": "Harrow",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/446.jpg",
+    "id": "446"
+   },
+   {
+    "rank": 14,
+    "change": 0,
+    "name": "Marina Stefanoni",
+    "country": "USA",
+    "points": 6551,
+    "racket": "Head",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1164.jpg",
+    "id": "1164"
+   },
+   {
+    "rank": 15,
+    "change": 0,
+    "name": "Sabrina Sobhy",
+    "country": "USA",
+    "points": 4885,
+    "racket": "Dunlop",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1151.jpg",
+    "id": "1151"
+   },
+   {
+    "rank": 16,
+    "change": 1,
+    "name": "Anahat Singh",
+    "country": "IND",
+    "points": 5026,
+    "racket": "Dunlop",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1135.jpg",
+    "id": "1135"
+   },
+   {
+    "rank": 17,
+    "change": 1,
+    "name": "Sana Ibrahim",
+    "country": "EGY",
+    "points": 5727,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/515.jpg",
+    "id": "515"
+   },
+   {
+    "rank": 18,
+    "change": -2,
+    "name": "Nada Abbas",
+    "country": "EGY",
+    "points": 5035,
+    "racket": "Head",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/5.jpg",
+    "id": "5"
+   },
+   {
+    "rank": 19,
+    "change": 0,
+    "name": "Melissa Alves",
+    "country": "FRA",
+    "points": 5549,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/65.jpg",
+    "id": "65"
+   },
+   {
+    "rank": 20,
+    "change": 0,
+    "name": "Farida Mohamed",
+    "country": "EGY",
+    "points": 4592,
+    "racket": "Tecnifibre",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/815.jpg",
+    "id": "815"
+   }
+  ],
+  "korea": [
+   {
+    "rank": 139,
+    "change": 0,
+    "name": "Mingyeong Heo",
+    "country": "KOR",
+    "points": 435,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/473.jpg",
+    "id": "473"
+   },
+   {
+    "rank": 168,
+    "change": -2,
+    "name": "Hwayeong Eum",
+    "country": "KOR",
+    "points": 327,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1406.jpg",
+    "id": "1406"
+   },
+   {
+    "rank": 186,
+    "change": -1,
+    "name": "Chaewon Song",
+    "country": "KOR",
+    "points": 334,
+    "racket": "Dunlop",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1156.jpg",
+    "id": "1156"
+   },
+   {
+    "rank": 212,
+    "change": 2,
+    "name": "Bo Ram Ryoo",
+    "country": "KOR",
+    "points": 222,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1034.jpg",
+    "id": "1034"
+   },
+   {
+    "rank": 252,
+    "change": 1,
+    "name": "Ain Jun",
+    "country": "KOR",
+    "points": 168,
+    "racket": "Harrow",
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/566.jpg",
+    "id": "566"
+   },
+   {
+    "rank": 319,
+    "change": -1,
+    "name": "Ye Won Jang",
+    "country": "KOR",
+    "points": 104,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/545.jpg",
+    "id": "545"
+   },
+   {
+    "rank": 346,
+    "change": -2,
+    "name": "Sunghee Oh",
+    "country": "KOR",
+    "points": 87,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1611.jpg",
+    "id": "1611"
+   },
+   {
+    "rank": 391,
+    "change": -2,
+    "name": "Yujin Shin",
+    "country": "KOR",
+    "points": 61,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/1123.jpg",
+    "id": "1123"
+   },
+   {
+    "rank": 395,
+    "change": -1,
+    "name": "Jihyun Lee",
+    "country": "KOR",
+    "points": 56,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/677.jpg",
+    "id": "677"
+   },
+   {
+    "rank": 419,
+    "change": -1,
+    "name": "Hyoju Seo",
+    "country": "KOR",
+    "points": 42,
+    "racket": null,
+    "picture": "https://dd34e8y1ttmkb.cloudfront.net/images/players/13497.jpg",
+    "id": "13497"
+   }
+  ]
+ }
+}

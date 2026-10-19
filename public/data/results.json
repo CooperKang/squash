@@ -1,0 +1,2455 @@
+{
+ "updated": "2026-10-19T07:53:13.192Z",
+ "matches": [
+  {
+   "id": 984487,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Final",
+   "date": "2026-10-18T20:00:00Z",
+   "players": [
+    {
+     "name": "Dmytro Shcherbakov",
+     "country": "UKR",
+     "games": 3,
+     "scores": [
+      11,
+      5,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Kent Rawlins",
+     "country": "CAN",
+     "games": 1,
+     "scores": [
+      7,
+      11,
+      5,
+      4
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984055,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Final",
+   "date": "2026-10-18T17:00:00Z",
+   "players": [
+    {
+     "name": "Jana Swaify",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      4,
+      6,
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Caroline Fouts",
+     "country": "USA",
+     "games": 2,
+     "scores": [
+      11,
+      11,
+      6,
+      6,
+      4
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984486,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Semi final",
+   "date": "2026-10-17T22:45:00Z",
+   "players": [
+    {
+     "name": "Aly Ezzat",
+     "country": "EGY",
+     "games": 0,
+     "scores": [
+      11,
+      8,
+      4
+     ]
+    },
+    {
+     "name": "Kent Rawlins",
+     "country": "CAN",
+     "games": 3,
+     "scores": [
+      13,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984485,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Semi final",
+   "date": "2026-10-17T22:00:00Z",
+   "players": [
+    {
+     "name": "Dmytro Shcherbakov",
+     "country": "UKR",
+     "games": 3,
+     "scores": [
+      11,
+      4,
+      12,
+      11
+     ]
+    },
+    {
+     "name": "Mohammadreza Jafarzadeh",
+     "country": "CAN",
+     "games": 1,
+     "scores": [
+      9,
+      11,
+      10,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984054,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Semi final",
+   "date": "2026-10-17T21:45:00Z",
+   "players": [
+    {
+     "name": "Caroline Fouts",
+     "country": "USA",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      10,
+      11
+     ]
+    },
+    {
+     "name": "Ka Yi Lee",
+     "country": "HKG",
+     "games": 1,
+     "scores": [
+      5,
+      4,
+      12,
+      8
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984053,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Semi final",
+   "date": "2026-10-17T21:00:00Z",
+   "players": [
+    {
+     "name": "Lucie Stefanoni",
+     "country": "USA",
+     "games": 1,
+     "scores": [
+      9,
+      5,
+      11,
+      5
+     ]
+    },
+    {
+     "name": "Jana Swaify",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      9,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984484,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Quarter final",
+   "date": "2026-10-17T00:50:00Z",
+   "players": [
+    {
+     "name": "Kent Rawlins",
+     "country": "CAN",
+     "games": 3,
+     "scores": [
+      10,
+      11,
+      12,
+      11
+     ]
+    },
+    {
+     "name": "Maximilien Godbout",
+     "country": "CAN",
+     "games": 1,
+     "scores": [
+      12,
+      9,
+      10,
+      4
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984483,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Quarter final",
+   "date": "2026-10-17T00:10:00Z",
+   "players": [
+    {
+     "name": "Aly Ezzat",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      7,
+      13,
+      5
+     ]
+    },
+    {
+     "name": "Jason Sano Herring",
+     "country": "JPN",
+     "games": 1,
+     "scores": [
+      5,
+      11,
+      11,
+      3
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984052,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Quarter final",
+   "date": "2026-10-16T23:00:00Z",
+   "players": [
+    {
+     "name": "Margot Prow",
+     "country": "BAR",
+     "games": 1,
+     "scores": [
+      12,
+      4,
+      5,
+      8
+     ]
+    },
+    {
+     "name": "Ka Yi Lee",
+     "country": "HKG",
+     "games": 3,
+     "scores": [
+      10,
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984482,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Quarter final",
+   "date": "2026-10-16T22:50:00Z",
+   "players": [
+    {
+     "name": "Emilio Carrillo",
+     "country": "CAN",
+     "games": 1,
+     "scores": [
+      6,
+      11,
+      3,
+      4
+     ]
+    },
+    {
+     "name": "Mohammadreza Jafarzadeh",
+     "country": "CAN",
+     "games": 3,
+     "scores": [
+      11,
+      9,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984051,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Quarter final",
+   "date": "2026-10-16T22:15:00Z",
+   "players": [
+    {
+     "name": "Isabella Tang",
+     "country": "USA",
+     "games": 1,
+     "scores": [
+      11,
+      8,
+      3,
+      7
+     ]
+    },
+    {
+     "name": "Caroline Fouts",
+     "country": "USA",
+     "games": 3,
+     "scores": [
+      5,
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984481,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Quarter final",
+   "date": "2026-10-16T22:10:00Z",
+   "players": [
+    {
+     "name": "Dmytro Shcherbakov",
+     "country": "UKR",
+     "games": 3,
+     "scores": [
+      11,
+      5,
+      11,
+      6,
+      11
+     ]
+    },
+    {
+     "name": "Youssef Taha",
+     "country": "CAN",
+     "games": 2,
+     "scores": [
+      9,
+      11,
+      5,
+      11,
+      8
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984050,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Quarter final",
+   "date": "2026-10-16T21:30:00Z",
+   "players": [
+    {
+     "name": "Madeleine Hylland",
+     "country": "NOR",
+     "games": 1,
+     "scores": [
+      11,
+      4,
+      6,
+      5
+     ]
+    },
+    {
+     "name": "Jana Swaify",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      7,
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984049,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Quarter final",
+   "date": "2026-10-16T20:45:00Z",
+   "players": [
+    {
+     "name": "Tomato Ho",
+     "country": "HKG",
+     "games": 2,
+     "scores": [
+      6,
+      3,
+      11,
+      11,
+      4
+     ]
+    },
+    {
+     "name": "Lucie Stefanoni",
+     "country": "USA",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      6,
+      7,
+      8
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968472,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Final",
+   "date": "2026-10-16T16:00:00Z",
+   "players": [
+    {
+     "name": "Hania El Hammamy",
+     "country": "EGY",
+     "games": 0,
+     "scores": [
+      4,
+      4,
+      3
+     ]
+    },
+    {
+     "name": "Amina Orfi",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984480,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Round 1",
+   "date": "2026-10-16T00:10:00Z",
+   "players": [
+    {
+     "name": "Juanse Barreyro",
+     "country": "ARG",
+     "games": 2,
+     "scores": [
+      11,
+      13,
+      8
+     ]
+    },
+    {
+     "name": "Maximilien Godbout",
+     "country": "CAN",
+     "games": 3,
+     "scores": [
+      9,
+      11,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984479,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Round 1",
+   "date": "2026-10-16T00:10:00Z",
+   "players": [
+    {
+     "name": "Kent Rawlins",
+     "country": "CAN",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Shamil Khan",
+     "country": "CAN",
+     "games": 0,
+     "scores": [
+      9,
+      6,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984478,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Round 1",
+   "date": "2026-10-15T23:30:00Z",
+   "players": [
+    {
+     "name": "Eddie Slama",
+     "country": "CAN",
+     "games": 0,
+     "scores": [
+      0,
+      10,
+      1
+     ]
+    },
+    {
+     "name": "Jason Sano Herring",
+     "country": "JPN",
+     "games": 3,
+     "scores": [
+      11,
+      12,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984477,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Round 1",
+   "date": "2026-10-15T23:30:00Z",
+   "players": [
+    {
+     "name": "Aly Ezzat",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Frédérik Bemeur-Thorson",
+     "country": "CAN",
+     "games": 0,
+     "scores": [
+      5,
+      4,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984048,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 2",
+   "date": "2026-10-15T23:00:00Z",
+   "players": [
+    {
+     "name": "Malak Samir",
+     "country": "EGY",
+     "games": 1,
+     "scores": [
+      8,
+      11,
+      7,
+      1
+     ]
+    },
+    {
+     "name": "Ka Yi Lee",
+     "country": "HKG",
+     "games": 3,
+     "scores": [
+      11,
+      8,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984476,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Round 1",
+   "date": "2026-10-15T22:50:00Z",
+   "players": [
+    {
+     "name": "Youssef Sarhan",
+     "country": "CAN",
+     "games": 0,
+     "scores": [
+      6,
+      5,
+      0
+     ]
+    },
+    {
+     "name": "Mohammadreza Jafarzadeh",
+     "country": "CAN",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      0
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984475,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Round 1",
+   "date": "2026-10-15T22:50:00Z",
+   "players": [
+    {
+     "name": "Abbas Nawaz",
+     "country": "CAN",
+     "games": 0,
+     "scores": [
+      0,
+      9,
+      6
+     ]
+    },
+    {
+     "name": "Emilio Carrillo",
+     "country": "CAN",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984047,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 2",
+   "date": "2026-10-15T22:15:00Z",
+   "players": [
+    {
+     "name": "Margot Prow",
+     "country": "BAR",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      8,
+      11
+     ]
+    },
+    {
+     "name": "Noa Romero",
+     "country": "ESP",
+     "games": 1,
+     "scores": [
+      9,
+      6,
+      11,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984474,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Round 1",
+   "date": "2026-10-15T22:10:00Z",
+   "players": [
+    {
+     "name": "미정",
+     "country": null,
+     "games": 0,
+     "scores": [
+      7,
+      10,
+      6
+     ]
+    },
+    {
+     "name": "Youssef Taha",
+     "country": "CAN",
+     "games": 3,
+     "scores": [
+      11,
+      12,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984473,
+   "tournament": "La Classique de Gatineau 2026",
+   "round": "Round 1",
+   "date": "2026-10-15T22:10:00Z",
+   "players": [
+    {
+     "name": "Dmytro Shcherbakov",
+     "country": "UKR",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Carl-Edmund Roux",
+     "country": "CAN",
+     "games": 0,
+     "scores": [
+      8,
+      5,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984046,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 2",
+   "date": "2026-10-15T21:00:00Z",
+   "players": [
+    {
+     "name": "Nadia Pfister",
+     "country": "SUI",
+     "games": 0,
+     "scores": [
+      2,
+      9,
+      1
+     ]
+    },
+    {
+     "name": "Caroline Fouts",
+     "country": "USA",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968381,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Final",
+   "date": "2026-10-15T21:00:00Z",
+   "players": [
+    {
+     "name": "Mostafa Asal",
+     "country": "EGY",
+     "games": 2,
+     "scores": [
+      11,
+      5,
+      6,
+      11,
+      6
+     ]
+    },
+    {
+     "name": "Diego Elias",
+     "country": "PER",
+     "games": 3,
+     "scores": [
+      5,
+      11,
+      11,
+      7,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984045,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 2",
+   "date": "2026-10-15T19:45:00Z",
+   "players": [
+    {
+     "name": "Xin Ying Yee",
+     "country": "MAS",
+     "games": 0,
+     "scores": [
+      3,
+      11,
+      4
+     ]
+    },
+    {
+     "name": "Isabella Tang",
+     "country": "USA",
+     "games": 3,
+     "scores": [
+      11,
+      13,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984044,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 2",
+   "date": "2026-10-15T19:00:00Z",
+   "players": [
+    {
+     "name": "Iman Shaheen",
+     "country": "CAN",
+     "games": 0,
+     "scores": [
+      9,
+      5,
+      3
+     ]
+    },
+    {
+     "name": "Jana Swaify",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984043,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 2",
+   "date": "2026-10-15T18:15:00Z",
+   "players": [
+    {
+     "name": "Madeleine Hylland",
+     "country": "NOR",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Kara Lincou",
+     "country": "FRA",
+     "games": 0,
+     "scores": [
+      4,
+      7,
+      7
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984042,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 2",
+   "date": "2026-10-15T17:30:00Z",
+   "players": [
+    {
+     "name": "Charlotte Sze",
+     "country": "USA",
+     "games": 0,
+     "scores": [
+      9,
+      7,
+      8
+     ]
+    },
+    {
+     "name": "Lucie Stefanoni",
+     "country": "USA",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968379,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Semi final",
+   "date": "2026-10-15T17:30:00Z",
+   "players": [
+    {
+     "name": "Mostafa Asal",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Karim Gawad",
+     "country": "EGY",
+     "games": 0,
+     "scores": [
+      6,
+      3,
+      4
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984041,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 2",
+   "date": "2026-10-15T16:45:00Z",
+   "players": [
+    {
+     "name": "Tomato Ho",
+     "country": "HKG",
+     "games": 3,
+     "scores": [
+      12,
+      11,
+      9,
+      11
+     ]
+    },
+    {
+     "name": "Sarahi Lopez",
+     "country": "MEX",
+     "games": 1,
+     "scores": [
+      10,
+      5,
+      11,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968470,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Semi final",
+   "date": "2026-10-15T16:00:00Z",
+   "players": [
+    {
+     "name": "Hania El Hammamy",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      6,
+      12,
+      10,
+      11,
+      12
+     ]
+    },
+    {
+     "name": "Sivasangari Subramaniam",
+     "country": "MAS",
+     "games": 2,
+     "scores": [
+      11,
+      10,
+      12,
+      0,
+      10
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986158,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Final",
+   "date": "2026-10-15T14:30:00Z",
+   "players": [
+    {
+     "name": "Seif Wael",
+     "country": "KUW",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Yusuf Thani",
+     "country": "BRN",
+     "games": 0,
+     "scores": [
+      8,
+      5,
+      7
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984039,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 1",
+   "date": "2026-10-14T23:00:00Z",
+   "players": [
+    {
+     "name": "Malak Samir",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Tamara Holzbauerová",
+     "country": "CZE",
+     "games": 0,
+     "scores": [
+      9,
+      3,
+      7
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984038,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 1",
+   "date": "2026-10-14T22:15:00Z",
+   "players": [
+    {
+     "name": "Elisabeth Ross",
+     "country": "USA",
+     "games": 0,
+     "scores": [
+      5,
+      5,
+      6
+     ]
+    },
+    {
+     "name": "Noa Romero",
+     "country": "ESP",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984035,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 1",
+   "date": "2026-10-14T21:30:00Z",
+   "players": [
+    {
+     "name": "Nadia Pfister",
+     "country": "SUI",
+     "games": 3,
+     "scores": [
+      11,
+      8,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "미정",
+     "country": null,
+     "games": 1,
+     "scores": [
+      9,
+      11,
+      4,
+      7
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968471,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Semi final",
+   "date": "2026-10-14T21:00:00Z",
+   "players": [
+    {
+     "name": "Nouran Gohar",
+     "country": "EGY",
+     "games": 1,
+     "scores": [
+      11,
+      8,
+      10,
+      6
+     ]
+    },
+    {
+     "name": "Amina Orfi",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      9,
+      11,
+      12,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968380,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Semi final",
+   "date": "2026-10-14T21:00:00Z",
+   "players": [
+    {
+     "name": "Diego Elias",
+     "country": "PER",
+     "games": 3,
+     "scores": [
+      4,
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Paul Coll",
+     "country": "NZL",
+     "games": 1,
+     "scores": [
+      11,
+      8,
+      2,
+      3
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984034,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 1",
+   "date": "2026-10-14T20:45:00Z",
+   "players": [
+    {
+     "name": "Vivienne Sze",
+     "country": "USA",
+     "games": 0,
+     "scores": [
+      9,
+      3,
+      3
+     ]
+    },
+    {
+     "name": "Isabella Tang",
+     "country": "USA",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984031,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 1",
+   "date": "2026-10-14T19:00:00Z",
+   "players": [
+    {
+     "name": "Iman Shaheen",
+     "country": "CAN",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      12
+     ]
+    },
+    {
+     "name": "Luiza Carbonieri",
+     "country": "BRA",
+     "games": 0,
+     "scores": [
+      8,
+      6,
+      10
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984030,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 1",
+   "date": "2026-10-14T18:15:00Z",
+   "players": [
+    {
+     "name": "Kara Lincou",
+     "country": "FRA",
+     "games": 3,
+     "scores": [
+      11,
+      6,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Malak Taha",
+     "country": "EGY",
+     "games": 1,
+     "scores": [
+      5,
+      11,
+      6,
+      8
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984027,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 1",
+   "date": "2026-10-14T17:30:00Z",
+   "players": [
+    {
+     "name": "Charlotte Sze",
+     "country": "USA",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Ritaj Gomaa",
+     "country": "EGY",
+     "games": 0,
+     "scores": [
+      8,
+      2,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968468,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Quarter final",
+   "date": "2026-10-14T17:15:00Z",
+   "players": [
+    {
+     "name": "Nour ElSherbini",
+     "country": "EGY",
+     "games": 1,
+     "scores": [
+      7,
+      11,
+      5,
+      4
+     ]
+    },
+    {
+     "name": "Nouran Gohar",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      7,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 984026,
+   "tournament": "Tennis & Racquet Club Boston Open 2026",
+   "round": "Round 1",
+   "date": "2026-10-14T16:45:00Z",
+   "players": [
+    {
+     "name": "Sarahi Lopez",
+     "country": "MEX",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Sofía Mateos",
+     "country": "ESP",
+     "games": 0,
+     "scores": [
+      4,
+      4,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968469,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Quarter final",
+   "date": "2026-10-14T16:00:00Z",
+   "players": [
+    {
+     "name": "Georgina Kennedy",
+     "country": "ENG",
+     "games": 0,
+     "scores": [
+      7,
+      7,
+      3
+     ]
+    },
+    {
+     "name": "Amina Orfi",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986157,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Semi final",
+   "date": "2026-10-14T15:15:00Z",
+   "players": [
+    {
+     "name": "Abdelrahman Abdelkhalek",
+     "country": "EGY",
+     "games": 0,
+     "scores": [
+      8,
+      7,
+      10
+     ]
+    },
+    {
+     "name": "Yusuf Thani",
+     "country": "BRN",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      12
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986156,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Semi final",
+   "date": "2026-10-14T14:30:00Z",
+   "players": [
+    {
+     "name": "Bader Almaghrebi",
+     "country": "KUW",
+     "games": 0,
+     "scores": [
+      5,
+      7,
+      9
+     ]
+    },
+    {
+     "name": "Seif Wael",
+     "country": "KUW",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968378,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Quarter final",
+   "date": "2026-10-13T21:00:00Z",
+   "players": [
+    {
+     "name": "Victor Crouin",
+     "country": "FRA",
+     "games": 0,
+     "scores": [
+      5,
+      6,
+      5
+     ]
+    },
+    {
+     "name": "Paul Coll",
+     "country": "NZL",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968377,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Quarter final",
+   "date": "2026-10-13T21:00:00Z",
+   "players": [
+    {
+     "name": "Diego Elias",
+     "country": "PER",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Joel Makin",
+     "country": "WAL",
+     "games": 0,
+     "scores": [
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968467,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Quarter final",
+   "date": "2026-10-13T17:30:00Z",
+   "players": [
+    {
+     "name": "Fayrouz Aboelkheir",
+     "country": "EGY",
+     "games": 2,
+     "scores": [
+      11,
+      11,
+      7,
+      8,
+      7
+     ]
+    },
+    {
+     "name": "Sivasangari Subramaniam",
+     "country": "MAS",
+     "games": 3,
+     "scores": [
+      9,
+      4,
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968466,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Quarter final",
+   "date": "2026-10-13T16:00:00Z",
+   "players": [
+    {
+     "name": "Hania El Hammamy",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      9,
+      11,
+      11,
+      9,
+      11
+     ]
+    },
+    {
+     "name": "Satomi Watanabe",
+     "country": "JPN",
+     "games": 2,
+     "scores": [
+      11,
+      9,
+      9,
+      11,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986155,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Quarter final",
+   "date": "2026-10-13T15:15:00Z",
+   "players": [
+    {
+     "name": "Yousef Essam Farag",
+     "country": "QAT",
+     "games": 1,
+     "scores": [
+      5,
+      9,
+      11,
+      1
+     ]
+    },
+    {
+     "name": "Yusuf Thani",
+     "country": "BRN",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      5,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986154,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Quarter final",
+   "date": "2026-10-13T15:15:00Z",
+   "players": [
+    {
+     "name": "Abdulrahman Almaghrebi",
+     "country": "KUW",
+     "games": 0,
+     "scores": [
+      7,
+      10,
+      10
+     ]
+    },
+    {
+     "name": "Abdelrahman Abdelkhalek",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      12,
+      12
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986153,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Quarter final",
+   "date": "2026-10-13T14:30:00Z",
+   "players": [
+    {
+     "name": "Jassim AlGhareeb",
+     "country": "KUW",
+     "games": 1,
+     "scores": [
+      4,
+      11,
+      5,
+      9
+     ]
+    },
+    {
+     "name": "Seif Wael",
+     "country": "KUW",
+     "games": 3,
+     "scores": [
+      11,
+      9,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986152,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Quarter final",
+   "date": "2026-10-13T14:30:00Z",
+   "players": [
+    {
+     "name": "Salem Al-Malki",
+     "country": "QAT",
+     "games": 0,
+     "scores": [
+      8,
+      13,
+      5
+     ]
+    },
+    {
+     "name": "Bader Almaghrebi",
+     "country": "KUW",
+     "games": 3,
+     "scores": [
+      11,
+      15,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 988010,
+   "tournament": "US Challenger Series #3 2026",
+   "round": "Final",
+   "date": "2026-10-12T21:00:00Z",
+   "players": [
+    {
+     "name": "Aryaveer Dewan",
+     "country": "IND",
+     "games": 2,
+     "scores": [
+      10,
+      9,
+      11,
+      11,
+      1
+     ]
+    },
+    {
+     "name": "Brendan Tagliarini",
+     "country": "USA",
+     "games": 3,
+     "scores": [
+      12,
+      11,
+      6,
+      7,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968376,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Quarter final",
+   "date": "2026-10-12T21:00:00Z",
+   "players": [
+    {
+     "name": "Marwan ElShorbagy",
+     "country": "ENG",
+     "games": 0,
+     "scores": [
+      13,
+      11,
+      7
+     ]
+    },
+    {
+     "name": "Karim Gawad",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      15,
+      13,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968375,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Quarter final",
+   "date": "2026-10-12T21:00:00Z",
+   "players": [
+    {
+     "name": "Mostafa Asal",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Mohamad Zakaria",
+     "country": "EGY",
+     "games": 0,
+     "scores": [
+      9,
+      2,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "id": 988007,
+   "tournament": "US Challenger Series #3 2026",
+   "round": "Final",
+   "date": "2026-10-12T20:15:00Z",
+   "players": [
+    {
+     "name": "Catalina Pelaez Casasfranco",
+     "country": "COL",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Trinity Moshi",
+     "country": "USA",
+     "games": 0,
+     "scores": [
+      6,
+      7,
+      4
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968465,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T17:30:00Z",
+   "players": [
+    {
+     "name": "Rowan Elaraby",
+     "country": "EGY",
+     "games": 0,
+     "scores": [
+      9,
+      6,
+      6
+     ]
+    },
+    {
+     "name": "Amina Orfi",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986151,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Round 1",
+   "date": "2026-10-12T16:00:00Z",
+   "players": [
+    {
+     "name": "Syed Shah",
+     "country": "PAK",
+     "games": 0,
+     "scores": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "name": "Yusuf Thani",
+     "country": "BRN",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986150,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Round 1",
+   "date": "2026-10-12T16:00:00Z",
+   "players": [
+    {
+     "name": "Muhammad Suleman Jilani",
+     "country": "PAK",
+     "games": 1,
+     "scores": [
+      3,
+      16,
+      8,
+      4
+     ]
+    },
+    {
+     "name": "Yousef Essam Farag",
+     "country": "QAT",
+     "games": 3,
+     "scores": [
+      11,
+      14,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968458,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T16:00:00Z",
+   "players": [
+    {
+     "name": "Hania El Hammamy",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      9,
+      11
+     ]
+    },
+    {
+     "name": "Amanda Sobhy",
+     "country": "USA",
+     "games": 1,
+     "scores": [
+      4,
+      7,
+      11,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986149,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Round 1",
+   "date": "2026-10-12T15:15:00Z",
+   "players": [
+    {
+     "name": "Saleh Altawari",
+     "country": "KUW",
+     "games": 0,
+     "scores": [
+      7,
+      2,
+      5
+     ]
+    },
+    {
+     "name": "Abdelrahman Abdelkhalek",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986148,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Round 1",
+   "date": "2026-10-12T15:15:00Z",
+   "players": [
+    {
+     "name": "Abdulrahman Almaghrebi",
+     "country": "KUW",
+     "games": 3,
+     "scores": [
+      9,
+      8,
+      11,
+      15,
+      11
+     ]
+    },
+    {
+     "name": "Omar Afifi",
+     "country": "EGY",
+     "games": 2,
+     "scores": [
+      11,
+      11,
+      8,
+      13,
+      6
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986147,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Round 1",
+   "date": "2026-10-12T15:15:00Z",
+   "players": [
+    {
+     "name": "Syed Azlan Amjad",
+     "country": "QAT",
+     "games": 0,
+     "scores": [
+      9,
+      9,
+      7
+     ]
+    },
+    {
+     "name": "Seif Wael",
+     "country": "KUW",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986146,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Round 1",
+   "date": "2026-10-12T14:30:00Z",
+   "players": [
+    {
+     "name": "Jassim AlGhareeb",
+     "country": "KUW",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "미정",
+     "country": null,
+     "games": 0,
+     "scores": [
+      0,
+      4,
+      4
+     ]
+    }
+   ]
+  },
+  {
+   "id": 986145,
+   "tournament": "QSF 4 PSA Challenger 2026",
+   "round": "Round 1",
+   "date": "2026-10-12T14:30:00Z",
+   "players": [
+    {
+     "name": "Aley Afifi",
+     "country": "EGY",
+     "games": 1,
+     "scores": [
+      7,
+      11,
+      2,
+      5
+     ]
+    },
+    {
+     "name": "Bader Almaghrebi",
+     "country": "KUW",
+     "games": 3,
+     "scores": [
+      11,
+      7,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968371,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T13:45:00Z",
+   "players": [
+    {
+     "name": "Diego Elias",
+     "country": "PER",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Mohamed ElShorbagy",
+     "country": "ENG",
+     "games": 0,
+     "scores": [
+      5,
+      6,
+      4
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968368,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T13:45:00Z",
+   "players": [
+    {
+     "name": "Youssef Soliman",
+     "country": "EGY",
+     "games": 0,
+     "scores": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "name": "Mohamad Zakaria",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968463,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T13:00:00Z",
+   "players": [
+    {
+     "name": "Ruqayya Salem",
+     "country": "EGY",
+     "games": 1,
+     "scores": [
+      12,
+      8,
+      16,
+      6
+     ]
+    },
+    {
+     "name": "Nouran Gohar",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      14,
+      11,
+      14,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968459,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T13:00:00Z",
+   "players": [
+    {
+     "name": "Yasshmita Jadishkumar",
+     "country": "MAS",
+     "games": 0,
+     "scores": [
+      3,
+      2,
+      6
+     ]
+    },
+    {
+     "name": "Satomi Watanabe",
+     "country": "JPN",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968373,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T11:15:00Z",
+   "players": [
+    {
+     "name": "Victor Crouin",
+     "country": "FRA",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Yahya Elnawasany",
+     "country": "EGY",
+     "games": 0,
+     "scores": [
+      6,
+      1,
+      8
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968372,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T11:15:00Z",
+   "players": [
+    {
+     "name": "Auguste Dussourd",
+     "country": "FRA",
+     "games": 0,
+     "scores": [
+      8,
+      8,
+      8
+     ]
+    },
+    {
+     "name": "Joel Makin",
+     "country": "WAL",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968464,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T10:30:00Z",
+   "players": [
+    {
+     "name": "Georgina Kennedy",
+     "country": "ENG",
+     "games": 3,
+     "scores": [
+      9,
+      12,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Sana Ibrahim",
+     "country": "EGY",
+     "games": 1,
+     "scores": [
+      11,
+      10,
+      6,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968462,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T10:30:00Z",
+   "players": [
+    {
+     "name": "Nour ElSherbini",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      7,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Marina Stefanoni",
+     "country": "USA",
+     "games": 1,
+     "scores": [
+      8,
+      11,
+      3,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968370,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T09:45:00Z",
+   "players": [
+    {
+     "name": "Kareem El Torkey",
+     "country": "EGY",
+     "games": 1,
+     "scores": [
+      11,
+      7,
+      6,
+      2
+     ]
+    },
+    {
+     "name": "Karim Gawad",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      7,
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968369,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T09:45:00Z",
+   "players": [
+    {
+     "name": "Marwan ElShorbagy",
+     "country": "ENG",
+     "games": 3,
+     "scores": [
+      11,
+      6,
+      5,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Leonel Cardenas",
+     "country": "MEX",
+     "games": 2,
+     "scores": [
+      8,
+      11,
+      11,
+      5,
+      6
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968461,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T09:00:00Z",
+   "players": [
+    {
+     "name": "Nele Gilis",
+     "country": "BEL",
+     "games": 0,
+     "scores": [
+      5,
+      6,
+      8
+     ]
+    },
+    {
+     "name": "Sivasangari Subramaniam",
+     "country": "MAS",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968460,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-12T09:00:00Z",
+   "players": [
+    {
+     "name": "Fayrouz Aboelkheir",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      5,
+      11,
+      11,
+      7,
+      11
+     ]
+    },
+    {
+     "name": "Jasmine Hutton",
+     "country": "ENG",
+     "games": 2,
+     "scores": [
+      11,
+      2,
+      5,
+      11,
+      3
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968374,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-11T21:00:00Z",
+   "players": [
+    {
+     "name": "Eain Yow Ng",
+     "country": "MAS",
+     "games": 0,
+     "scores": [
+      6,
+      4,
+      3
+     ]
+    },
+    {
+     "name": "Paul Coll",
+     "country": "NZL",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": 968367,
+   "tournament": "CIB Egyptian Squash Open 2026",
+   "round": "Round 3",
+   "date": "2026-10-11T21:00:00Z",
+   "players": [
+    {
+     "name": "Mostafa Asal",
+     "country": "EGY",
+     "games": 3,
+     "scores": [
+      11,
+      11,
+      11
+     ]
+    },
+    {
+     "name": "Mohamed Abouelghar",
+     "country": "EGY",
+     "games": 0,
+     "scores": [
+      8,
+      7,
+      2
+     ]
+    }
+   ]
+  }
+ ]
+}

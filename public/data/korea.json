@@ -1,0 +1,519 @@
+{
+ "updated": "2026-10-19T07:53:13.192Z",
+ "events": [
+  {
+   "idx": "180",
+   "kind": "국내대회",
+   "status": "대회종료",
+   "title": "2026 청소년 스쿼시 주말리그",
+   "start": "2026-01-31",
+   "end": "2026-02-22",
+   "venue": "권역별",
+   "host": "사단법인 대한스쿼시연맹",
+   "apply": "https://naver.me/xcAa0479"
+  },
+  {
+   "idx": "179",
+   "kind": "국제대회",
+   "status": "대회종료",
+   "title": "2026 TLAB KOREA PSA 1 Satellite",
+   "start": "2026-02-05",
+   "end": "2026-02-07",
+   "venue": "청주 국제스쿼시경기장",
+   "host": "(사)청주스포츠클럽(CSC)",
+   "apply": "https://moaform.com/q/vHBsy7"
+  },
+  {
+   "idx": "176",
+   "kind": "국제대회",
+   "status": "대회종료",
+   "title": "KOREA CUP JUNIOR OPEN SQUASH CHAMPIONSHIPS 2026",
+   "start": "2026-02-08",
+   "end": "2026-02-12",
+   "venue": "김천스쿼시경기장",
+   "host": "경상북도스쿼시연맹",
+   "apply": "https://docs.google.com/forms/d/e/1FAIpQLScVlEdaELjdCgWIGK2J6xJKuG5nedul1VPrrx4JuE1T2rqVHQ/viewform?usp=publish-editor"
+  },
+  {
+   "idx": "177",
+   "kind": "국제대회",
+   "status": "대회종료",
+   "title": "2026 KOREA CUP PSA CHALLENGER 6",
+   "start": "2026-02-10",
+   "end": "2026-02-12",
+   "venue": "김천스쿼시경기장",
+   "host": "사)대한스쿼시연맹/경상북도스쿼시연맹",
+   "apply": "https://www.psasquashtour.com/rankings/"
+  },
+  {
+   "idx": "181",
+   "kind": "국내대회",
+   "status": "대회종료",
+   "title": "2026 제22회 대한체육회장배 전국 스쿼시 선수권대회",
+   "start": "2026-03-19",
+   "end": "2026-03-22",
+   "venue": "김천스쿼시경기장",
+   "host": "사)대한스쿼시연맹, 김천시",
+   "apply": "https://result.sports.or.kr/SQ/INF001.do"
+  },
+  {
+   "idx": "184",
+   "kind": "승인대회",
+   "status": "대회종료",
+   "title": "제7회 춘계 김천시 황악배 전국 스쿼시 동호인대회",
+   "start": "2026-03-28",
+   "end": "2026-03-29",
+   "venue": "김천스쿼시경기장",
+   "host": "김천시스쿼시연맹",
+   "apply": null
+  },
+  {
+   "idx": "182",
+   "kind": "국내대회",
+   "status": "대회종료",
+   "title": "2026 제20회 회장배(전북) 전국 스쿼시 선수권대회",
+   "start": "2026-04-01",
+   "end": "2026-04-04",
+   "venue": "전북특별자치도체육회관 및 전주비전대학교",
+   "host": "사단법인 대한스쿼시연맹, 전북특별자치도스쿼시연맹",
+   "apply": "https://result.sports.or.kr/SQ/INF101.do"
+  },
+  {
+   "idx": "185",
+   "kind": "국내대회",
+   "status": "대회종료",
+   "title": "2026 전국생활체육대축전",
+   "start": "2026-04-23",
+   "end": "2026-04-26",
+   "venue": "마산합포스포츠센터",
+   "host": "대한체육회",
+   "apply": null
+  },
+  {
+   "idx": "186",
+   "kind": "국내대회",
+   "status": "대회종료",
+   "title": "제10회 광주광역시장배 전국실업스쿼시 선수권대회(개인전)(승인대회)",
+   "start": "2026-04-28",
+   "end": "2026-05-01",
+   "venue": "광주광역시체육회관 스쿼시경기장",
+   "host": "전국실업스쿼시연맹",
+   "apply": "https://result.sports.or.kr/SQ/INF001.do"
+  },
+  {
+   "idx": "187",
+   "kind": "국제대회",
+   "status": "대회종료",
+   "title": "2026 제33회 아시아 주니어 스쿼시 선수권대회(개인전)",
+   "start": "2026-05-20",
+   "end": "2026-05-24",
+   "venue": "중국 판즈화",
+   "host": "아시아스쿼시연맹, 중국스쿼시협회",
+   "apply": null
+  },
+  {
+   "idx": "190",
+   "kind": "국내대회",
+   "status": "대회종료",
+   "title": "제55회 전국소년체육대회 스쿼시경기",
+   "start": "2026-05-23",
+   "end": "2026-05-24",
+   "venue": "부산광역시(경성대학교 스쿼시장)",
+   "host": "대한체육회",
+   "apply": null
+  },
+  {
+   "idx": "188",
+   "kind": "국제대회",
+   "status": "대회종료",
+   "title": "2026 제17회 동아시아 스쿼시 선수권대회",
+   "start": "2026-05-29",
+   "end": "2026-05-31",
+   "venue": "마카오",
+   "host": "동아시아스쿼시연맹",
+   "apply": null
+  },
+  {
+   "idx": "191",
+   "kind": "국내대회",
+   "status": "대회종료",
+   "title": "제26회 회장배 전 한국 스쿼시 선수권대회",
+   "start": "2026-06-12",
+   "end": "2026-06-15",
+   "venue": "김천스쿼시경기장",
+   "host": "사단법인 대한스쿼시연맹",
+   "apply": "https://result.sports.or.kr/SQ/INF001.do"
+  },
+  {
+   "idx": "189",
+   "kind": "국내대회",
+   "status": "대회종료",
+   "title": "2026 제25회 대한체육회장배 전국 스쿼시 동호인대회",
+   "start": "2026-06-20",
+   "end": "2026-06-21",
+   "venue": "김천스쿼시경기장",
+   "host": "(사)대한스쿼시연맹",
+   "apply": "https://form.naver.com/response/u9TQW0xcuH3b-ZcJOL5cAQ"
+  },
+  {
+   "idx": "192",
+   "kind": "국내대회",
+   "status": "대회종료",
+   "title": "2026 제29회 금곡배 전국 초ㆍ중ㆍ고 스쿼시 선수권대회",
+   "start": "2026-06-25",
+   "end": "2026-06-27",
+   "venue": "김천스쿼시경기장",
+   "host": "(사)대한스쿼시연맹",
+   "apply": "https://result.sports.or.kr/SQ/INF001.do"
+  },
+  {
+   "idx": "194",
+   "kind": "승인대회",
+   "status": "대회종료",
+   "title": "제11회 울산광역시장배 생활체육 전국 스쿼시 동호인대회",
+   "start": "2026-06-27",
+   "end": "2026-06-28",
+   "venue": "울산 문수스쿼시경기장",
+   "host": "울산광역시스쿼시연맹",
+   "apply": null
+  },
+  {
+   "idx": "196",
+   "kind": "국내대회",
+   "status": "대회종료",
+   "title": "2026 제6회 태산배 전국 스쿼시 선수권대회",
+   "start": "2026-07-11",
+   "end": "2026-07-14",
+   "venue": "나주스쿼시경기장",
+   "host": "사)대한스쿼시연맹",
+   "apply": "https://result.sports.or.kr/SQ/INF001.do"
+  },
+  {
+   "idx": "198",
+   "kind": "승인대회",
+   "status": "대회종료",
+   "title": "제8회 울산광역시교육감배 전국 학생 스쿼시대회",
+   "start": "2026-07-19",
+   "end": "2026-07-19",
+   "venue": "울산 문수스쿼시경기장",
+   "host": "울산광역시교육청, 울산광역시스쿼시연맹",
+   "apply": "https://naver.me/GdT2pktF",
+   "result": "http://www.koreasquash.or.kr/matchData/result/%28%BD%C2%C0%CE%29%B4%EB%C8%B8%BF%E4%B0%AD.pdf"
+  },
+  {
+   "idx": "197",
+   "kind": "국제대회",
+   "status": "참가신청중",
+   "title": "2026 TLAB KOREA PSA 2 Satellite",
+   "start": "2026-07-23",
+   "end": "2026-07-25",
+   "venue": "청주국제스쿼시경기장",
+   "host": "(사)청주스포츠클럽(CSC)",
+   "apply": "https://moaform.com/q/CL49QB"
+  },
+  {
+   "idx": "193",
+   "kind": "국제대회",
+   "status": "대회종료",
+   "title": "Hong Kong Junior Open 2026 (AJSS Platinum Event)",
+   "start": "2026-08-04",
+   "end": "2026-08-09",
+   "venue": "홍콩",
+   "host": "홍콩스쿼시협회 / 아시아스쿼시연맹",
+   "apply": "https://www.asiansquash.org/eventpage/ajss-event"
+  },
+  {
+   "idx": "200",
+   "kind": "국제대회",
+   "status": "대회종료",
+   "title": "2026 제19회 코리아오픈 시니어 스쿼시 챔피언쉽",
+   "start": "2026-08-11",
+   "end": "2026-08-15",
+   "venue": "인천광역시 열우물스쿼시경기장",
+   "host": "사)대한스쿼시연맹",
+   "apply": "https://result.sports.or.kr/SQ/INF001.do",
+   "result": "http://www.koreasquash.or.kr/matchData/result/%B0%E6%B1%E2%B0%E1%B0%FA.pdf"
+  },
+  {
+   "idx": "195",
+   "kind": "국제대회",
+   "status": "대회종료",
+   "title": "19th Korea Junior Open 2026(AJSS GOLD EVENT)",
+   "start": "2026-08-12",
+   "end": "2026-08-15",
+   "venue": "인천광역시 열우물 스쿼시 경기장",
+   "host": "사)대한스쿼시연맹",
+   "apply": "https://docs.google.com/forms/d/e/1FAIpQLSfjlAm8I8eOqFPr4ZcMTsD9YzmQ03g1z6RyFoYekxJY9ybs9A/viewform?usp=send_form"
+  },
+  {
+   "idx": "201",
+   "kind": "국내대회",
+   "status": "대회종료",
+   "title": "2026 제23회 회장배 전국 학생 스쿼시 선수권대회",
+   "start": "2026-08-20",
+   "end": "2026-08-23",
+   "venue": "울산 문수스쿼시경기장",
+   "host": "(사)대한스쿼시연맹",
+   "apply": "https://result.sports.or.kr/SQ/INF001.do",
+   "result": "http://www.koreasquash.or.kr/matchData/result/%B0%E6%B1%E2%B0%E1%B0%FA_1.pdf"
+  },
+  {
+   "idx": "202",
+   "kind": "국내대회",
+   "status": "대회종료",
+   "title": "2026 제19회 하계 전국 중고 스쿼시 선수권대회",
+   "start": "2026-08-29",
+   "end": "2026-08-30",
+   "venue": "대구스쿼시장",
+   "host": "(사)대한스쿼시연맹",
+   "apply": "https://result.sports.or.kr/SQ/INF001.do",
+   "result": "http://www.koreasquash.or.kr/matchData/result/%A1%D9%C7%CF%B0%E8%B4%EB%C8%B8%B0%E6%B1%E2%B0%E1%B0%FA.pdf"
+  },
+  {
+   "idx": "199",
+   "kind": "승인대회",
+   "status": "대회종료",
+   "title": "제3회 원주치악배 전국스쿼시 동호인대회",
+   "start": "2026-09-05",
+   "end": "2026-09-05",
+   "venue": "원주동부복합생활지원센터 2층 스쿼시장",
+   "host": "원주시스쿼시연맹",
+   "apply": "https://band.us/n/aaa4A3J5e7u1K",
+   "result": "http://www.koreasquash.or.kr/matchData/result/%28%B0%E6%B1%E2%B0%E1%B0%FA%29%C1%A63%C8%B8%20%BF%F8%C1%D6%C4%A1%BE%C7%B9%E8.pdf"
+  },
+  {
+   "idx": "204",
+   "kind": "국내대회",
+   "status": "참가마감",
+   "title": "제107회 전국체육대회 스쿼시경기",
+   "start": "2026-10-16",
+   "end": "2026-10-21",
+   "venue": "제주특별자치도 체육회관",
+   "host": "대한체육회",
+   "apply": null
+  },
+  {
+   "idx": "210",
+   "kind": "승인대회",
+   "status": "참가신청중",
+   "title": "제10회 김천시 전국 동호인 스쿼시 추계대회",
+   "start": "2026-10-24",
+   "end": "2026-10-25",
+   "venue": "김천스쿼시경기장",
+   "host": "김천시스쿼시연맹",
+   "apply": "https://light-acapella-8bc.notion.site/rost-guide-pc"
+  },
+  {
+   "idx": "209",
+   "kind": "승인대회",
+   "status": "참가신청중",
+   "title": "제6회 창원특례시장배 전국 스쿼시대회",
+   "start": "2026-11-07",
+   "end": "2026-11-08",
+   "venue": "마산합포스포츠센터",
+   "host": "창원특례시스쿼시연맹",
+   "apply": "https://m.site.naver.com/2hfzI"
+  },
+  {
+   "idx": "207",
+   "kind": "국내대회",
+   "status": "참가신청중",
+   "title": "2026 제19회 회장배 전국 스쿼시 동호인대회",
+   "start": "2026-11-14",
+   "end": "2026-11-15",
+   "venue": "청주국제스쿼시경기장",
+   "host": "(사)대한스쿼시연맹",
+   "apply": "http://www.koreasquash.or.kr/matchData/%EC%B0%B8%EA%B0%80%EC%8B%A0%EC%B2%AD%20%EB%B0%94%EB%A1%9C%EA%B0%80%EA%B8%B0.pdf"
+  },
+  {
+   "idx": "205",
+   "kind": "국내대회",
+   "status": "참가신청중",
+   "title": "2026 스쿼시 청소년스포츠한마당",
+   "start": "2026-11-21",
+   "end": "2026-11-21",
+   "venue": "청주 국제스쿼시경기장",
+   "host": "사단법인 대한스쿼시연맹",
+   "apply": "https://naver.me/xB7qNhN0"
+  },
+  {
+   "idx": "208",
+   "kind": "국내대회",
+   "status": "참가신청중",
+   "title": "제5회 회장배 전국 대학스쿼시 동아리대회",
+   "start": "2026-11-28",
+   "end": "2026-11-28",
+   "venue": "청주국제스쿼시경기장",
+   "host": "(사)대한스쿼시연맹",
+   "apply": "https://result.sports.or.kr/SQ/INF001.do"
+  },
+  {
+   "idx": "206",
+   "kind": "국제대회",
+   "status": "참가신청중",
+   "title": "REDtone 18th KL Junior Open Squash Championships 2026 (AJSS Platinum Event)",
+   "start": "2026-12-01",
+   "end": "2026-12-06",
+   "venue": "말레이시아 쿠알라룸푸르",
+   "host": "말레이시아스쿼시협회",
+   "apply": "https://www.asiansquash.org/eventpage/ajss-event"
+  },
+  {
+   "idx": "203",
+   "kind": "국제대회",
+   "status": "참가마감",
+   "title": "World Squash Team Championships 2026",
+   "start": "2026-12-14",
+   "end": "2026-12-19",
+   "venue": "청주국제스쿼시경기장",
+   "host": "세계스쿼시연맹,",
+   "apply": null
+  }
+ ],
+ "ranking": {
+  "men": [
+   {
+    "rank": 1,
+    "change": "-",
+    "name": "이민우",
+    "points": 900,
+    "team": "충청북도체육회"
+   },
+   {
+    "rank": 2,
+    "change": "-",
+    "name": "이동준",
+    "points": 640,
+    "team": "경상남도체육회"
+   },
+   {
+    "rank": 3,
+    "change": "-",
+    "name": "오서진",
+    "points": 440,
+    "team": "인천광역시체육회"
+   },
+   {
+    "rank": 4,
+    "change": "-",
+    "name": "박종명",
+    "points": 420,
+    "team": "충청남도체육회"
+   },
+   {
+    "rank": 5,
+    "change": "-",
+    "name": "나주영",
+    "points": 400,
+    "team": "충청남도체육회"
+   },
+   {
+    "rank": 6,
+    "change": "-",
+    "name": "강우석",
+    "points": 380,
+    "team": "울산광역시체육회"
+   },
+   {
+    "rank": 7,
+    "change": "-",
+    "name": "최호진",
+    "points": 330,
+    "team": "경상북도체육회"
+   },
+   {
+    "rank": 8,
+    "change": "-",
+    "name": "고영조",
+    "points": 320,
+    "team": "광주광역시체육회"
+   },
+   {
+    "rank": 9,
+    "change": "-",
+    "name": "유덕재",
+    "points": 310,
+    "team": "울산광역시체육회"
+   },
+   {
+    "rank": 10,
+    "change": "-",
+    "name": "강현범",
+    "points": 270,
+    "team": "경상남도체육회"
+   }
+  ],
+  "women": [
+   {
+    "rank": 1,
+    "change": "-",
+    "name": "엄화영",
+    "points": 820,
+    "team": "인천광역시체육회"
+   },
+   {
+    "rank": 2,
+    "change": "-",
+    "name": "송채원",
+    "points": 640,
+    "team": "인천광역시체육회"
+   },
+   {
+    "rank": 3,
+    "change": "-",
+    "name": "김다미",
+    "points": 580,
+    "team": "광주광역시체육회"
+   },
+   {
+    "rank": 4,
+    "change": "-",
+    "name": "서효주",
+    "points": 540,
+    "team": "전라남도청"
+   },
+   {
+    "rank": 5,
+    "change": "-",
+    "name": "최유라",
+    "points": 520,
+    "team": "경상남도체육회"
+   },
+   {
+    "rank": 6,
+    "change": "-",
+    "name": "허민경",
+    "points": 460,
+    "team": "경상남도체육회"
+   },
+   {
+    "rank": 7,
+    "change": "-",
+    "name": "전아인",
+    "points": 410,
+    "team": "충청남도체육회"
+   },
+   {
+    "rank": 8,
+    "change": "-",
+    "name": "송동주",
+    "points": 280,
+    "team": "광주광역시체육회"
+   },
+   {
+    "rank": 9,
+    "change": "-",
+    "name": "양연수",
+    "points": 250,
+    "team": "전라남도청"
+   },
+   {
+    "rank": 10,
+    "change": "-",
+    "name": "김민희",
+    "points": 210,
+    "team": "울산광역시체육회"
+   }
+  ]
+ }
+}

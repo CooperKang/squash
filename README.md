@@ -1,0 +1,38 @@
+# 스쿼시 코트
+
+스쿼시를 처음 시작하는 사람을 위한 안내 웹앱입니다. <https://cooperkang.github.io/squash/>
+
+- **스쿼시란 / 경기 규칙**: 코트 그림을 눌러 보며 익히는 선 이름, PAR 11 점수, 서브, 렛·스트로크
+- **장비**: 라켓 무게·밸런스·헤드 모양, 브랜드별 성향, 공의 점 색깔, 세계 랭커들이 쓰는 라켓 브랜드
+- **라켓 찾기**: 질문 네 개로 영산스포츠(ysretail.com) 판매 라켓 중에서 추천하고 구매 페이지로 연결
+- **대회 현황판**: PSA 월드 투어 일정, 최근 경기 결과, 세계 랭킹, 대한스쿼시연맹 국내 대회와 랭킹
+- **터치 스쿼시**: 날아오는 공을 마우스나 손가락으로 눌러 치는 미니 게임(PAR 11, 난이도 3단계)
+
+디자인은 Harrow Response 115 라켓의 색(실버 프레임, 딥 틸, 검정 링, 흰 그립)에서 가져왔습니다.
+
+## 개발
+
+```sh
+npm install
+npm run dev      # http://localhost:5173
+npm test
+npm run data     # 현황판 데이터를 public/data/에 새로 받기
+npm run build
+```
+
+## 데이터
+
+| 파일 | 출처 | 갱신 |
+|---|---|---|
+| `public/data/calendar.json` | PSA 투어 사이트의 WordPress REST API | GitHub Actions가 3시간마다 |
+| `public/data/results.json` | PSA 결과 API(최근 1주일치를 받아 지난 결과와 합침) | 3시간마다 + 화면을 열 때 브라우저에서 한 번 더 |
+| `public/data/rankings.json` | PSA 랭킹 API | 3시간마다 |
+| `public/data/korea.json` | 대한스쿼시연맹(koreasquash.or.kr) 대회 일정·랭킹 | 3시간마다 |
+| `src/data/rackets.ts` | 영산스포츠 스쿼시 라켓 목록 | 손으로(판매처 robots.txt가 자동 수집을 막아 둠) |
+
+수집 스크립트는 `scripts/fetch-data.mjs`입니다. 출처 하나가 실패하면 지금 배포된 파일을 그대로 씁니다.
+GitHub는 저장소에 60일 동안 활동이 없으면 예약 실행을 멈추니, 멈췄다면 Actions 탭에서 다시 켜 주세요.
+
+## 라켓 목록 고치기
+
+`src/data/rackets.ts`의 항목을 직접 고칩니다. `style`(파워/컨트롤/스피드/올라운드)과 `level`은 제조사 라인별 일반적인 성격으로 붙인 참고값이고, 추천 점수는 `src/data/recommend.ts`에서 계산합니다.
