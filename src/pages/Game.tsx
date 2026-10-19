@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Engine, type HudState } from '../game/engine'
 import type { Difficulty } from '../game/physics'
+import { HINTS, type RuleKey } from '../game/hints'
+import { href } from '../router'
 
 const DIFF: { id: Difficulty; label: string }[] = [
   { id: 'easy', label: '쉬움' },
@@ -14,6 +16,13 @@ export default function Game() {
   const [hud, setHud] = useState<HudState | null>(null)
   const [difficulty, setDifficulty] = useState<Difficulty>('normal')
   const [sound, setSound] = useState(true)
+  const [askRules, setAskRules] = useState(true)
+  // 사라질 때도 글자가 남아 있게 마지막으로 물어본 규칙을 기억한다
+  const [lastHint, setLastHint] = useState<RuleKey | null>(null)
+  const [reading, setReading] = useState<RuleKey | null>(null)
+  const [dismissed, setDismissed] = useState<RuleKey | null>(null)
+  if (hud?.hint && hud.hint !== lastHint) setLastHint(hud.hint)
+  const asking = !!hud?.hint && hud.hint !== dismissed && !reading
 
   useEffect(() => {
     const canvas = canvasRef.current!
@@ -35,6 +44,26 @@ export default function Game() {
   useEffect(() => {
     if (engineRef.current) engineRef.current.sound = sound
   }, [sound])
+  useEffect(() => {
+    if (engineRef.current) engineRef.current.askRules = askRules
+  }, [askRules])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'b' || e.key === 'B') engineRef.current?.boast()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  const openHint = (k: RuleKey) => {
+    setReading(k)
+    engineRef.current?.pause()
+  }
+  const closeHint = () => {
+    setReading(null)
+    engineRef.current?.resume()
+  }
 
   const local = (e: React.PointerEvent) => {
     const r = e.currentTarget.getBoundingClientRect()
@@ -68,10 +97,74 @@ export default function Game() {
           </div>
         )}
 
-        {hud?.phase === 'serve-you' && (
+        {hud?.phase === 'serve-you' && !hud.hint && (
           <p className="pointer-events-none absolute inset-x-0 bottom-5 text-center text-[14px] font-semibold text-white/85">
             내 서브예요. 떠오른 공을 눌러 치세요
           </p>
+        )}
+
+        {hud?.boastSide != null && (
+          <button
+            type="button"
+            onPointerDown={(e) => {
+              e.preventDefault()
+              engineRef.current?.boast()
+            }}
+            className={`absolute bottom-6 grid size-[76px] place-items-center rounded-full border-2 border-white/80 bg-teal text-[15px] font-extrabold text-white shadow-xl active:scale-95 ${hud.boastSide > 0 ? 'right-4' : 'left-4'}`}
+          >
+            보스트
+            <span className="sr-only">: 옆벽으로 쳐서 앞 구석에 떨어뜨리기</span>
+          </button>
+        )}
+
+        {lastHint && (
+          <div
+            className={`absolute inset-x-0 bottom-4 flex justify-center px-3 transition duration-500 ${asking ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'}`}
+            aria-hidden={!asking}
+          >
+            <div className="flex items-center gap-1 rounded-full bg-white/95 py-1.5 pr-1.5 pl-4 text-[14px] text-ink shadow-xl">
+              <span className="font-semibold">{HINTS[lastHint].name}, 궁금하세요?</span>
+              <button type="button" onClick={() => openHint(lastHint)} tabIndex={asking ? 0 : -1} className="ml-1 rounded-full bg-teal px-3.5 py-1.5 text-[13px] font-bold text-white">
+                보기
+              </button>
+              <button
+                type="button"
+                onClick={() => setDismissed(lastHint)}
+                tabIndex={asking ? 0 : -1}
+                aria-label="닫기"
+                className="grid size-8 place-items-center rounded-full text-[18px] leading-none text-muted"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
+
+        {reading && (
+          <div className="absolute inset-0 z-10 flex items-end justify-center bg-ink/55 p-3 md:items-center" role="dialog" aria-modal="true" aria-labelledby="hint-title">
+            <div className="w-full max-w-md rounded-[26px] bg-white p-6 text-ink shadow-2xl">
+              <p className="text-[13px] font-semibold text-teal">게임을 잠깐 멈췄어요</p>
+              <h2 id="hint-title" className="mt-1 text-[24px] font-extrabold">
+                {HINTS[reading].name}
+              </h2>
+              <ul className="mt-3 space-y-2 text-[15px] leading-relaxed text-ink/80">
+                {HINTS[reading].body.map((b) => (
+                  <li key={b} className="flex gap-2">
+                    <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-teal" />
+                    {b}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-5 flex items-center gap-3">
+                <button type="button" autoFocus onClick={closeHint} className="flex-1 rounded-2xl bg-teal py-3 text-[16px] font-bold text-white transition hover:bg-teal-deep">
+                  계속하기
+                </button>
+                <a href={reading === 'boast' ? `${href('shots')}?s=boast` : href('rules')} className="text-[14px] font-semibold text-muted underline underline-offset-4">
+                  {reading === 'boast' ? '기술 더 보기' : '규칙 전체 보기'}
+                </a>
+              </div>
+            </div>
+          </div>
         )}
 
         {showMenu && (
@@ -93,6 +186,7 @@ export default function Game() {
                     <li>· 공 둘레에 청록 링이 보이면 공을 눌러 치세요.</li>
                     <li>· 공의 <b className="text-ink">왼쪽</b>을 치면 오른쪽으로, <b className="text-ink">아래쪽</b>을 치면 높이 날아가요.</li>
                     <li>· 윗부분을 치면 낮게 깔리지만 틴(빨간 선 아래)에 걸릴 수 있어요.</li>
+                    <li>· 옆벽 가까이 뒤쪽으로 공이 오면 <b className="text-ink">보스트</b> 버튼이 나와요(PC는 B 키). 옆벽을 먼저 맞혀 앞 구석으로 보내요.</li>
                     <li>· 뒤쪽 허리 높이에서 칠수록 정확해요. 11점 먼저 내면 이겨요.</li>
                   </ul>
                 </>
@@ -116,6 +210,10 @@ export default function Game() {
               <label className="mt-3 flex items-center gap-2 text-[14px] text-muted">
                 <input type="checkbox" checked={sound} onChange={(e) => setSound(e.target.checked)} className="size-4 accent-teal" />
                 효과음
+              </label>
+              <label className="mt-2 flex items-center gap-2 text-[14px] text-muted">
+                <input type="checkbox" checked={askRules} onChange={(e) => setAskRules(e.target.checked)} className="size-4 accent-teal" />
+                점수가 날 때 관련 규칙 물어보기
               </label>
               <button
                 type="button"

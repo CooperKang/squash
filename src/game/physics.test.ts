@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { COURT, Shot, aimVelocity, cpuShot, outcome, findReachWindow, inCpuReach, inYourReach, step, yourShot, type Ball, type Vec } from './physics'
+import { COURT, Shot, aimVelocity, cpuShot, outcome, findReachWindow, inCpuReach, inYourReach, step, trace, yourBoast, yourShot, type Ball, type Vec } from './physics'
 import { winner } from './score'
 
 function seeded(seed: number) {
@@ -131,5 +131,45 @@ describe('뒷벽', () => {
       const v = cpuShot(from, 'hard', false, rand)
       expect(outcome({ p: from, v }, new Shot('cpu')), `#${i}`).toBe('double')
     }
+  })
+})
+
+describe('보스트', () => {
+  it('뒤 구석에서 친 보스트는 옆벽 → 앞벽 → 앞 코트로 떨어진다', () => {
+    const rand = seeded(21)
+    for (const from of [
+      { x: 2.6, y: 0.8, z: 8 },
+      { x: -2.5, y: 0.9, z: 7.4 },
+      { x: 1.9, y: 0.7, z: 6.8 },
+    ]) {
+      const v = yourBoast(from, 0.9, rand)
+      expect(v, JSON.stringify(from)).not.toBeNull()
+      const tr = trace({ p: from, v: v! }, new Shot('you'))
+      expect(tr.boast).toBe(true)
+      expect(tr.result).toBe('double')
+      expect(tr.land!.z).toBeLessThan(4.8)
+    }
+  })
+
+  it('서브가 옆벽부터 맞으면 서브 폴트', () => {
+    expect(new Shot('you', true).apply({ hit: 'side', at: { x: 3.1, y: 1.5, z: 5 } })).toBe('serve-fault')
+    const s = new Shot('you')
+    expect(s.apply({ hit: 'side', at: { x: 3.1, y: 1.5, z: 5 } })).toBeNull()
+    expect(s.boast).toBe(true)
+  })
+
+  it('상대 보스트는 내가 앞으로 나가 칠 수 있는 구간이 있다', () => {
+    const rand = seeded(9)
+    let boasts = 0
+    for (let i = 0; i < 200; i++) {
+      const from = { x: (rand() < 0.5 ? -1 : 1) * (1.8 + rand() * 1.1), y: 0.7 + rand() * 0.5, z: 6 + rand() * 2.5 }
+      const v = cpuShot(from, 'hard', false, rand)
+      const tr = trace({ p: from, v }, new Shot('cpu'))
+      expect(tr.result).toBe('double')
+      if (!tr.boast) continue
+      boasts++
+      expect(findReachWindow({ p: from, v }, new Shot('cpu'), inYourReach)).not.toBeNull()
+    }
+    expect(boasts).toBeGreaterThan(10)
   })
 })

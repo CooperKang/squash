@@ -56,14 +56,19 @@ export function step(b: Ball, dt: number): BallEvent[] {
   return events
 }
 
-/** 앞벽 (tx, ty)에 time초 뒤 닿는 속도 */
+/** 앞벽 (tx, ty)에 닿는 속도 */
 export function aimVelocity(from: Vec, tx: number, ty: number, speed: number): Vec {
-  const dist = Math.hypot(tx - from.x, ty - from.y, from.z)
+  return aimAt(from, { x: tx, y: ty, z: 0 }, speed)
+}
+
+/** 코트 안 한 점(벽 위의 점)으로 날아가는 속도 */
+export function aimAt(from: Vec, to: Vec, speed: number): Vec {
+  const dist = Math.hypot(to.x - from.x, to.y - from.y, to.z - from.z)
   const t = Math.max(0.25, dist / speed)
   return {
-    x: (tx - from.x) / t,
-    y: (ty - from.y + 0.5 * G * t * t) / t,
-    z: -from.z / t,
+    x: (to.x - from.x) / t,
+    y: (to.y - from.y + 0.5 * G * t * t) / t,
+    z: (to.z - from.z) / t,
   }
 }
 
@@ -74,6 +79,7 @@ export class Shot {
   frontOk = false
   floorAfterFront = 0
   backWall = false // 앞벽을 맞고 온 공이 뒷벽에도 맞았는지
+  boast = false // 앞벽보다 옆벽을 먼저 맞힌 샷(보스트)
   by: Hitter
   serve: boolean
   constructor(by: Hitter, serve = false) {
@@ -87,6 +93,11 @@ export class Shot {
     if ((e.hit === 'side' || e.hit === 'back') && e.at.y > outLineAt(e.at.z)) return 'out'
     if (!this.frontOk) {
       if (e.hit === 'floor') return 'down'
+      if (e.hit === 'side') {
+        // 서브는 앞벽부터 맞혀야 하고, 랠리에서는 옆벽 먼저 맞히는 보스트가 된다
+        if (this.serve) return 'serve-fault'
+        this.boast = true
+      }
       if (e.hit === 'front') {
         if (e.at.y < COURT.tin) return 'tin'
         if (e.at.y > COURT.frontOut) return 'out'
@@ -125,9 +136,65 @@ export function outcome(ball: Ball, shot: Shot, maxT = 5, dt = 1 / 120) {
 
 // 받는 쪽(카메라 쪽, 뒤 코트)이 칠 수 있는 범위.
 // 뒷벽을 맞고 앞으로 튀어나오는 공도 두 번 튀기 전이면 칠 수 있고, 그때는 공을 따라 조금 더 앞까지 나간다
+// 상대 보스트는 앞 코트로 떨어지니 앞으로 달려 나가 친다
 export function inYourReach(b: Ball, shot: Shot) {
   if (!shot.frontOk || shot.floorAfterFront > 1 || b.p.y > 2.4) return false
+  if (shot.boast) return b.p.z >= 1.6 && b.p.y <= 1.6
   return b.p.z >= (shot.backWall ? 3.8 : 5.3)
+}
+
+export type Trace = { result: ReturnType<Shot['apply']>; boast: boolean; front: Vec | null; land: Vec | null }
+
+/** 샷을 끝까지 굴려 앞벽에 맞은 곳, 앞벽 뒤 처음 떨어진 곳까지 알려 준다 */
+export function trace(ball: Ball, shot: Shot, maxT = 5, dt = 1 / 120): Trace {
+  const b: Ball = { p: { ...ball.p }, v: { ...ball.v } }
+  const s = Object.assign(new Shot(shot.by, shot.serve), shot)
+  let front: Vec | null = null
+  let land: Vec | null = null
+  for (let t = 0; t < maxT; t += dt) {
+    for (const e of step(b, dt)) {
+      const was = s.frontOk
+      const r = s.apply(e)
+      if (!was && s.frontOk) front = e.at
+      if (was && e.hit === 'floor' && !land) land = e.at
+      if (r) return { result: r, boast: s.boast, front, land }
+    }
+  }
+  return { result: null, boast: s.boast, front, land }
+}
+
+/**
+ * 보스트 후보: 가까운 옆벽을 먼저 맞혀 반대쪽 앞 코트로 떨어지는 샷.
+ * 앞벽에 낮게 맞고 앞쪽에 떨어질수록 좋은 보스트다.
+ */
+export function boastCandidates(from: Vec, by: Hitter, rand = Math.random) {
+  const side = Math.sign(from.x) || 1
+  const out: { v: Vec; score: number; trace: Trace }[] = []
+  for (let i = 0; i < 70; i++) {
+    const sz = from.z - (0.5 + rand() * 2.8)
+    const sy = 0.7 + rand() * 1.5
+    const speed = 10 + rand() * 6
+    const v = aimAt(from, { x: side * (COURT.halfWidth - BALL_R), y: sy, z: sz }, speed)
+    const tr = trace({ p: { ...from }, v }, new Shot(by))
+    if (tr.result !== 'double' || !tr.boast || !tr.front || !tr.land) continue
+    if (tr.front.y > 2.4 || tr.land.z > 4.8) continue
+    const score = -tr.front.y - tr.land.z * 0.4 + (Math.sign(tr.land.x) === -side ? 0.6 : 0)
+    out.push({ v, score, trace: tr })
+  }
+  return out.sort((a, b) => b.score - a.score)
+}
+
+/** 내 보스트: 타이밍이 좋을수록 상위 후보에서 고른다. 보스트가 안 되는 자리면 null */
+export function yourBoast(from: Vec, quality: number, rand = Math.random): Vec | null {
+  const c = boastCandidates(from, 'you', rand)
+  if (c.length === 0) return null
+  const spread = Math.max(1, Math.round((1 - quality) * Math.min(8, c.length)))
+  return c[Math.floor(rand() * Math.min(spread, c.length))].v
+}
+
+/** 뒤 코트, 옆벽 가까이에서만 보스트를 칠 수 있다 */
+export function canBoast(p: Vec) {
+  return Math.abs(p.x) > 1.5 && p.z > 5.6
 }
 
 export type Window = { start: number; length: number; at: Vec }
@@ -158,6 +225,8 @@ const CPU_MIN_WINDOW: Record<Difficulty, number> = { easy: 0.55, normal: 0.42, h
 
 /** 상대(CPU)의 샷을 고른다: 내가 칠 수 있는 구간이 생기는 후보 중에서 난이도에 맞춰 */
 export function cpuShot(from: Vec, diff: Difficulty, serve: boolean, rand = Math.random): Vec {
+  const boast = cpuBoast(from, diff, serve, rand)
+  if (boast) return boast
   const cands: { v: Vec; score: number }[] = []
   for (let i = 0; i < 60; i++) {
     const tx = (rand() * 2 - 1) * 2.6
@@ -183,6 +252,18 @@ export function cpuShot(from: Vec, diff: Difficulty, serve: boolean, rand = Math
   return cands[Math.floor(rand() * Math.min(4, cands.length))].v
 }
 
+const CPU_BOAST: Record<Difficulty, number> = { easy: 0.12, normal: 0.25, hard: 0.35 }
+
+/** 뒤 구석에 몰린 상대는 가끔 보스트로 빠져나온다. 내가 앞으로 달려가 칠 시간이 있는 것만 */
+function cpuBoast(from: Vec, diff: Difficulty, serve: boolean, rand: () => number): Vec | null {
+  if (serve || !canBoast(from) || rand() > CPU_BOAST[diff]) return null
+  for (const c of boastCandidates(from, 'cpu', rand)) {
+    const w = findReachWindow({ p: { ...from }, v: { ...c.v } }, new Shot('cpu'), inYourReach)
+    if (w && w.length >= CPU_MIN_WINDOW[diff] + 0.1) return c.v
+  }
+  return null
+}
+
 /**
  * 내 샷: 공의 어디를 쳤는지(dx, dy: 공 중심 기준 -1~1, 화면 아래가 +)와
  * 타이밍 품질(0~1)로 앞벽 목표점을 정한다.
@@ -197,8 +278,8 @@ export function yourShot(from: Vec, dx: number, dy: number, quality: number, ran
 }
 
 /** 타이밍 품질: 공이 허리 높이, 뒤 코트 깊숙이 왔을 때 칠수록 좋다(뒷벽에서 나온 공은 조금 앞에서 쳐도 된다) */
-export function timingQuality(p: Vec, offBackWall = false) {
-  const depth = 1 - Math.min(1, Math.abs(p.z - (offBackWall ? 7.4 : 8)) / (offBackWall ? 3 : 2.4))
+export function timingQuality(p: Vec, offBackWall = false, frontCourt = false) {
+  const depth = frontCourt ? 0.75 : 1 - Math.min(1, Math.abs(p.z - (offBackWall ? 7.4 : 8)) / (offBackWall ? 3 : 2.4))
   const height = 1 - Math.min(1, Math.abs(p.y - 0.9) / 1.4)
   return clamp(0.25 + depth * 0.45 + height * 0.3, 0, 1)
 }

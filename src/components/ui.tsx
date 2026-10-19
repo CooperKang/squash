@@ -33,3 +33,8 @@ export function FrameStripe({ className = '' }: { className?: string }) {
     </div>
   )
 }
+
+export function LevelBadge({ level }: { level: string }) {
+  const tone = level === '입문' ? 'bg-silver-soft text-ink' : level === '초급' ? 'bg-teal-soft text-teal-deep' : 'bg-ink text-white'
+  return <span className={`inline-block rounded-full px-2.5 py-0.5 text-[12px] font-bold ${tone}`}>{level}</span>
+}

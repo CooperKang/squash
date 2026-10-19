@@ -1,4 +1,4 @@
-import { NAV, href, inSection, useRoute, type Route } from './router'
+import { MOBILE_NAV, NAV, href, inSection, sectionTabs, useRoute, type Route } from './router'
 import { RouteIcon } from './components/Icon'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -8,6 +8,9 @@ import Finder from './pages/Finder'
 import Live from './pages/Live'
 import Game from './pages/Game'
 import Giyeok from './pages/Giyeok'
+import Shots from './pages/Shots'
+import Practice from './pages/Practice'
+import Courts from './pages/Courts'
 
 const PAGES: Record<Route, () => React.JSX.Element> = {
   home: Home,
@@ -18,13 +21,16 @@ const PAGES: Record<Route, () => React.JSX.Element> = {
   live: Live,
   game: Game,
   giyeok: Giyeok,
+  shots: Shots,
+  practice: Practice,
+  courts: Courts,
 }
 
 export default function App() {
   const route = useRoute()
   const Page = PAGES[route]
   return (
-    <div className="min-h-dvh pb-[calc(76px+env(safe-area-inset-bottom))] md:pb-0">
+    <div className="min-h-dvh pb-[calc(76px+env(safe-area-inset-bottom))] lg:pb-0">
       <header className="sticky top-0 z-30 border-b border-line/70 bg-court/85 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 md:h-16">
           <a href={href('home')} className="flex items-center gap-2.5" aria-label="스쿼시 코트 처음 화면">
@@ -33,14 +39,14 @@ export default function App() {
               SQUASH<span className="text-teal">COURT</span>
             </span>
           </a>
-          <nav className="ml-auto hidden md:block" aria-label="주 메뉴">
+          <nav className="ml-auto hidden lg:block" aria-label="주 메뉴">
             <ul className="flex items-center gap-1">
               {NAV.map((r) => (
                 <li key={r.id}>
                   <a
                     href={href(r.id)}
                     aria-current={inSection(route, r.id) ? 'page' : undefined}
-                    className="rounded-full px-3.5 py-2 text-[15px] font-semibold text-muted transition hover:text-ink aria-[current=page]:bg-ink aria-[current=page]:text-white"
+                    className="rounded-full px-3 py-2 text-[15px] font-semibold text-muted transition hover:text-ink aria-[current=page]:bg-ink aria-[current=page]:text-white"
                   >
                     {r.label}
                   </a>
@@ -48,13 +54,14 @@ export default function App() {
               ))}
             </ul>
           </nav>
-          <a href="https://cooperkang.github.io/" className="ml-auto text-[13px] font-medium text-muted underline-offset-4 hover:underline md:ml-2">
+          <a href="https://cooperkang.github.io/" className="ml-auto text-[13px] font-medium text-muted underline-offset-4 hover:underline lg:ml-2">
             서비스 허브
           </a>
         </div>
       </header>
 
       <main>
+        <SectionTabs route={route} />
         <Page key={route} />
       </main>
 
@@ -68,9 +75,9 @@ export default function App() {
         </footer>
       )}
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden" aria-label="주 메뉴">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden" aria-label="주 메뉴">
         <ul className="grid grid-cols-6">
-          {NAV.map((r) => (
+          {MOBILE_NAV.map((r) => (
             <li key={r.id}>
               <a
                 href={href(r.id)}
@@ -85,6 +92,28 @@ export default function App() {
         </ul>
       </nav>
     </div>
+  )
+}
+
+function SectionTabs({ route }: { route: Route }) {
+  const tabs = sectionTabs(route)
+  if (!tabs.length) return null
+  return (
+    <nav className="mx-auto max-w-6xl px-4 pt-5 md:pt-8" aria-label="이 섹션의 화면">
+      <ul className="flex gap-1.5 overflow-x-auto">
+        {tabs.map((r) => (
+          <li key={r.id}>
+            <a
+              href={href(r.id)}
+              aria-current={route === r.id ? 'page' : undefined}
+              className="block rounded-full border border-line px-4 py-2 text-[14px] font-semibold whitespace-nowrap text-muted transition hover:text-ink aria-[current=page]:border-teal aria-[current=page]:bg-teal-soft aria-[current=page]:text-teal-deep"
+            >
+              {r.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
   )
 }
 

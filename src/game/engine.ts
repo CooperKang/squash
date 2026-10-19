@@ -2,6 +2,7 @@ import {
   BALL_R,
   COURT,
   Shot,
+  canBoast,
   clamp,
   cpuReturnChance,
   cpuShot,
@@ -9,6 +10,7 @@ import {
   inYourReach,
   step,
   timingQuality,
+  yourBoast,
   yourShot,
   type Ball,
   type Difficulty,
@@ -16,6 +18,7 @@ import {
   type Vec,
 } from './physics'
 import { winner, type Score } from './score'
+import type { RuleKey } from './hints'
 
 export type HudState = {
   score: Score
@@ -25,6 +28,9 @@ export type HudState = {
   phase: Phase
   message: string
   result: Hitter | null
+  hint: RuleKey | null
+  paused: boolean
+  boastSide: -1 | 1 | null // 보스트를 칠 수 있으면 공이 있는 쪽(화면 왼쪽 -1, 오른쪽 1)
 }
 
 type Phase = 'ready' | 'serve-you' | 'serve-cpu' | 'rally' | 'point' | 'over'
@@ -75,8 +81,15 @@ export class Engine {
   private audio: AudioContext | null = null
   // 카메라는 공이 화면 밖으로 나가지 않을 만큼만 따라간다(좁은 폰 화면에서 특히 필요)
   private cam = { x: CAM.x, y: CAM.y }
+  // 점수가 날 때 관련 규칙을 한 번씩 물어본다. 다음 랠리가 시작되면 사라진다
+  private hint: RuleKey | null = null
+  private asked = new Set<RuleKey>()
+  private paused = false
+  private rallySaw = { boast: false, backWall: false }
+  private boastSide: -1 | 1 | null = null
   public difficulty: Difficulty = 'normal'
   public sound = true
+  public askRules = true
 
   private canvas: HTMLCanvasElement
   private onHud: (h: HudState) => void
@@ -99,7 +112,7 @@ export class Engine {
     const loop = (now: number) => {
       const dt = Math.min(0.05, (now - this.last) / 1000)
       this.last = now
-      this.update(dt)
+      if (!this.paused) this.update(dt)
       this.draw()
       this.raf = requestAnimationFrame(loop)
     }
@@ -126,7 +139,21 @@ export class Engine {
     this.cam = { ...this.camTarget() }
   }
 
+  /** 규칙 설명을 읽는 동안 멈춘다 */
+  pause() {
+    this.paused = true
+    this.emit()
+  }
+
+  resume() {
+    this.paused = false
+    this.last = performance.now()
+    this.emit()
+  }
+
   newMatch() {
+    this.paused = false
+    this.hint = null
     this.score = { you: 0, cpu: 0 }
     this.server = 'you'
     this.side = 1
@@ -154,7 +181,7 @@ export class Engine {
 
   tap(x: number, y: number) {
     this.unlockAudio()
-    if (this.phase === 'ready' || this.phase === 'over') return
+    if (this.phase === 'ready' || this.phase === 'over' || this.paused) return
     const yourTurn = this.phase === 'serve-you' || (this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot))
     const s = this.project(this.ball.p)
     const r = s ? Math.max(48, s.r * 3.2) : 0
@@ -166,19 +193,41 @@ export class Engine {
     const dx = clamp((x - s.x) / r, -1, 1)
     const dy = clamp((y - s.y) / r, -1, 1)
     const serve = this.phase === 'serve-you'
-    const q = serve ? 0.9 : timingQuality(this.ball.p, this.shot.backWall)
-    const { v } = yourShot(this.ball.p, dx, dy, q)
+    const q = serve ? 0.9 : timingQuality(this.ball.p, this.shot.backWall, this.shot.boast)
+    this.strike(yourShot(this.ball.p, dx, dy, q).v, serve, q)
+    this.swings.push({ x, y, t: 0, good: true })
+    if (!serve && q > 0.82) this.flash('굿 타이밍!', C.tealBright)
+    navigator.vibrate?.(12)
+    this.emit()
+  }
+
+  /** 보스트 버튼(또는 B 키): 옆벽 가까이 뒤쪽에 온 공을 옆벽으로 쳐서 보스트 */
+  boast() {
+    if (this.paused || this.boastSide == null) return false
+    this.unlockAudio()
+    const q = timingQuality(this.ball.p, this.shot.backWall)
+    const v = yourBoast(this.ball.p, q)
+    if (!v) return false
+    this.strike(v, false, q)
+    this.rallySaw.boast = true
+    this.flash('보스트!', C.tealBright, 0.9)
+    const s = this.project(this.ball.p)
+    if (s) this.swings.push({ x: s.x, y: s.y, t: 0, good: true })
+    navigator.vibrate?.(12)
+    this.emit()
+    return true
+  }
+
+  private strike(v: Vec, serve: boolean, q: number) {
     this.ball.v = v
     this.shot = new Shot('you', serve)
+    this.hint = null
+    this.boastSide = null
     this.lastShotInfo = { frontY: 2, speed: Math.hypot(v.x, v.y, v.z) }
     this.cpuPlan = { decided: false, returns: false }
     this.phase = 'rally'
     this.rally++
-    this.swings.push({ x, y, t: 0, good: true })
     this.sfx('hit', q)
-    if (!serve && q > 0.82) this.flash('굿 타이밍!', C.tealBright)
-    navigator.vibrate?.(12)
-    this.emit()
   }
 
   // ---------- 진행 ----------
@@ -187,12 +236,14 @@ export class Engine {
     this.trail = []
     this.rally = 0
     this.message = ''
+    this.rallySaw = { boast: false, backWall: false }
     if (this.server === 'you') {
       this.phase = 'serve-you'
       this.toss()
     } else {
       this.phase = 'serve-cpu'
-      this.timer = 0.9
+      // 규칙을 물어보는 중이면 읽을 시간을 조금 더 준다
+      this.timer = this.hint ? 2.6 : 0.9
       this.ball = { p: { x: this.side * 1.6, y: 1.1, z: 5.9 }, v: { x: 0, y: 0, z: 0 } }
     }
     this.emit()
@@ -219,7 +270,9 @@ export class Engine {
         this.shot = new Shot('cpu', true)
         this.phase = 'rally'
         this.rally++
+        this.hint = null
         this.sfx('hit', 0.7)
+        this.emit()
       }
     }
 
@@ -231,6 +284,13 @@ export class Engine {
     const targetZ = this.shot.by === 'you' && this.phase === 'rally' ? clamp(this.ball.p.z, 3.2, 7.2) : 5.4
     this.cpu.x += (clamp(targetX, -2.6, 2.6) - this.cpu.x) * Math.min(1, realDt * 4)
     this.cpu.z += (targetZ - this.cpu.z) * Math.min(1, realDt * 3)
+
+    const yourBall = this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot) && !this.shot.boast
+    const side = yourBall && canBoast(this.ball.p) ? (Math.sign(this.ball.p.x - this.cam.x) >= 0 ? 1 : -1) : null
+    if (side !== this.boastSide) {
+      this.boastSide = side
+      this.emit()
+    }
 
     const t = this.camTarget()
     const k = Math.min(1, realDt * 7)
@@ -267,18 +327,26 @@ export class Engine {
     for (const e of events) {
       if (e.hit !== 'floor') this.sfx('wall', 0.5)
       // 상대 공이 뒷벽을 맞고 나오면 아직 칠 수 있다고 알려 준다
-      if (e.hit === 'back' && this.shot.by === 'cpu' && this.shot.frontOk && !this.shot.backWall && this.shot.floorAfterFront <= 1 && e.at.y <= COURT.backOut)
+      if (e.hit === 'back' && this.shot.by === 'cpu' && this.shot.frontOk && !this.shot.backWall && this.shot.floorAfterFront <= 1 && e.at.y <= COURT.backOut) {
+        this.rallySaw.backWall = true
         this.flash('뒷벽! 나오는 공을 치세요', C.tealBright, 0.9)
+      }
       if (e.hit === 'front' && !this.shot.frontOk) this.lastShotInfo.frontY = e.at.y
+      // 상대 보스트가 앞벽에 맞으면 앞으로 나오라고 알려 준다
+      if (e.hit === 'front' && !this.shot.frontOk && this.shot.boast && this.shot.by === 'cpu' && e.at.y >= COURT.tin) {
+        this.rallySaw.boast = true
+        this.flash('보스트! 앞으로 나가 치세요', C.tealBright, 0.85)
+      }
       const r = this.shot.apply(e)
       if (!r) continue
       const by = this.shot.by
       const other: Hitter = by === 'you' ? 'cpu' : 'you'
       if (r === 'double') {
-        this.endRally(by, by === 'you' ? '위너!' : '놓쳤어요')
+        this.endRally(by, by === 'you' ? '위너!' : '놓쳤어요', by === 'cpu' ? 'not-up' : null)
       } else {
-        const label = { down: '바닥에 먼저 닿았어요', tin: '틴!', out: e.hit === 'front' ? '아웃!' : '아웃! (벽 아웃 라인 위)', 'serve-fault': '서브 폴트' }[r]
-        this.endRally(other, label)
+        const wallOut = r === 'out' && e.hit !== 'front'
+        const label = { down: '바닥에 먼저 닿았어요', tin: '틴!', out: wallOut ? '아웃! (벽 아웃 라인 위)' : '아웃!', 'serve-fault': '서브 폴트' }[r]
+        this.endRally(other, label, wallOut ? 'out-wall' : r)
       }
       return
     }
@@ -298,7 +366,8 @@ export class Engine {
     }
   }
 
-  private endRally(win: Hitter, label: string) {
+  private endRally(win: Hitter, label: string, reason: RuleKey | null) {
+    const kept = win === this.server
     this.score = { ...this.score, [win]: this.score[win] + 1 }
     if (this.rally > this.bestRally) {
       this.bestRally = this.rally
@@ -317,6 +386,19 @@ export class Engine {
     this.message = label
     this.flash(win === 'you' ? `+1  ${label}` : label, win === 'you' ? C.teal : C.line)
     this.sfx(win === 'you' ? 'win' : 'lose', 1)
+    this.hint = null
+    if (this.askRules && !winner(this.score)) {
+      const deuce = this.score.you === 10 && this.score.cpu === 10
+      const order: (RuleKey | null)[] = [
+        reason,
+        this.rallySaw.boast ? 'boast' : null,
+        this.rallySaw.backWall && win === 'cpu' ? 'back-wall' : null,
+        deuce ? 'deuce' : null,
+        kept ? 'serve-box' : null,
+      ]
+      this.hint = order.find((k): k is RuleKey => !!k && !this.asked.has(k)) ?? null
+      if (this.hint) this.asked.add(this.hint)
+    }
     if (winner(this.score)) {
       this.phase = 'over'
     } else {
@@ -339,6 +421,9 @@ export class Engine {
       phase: this.phase,
       message: this.message,
       result: winner(this.score),
+      hint: this.hint,
+      paused: this.paused,
+      boastSide: this.boastSide,
     })
   }
 
