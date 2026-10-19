@@ -2,7 +2,6 @@
 // GitHub Actions가 몇 시간마다 실행하고, 화면은 접속할 때마다 이 파일을 새로 읽는다.
 // 한 출처가 실패하면 지금 배포된 파일(그것도 없으면 저장소의 초기 파일)을 그대로 둔다.
 import { readFile, writeFile } from 'node:fs/promises'
-import { courts } from './fetch-courts.mjs'
 
 const OUT = new URL('../public/data/', import.meta.url)
 const LIVE = 'https://cooperkang.github.io/squash/data/'
@@ -303,7 +302,6 @@ const jobs = [
   ['calendar.json', async () => calendar()],
   ['videos.json', async () => videos(await previous('videos.json'))],
   ['korea.json', async () => ({ ...(await ksfEvents()), ranking: await ksfRanking() })],
-  ['courts.json', async () => courts(await previous('courts.json'))],
 ]
 
 let failed = 0

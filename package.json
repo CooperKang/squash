@@ -17,7 +17,8 @@
     "lint": "oxlint",
     "test": "vitest run",
     "preview": "vite preview",
-    "data": "node scripts/fetch-data.mjs"
+    "data": "node scripts/fetch-data.mjs",
+    "courts": "node scripts/fetch-courts.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",
