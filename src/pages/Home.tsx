@@ -5,6 +5,7 @@ import { FrameStripe } from '../components/ui'
 const TILES: { id: Route; title: string; body: string }[] = [
   { id: 'about', title: '스쿼시란?', body: '네 벽으로 둘러싸인 코트에서 벽에 공을 번갈아 치는 실내 라켓 스포츠예요.' },
   { id: 'rules', title: '경기 규칙', body: '서브, 틴, 렛·스트로크, 11점 랠리 포인트까지 코트 그림과 함께 정리했어요.' },
+  { id: 'giyeok', title: 'ㄱ자 게임', body: '동호회에서 여럿이 돌아가며 치는 3/4 코트 게임. 어디로 치면 실점인지 코트에서 눌러 봐요.' },
   { id: 'gear', title: '장비 고르기', body: '라켓 무게와 밸런스, 브랜드별 성향, 공의 점 색깔이 뜻하는 것.' },
   { id: 'finder', title: '내 라켓 찾기', body: '네 가지 질문에 답하면 영산스포츠 판매 라켓 중에서 골라 드려요.' },
   { id: 'live', title: '대회 현황판', body: 'PSA 월드 투어와 국내 대회 일정, 최근 결과와 세계 랭킹.' },

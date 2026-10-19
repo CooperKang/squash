@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Card, PageHead, Section } from '../components/ui'
+import { href } from '../router'
 
 type Spot = 'tin' | 'service' | 'out' | 'short' | 'half' | 'box' | 't'
 
@@ -119,6 +120,18 @@ export default function Rules() {
             상대가 가까이 있는데 휘두르면 위험해요. 라켓에 사람이 맞을 것 같으면 스윙을 멈추고 렛을 요청하세요. 규칙도 이런 경우를 보호해요.
           </p>
         </Card>
+      </Section>
+
+      <Section kicker="CLUB GAME" title="여럿이 칠 때는 ㄱ자 게임">
+        <a
+          href={href('giyeok')}
+          className="flex flex-col gap-1 rounded-[24px] border border-line/80 bg-card p-5 transition hover:border-teal/50 md:flex-row md:items-center md:justify-between md:p-6"
+        >
+          <span className="text-[15px] leading-relaxed text-muted">
+            동호회나 레슨 뒤 자유 시간에는 뒤 코트 한쪽을 대기 자리로 비우고 돌아가며 쳐요. 규칙과 순서를 코트 그림으로 정리했어요.
+          </span>
+          <span className="shrink-0 text-[15px] font-bold text-teal">ㄱ자 게임 알아보기</span>
+        </a>
       </Section>
 
       <Section kicker="ETIQUETTE" title="코트 매너">

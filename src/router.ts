@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 
 // GitHub Pages에서 새로고침해도 깨지지 않게 해시 주소(#/rules)로 화면을 나눈다
-export type Route = 'home' | 'about' | 'rules' | 'gear' | 'finder' | 'live' | 'game'
+export type Route = 'home' | 'about' | 'rules' | 'gear' | 'finder' | 'live' | 'game' | 'giyeok'
 
-export const ROUTES: { id: Route; label: string; short: string }[] = [
+export const ROUTES: { id: Route; label: string; short: string; parent?: Route }[] = [
   { id: 'home', label: '처음', short: '처음' },
   { id: 'about', label: '스쿼시란', short: '소개' },
   { id: 'rules', label: '경기 규칙', short: '규칙' },
@@ -11,7 +11,15 @@ export const ROUTES: { id: Route; label: string; short: string }[] = [
   { id: 'finder', label: '라켓 찾기', short: '라켓' },
   { id: 'live', label: '대회 현황', short: '현황' },
   { id: 'game', label: '게임', short: '게임' },
+  // 메뉴에는 없고 경기 규칙 아래에 붙는 화면
+  { id: 'giyeok', label: 'ㄱ자 게임', short: 'ㄱ자', parent: 'rules' },
 ]
+
+export const NAV = ROUTES.filter((r) => r.id !== 'home' && !r.parent)
+
+export function inSection(route: Route, id: Route) {
+  return route === id || ROUTES.find((r) => r.id === route)?.parent === id
+}
 
 function parse(): Route {
   const id = location.hash.replace(/^#\/?/, '').split('?')[0]

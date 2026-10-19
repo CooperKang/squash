@@ -1,4 +1,4 @@
-import { ROUTES, href, useRoute, type Route } from './router'
+import { NAV, href, inSection, useRoute, type Route } from './router'
 import { RouteIcon } from './components/Icon'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -7,6 +7,7 @@ import Gear from './pages/Gear'
 import Finder from './pages/Finder'
 import Live from './pages/Live'
 import Game from './pages/Game'
+import Giyeok from './pages/Giyeok'
 
 const PAGES: Record<Route, () => React.JSX.Element> = {
   home: Home,
@@ -16,6 +17,7 @@ const PAGES: Record<Route, () => React.JSX.Element> = {
   finder: Finder,
   live: Live,
   game: Game,
+  giyeok: Giyeok,
 }
 
 export default function App() {
@@ -33,11 +35,11 @@ export default function App() {
           </a>
           <nav className="ml-auto hidden md:block" aria-label="주 메뉴">
             <ul className="flex items-center gap-1">
-              {ROUTES.slice(1).map((r) => (
+              {NAV.map((r) => (
                 <li key={r.id}>
                   <a
                     href={href(r.id)}
-                    aria-current={route === r.id ? 'page' : undefined}
+                    aria-current={inSection(route, r.id) ? 'page' : undefined}
                     className="rounded-full px-3.5 py-2 text-[15px] font-semibold text-muted transition hover:text-ink aria-[current=page]:bg-ink aria-[current=page]:text-white"
                   >
                     {r.label}
@@ -68,11 +70,11 @@ export default function App() {
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden" aria-label="주 메뉴">
         <ul className="grid grid-cols-6">
-          {ROUTES.slice(1).map((r) => (
+          {NAV.map((r) => (
             <li key={r.id}>
               <a
                 href={href(r.id)}
-                aria-current={route === r.id ? 'page' : undefined}
+                aria-current={inSection(route, r.id) ? 'page' : undefined}
                 className="flex h-[60px] flex-col items-center justify-center gap-1 text-[11px] font-semibold text-muted aria-[current=page]:text-teal"
               >
                 <RouteIcon id={r.id} className="size-[22px]" />
