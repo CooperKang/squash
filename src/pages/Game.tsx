@@ -178,7 +178,8 @@ export default function Game() {
                   <p className="mt-3 text-[14px] leading-relaxed text-muted">공 둘레에 청록 링이 보이면 공을 눌러 치세요. 누르는 곳이 샷을 정해요.</p>
                   <ShotPad />
                   <ul className="mt-3 space-y-1 text-[13.5px] leading-relaxed text-muted">
-                    <li>· 쉬움 모드는 칠 차례에 느려지고, 공 둘레에 칸마다 무슨 샷이 나가는지 보여 줘요.</li>
+                    <li>· 쉬움 모드는 링이 보일 때 누르면 그 순간 멈추고, 공을 크게 보여 줘요. 칸마다 적힌 샷을 골라 누르면 그 샷이 나가요.</li>
+                    <li>· 상대는 공이 올 곳을 미리 읽고 스텝을 밟아 가서 실제 선수처럼 런지하고 휘둘러요.</li>
                     <li>· 뒤쪽 허리 높이에서 제때 칠수록 샷이 예리하게 들어가요. 11점 먼저 내면 이겨요.</li>
                   </ul>
                 </>

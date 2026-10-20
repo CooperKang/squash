@@ -204,6 +204,18 @@ export function findReachWindow(ball: Ball, shot: Shot, reach: (b: Ball, s: Shot
   return start >= 0 ? { start, length: maxT - start, at: at! } : null
 }
 
+/** 공을 앞으로 굴려 보며 reach가 참인 순간들(시각과 위치)을 모은다. 샷이 끝나면 멈춘다 */
+export function sampleReach(ball: Ball, shot: Shot, reach: (b: Ball, s: Shot) => boolean, maxT = 4, dt = 1 / 120) {
+  const b: Ball = { p: { ...ball.p }, v: { ...ball.v } }
+  const s = Object.assign(new Shot(shot.by, shot.serve, shot.serveSide), shot)
+  const out: { t: number; p: Vec }[] = []
+  for (let t = dt; t < maxT; t += dt) {
+    for (const e of step(b, dt)) if (s.apply(e)) return out
+    if (reach(b, s)) out.push({ t, p: { ...b.p } })
+  }
+  return out
+}
+
 export type Difficulty = 'easy' | 'normal' | 'hard'
 
 /** 타이밍 품질: 공이 허리 높이, 뒤 코트 깊숙이 왔을 때 칠수록 좋다(뒷벽에서 나온 공은 조금 앞에서, 앞 코트 공은 앞에서) */

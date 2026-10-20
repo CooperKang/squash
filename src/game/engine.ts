@@ -6,6 +6,7 @@ import {
   clamp,
   inCpuReach,
   inYourReach,
+  sampleReach,
   step,
   timingQuality,
   type Ball,
@@ -15,6 +16,7 @@ import {
 } from './physics'
 import { status, winner, type Score, type Status } from './score'
 import type { RuleKey } from './hints'
+import { BODY, CpuBody, type Joints } from './cpuBody'
 import { SHOT_NAME, ZONE, cpuReturnChance, cpuShot, intentFrom, kindFor, newShot, playerShot, sharpness, type ShotKind } from './shots'
 
 export type HudState = {
@@ -69,11 +71,15 @@ export class Engine {
   private bestRally = 0
   private message = ''
   private timer = 0
-  private cpuPlan: { decided: boolean; returns: boolean } = { decided: false, returns: false }
-  private cpu: Vec = { x: 0, y: 0, z: 5.6 }
+  // 상대가 공을 칠 시각(내가 친 뒤 경과한 게임 시간 기준)
+  private cpuPlan: { returns: boolean; t: number } = { returns: false, t: 0 }
+  private cpuClock = 0
+  private body = new CpuBody()
+  // 쉬움 모드: 칠 타이밍에 누르면 멈추고 공을 크게 보여 칠 곳을 고르게 한다
+  private pick: { k: number; dir: 1 | -1; q: number; serve: boolean; sx: number; sy: number; sr: number; kind: ShotKind | null } | null = null
   private lastShot: { by: Hitter; kind: ShotKind; sharp: number } | null = null
   private trail: Vec[] = []
-  private swings: { x: number; y: number; t: number; good: boolean }[] = []
+  private swings: { x: number; y: number; t: number; good: boolean; side: number }[] = []
   private pointer: { x: number; y: number } | null = null
   private flashes: { text: string; t: number; color: string; scale: number }[] = []
   private audio: AudioContext | null = null
@@ -86,7 +92,6 @@ export class Engine {
   private asked = new Set<RuleKey>()
   private paused = false
   private rallySaw = { boast: false, backWall: false }
-  private warp = 1 // 쉬움 모드에서 칠 차례에 느려지는 시간 배율
   private lastStatus: Status = null
   public difficulty: Difficulty = 'normal'
   public sound = true
@@ -154,6 +159,7 @@ export class Engine {
 
   newMatch() {
     this.paused = false
+    this.pick = null
     this.hint = null
     this.lastStatus = null
     this.score = { you: 0, cpu: 0 }
@@ -184,23 +190,55 @@ export class Engine {
   tap(x: number, y: number) {
     this.unlockAudio()
     if (this.phase === 'ready' || this.phase === 'over' || this.paused) return
+    if (this.pick) return this.choose(x, y)
     const yourTurn = this.phase === 'serve-you' || (this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot))
     const s = this.project(this.ball.p)
     const r = s ? this.hitRadius(s.r) : 0
     const near = s && Math.hypot(x - s.x, y - s.y) <= r
     if (!yourTurn || !s || !near) {
-      this.swings.push({ x, y, t: 0, good: false })
+      this.swings.push({ x, y, t: 0, good: false, side: this.handSide() })
       return
     }
     const dx = clamp((x - s.x) / r, -1, 1)
     const dy = clamp((y - s.y) / r, -1, 1)
     const serve = this.phase === 'serve-you'
     const q = serve ? 0.9 : timingQuality(this.ball.p, this.shot.backWall, this.shot.boast || this.shot.short)
+    navigator.vibrate?.(12)
+    // 쉬움 모드: 여기서 멈추고 칠 곳을 고르게 한다
+    if (this.difficulty === 'easy') {
+      this.pick = { k: 0, dir: 1, q, serve, sx: s.x, sy: s.y, sr: r, kind: null }
+      this.pointer = null
+      return
+    }
     // 누른 곳 = 라켓이 공을 때린 곳: 안쪽은 보스트, 가운데는 드라이브, 벽 쪽은 크로스, 윗면은 드롭, 아랫면은 로브
     this.strike(kindFor(intentFrom(this.ball.p.x, dx, dy), this.ball.p, serve), serve, q)
-    this.swings.push({ x, y, t: 0, good: true })
-    navigator.vibrate?.(12)
+    this.swings.push({ x: s.x, y: s.y, t: 0, good: true, side: this.handSide() })
     this.emit()
+  }
+
+  /** 쉬움 모드에서 멈춘 화면: 크게 보이는 공 둘레에서 칠 곳을 고른다 */
+  private choose(x: number, y: number) {
+    const p = this.pick!
+    if (p.dir < 0 || p.k < 0.6) return
+    const g = this.pickGeom()
+    if (Math.hypot(x - g.cx, y - g.cy) > g.R) return
+    const dx = clamp((x - g.cx) / g.R, -1, 1)
+    const dy = clamp((y - g.cy) / g.R, -1, 1)
+    p.kind = kindFor(intentFrom(this.ball.p.x, dx, dy), this.ball.p, p.serve)
+    p.dir = -1
+    navigator.vibrate?.(12)
+  }
+
+  private pickGeom() {
+    const p = this.pick!
+    const e = p.k * p.k * (3 - 2 * p.k)
+    const big = Math.min(this.w * 0.4, this.h * 0.27)
+    return { cx: p.sx + (this.w / 2 - p.sx) * e, cy: p.sy + (this.h * 0.5 - p.sy) * e, R: p.sr + (big - p.sr) * e, e }
+  }
+
+  /** 오른손잡이 기준: 공이 몸 오른쪽이면 포핸드(1), 왼쪽이면 백핸드(-1) */
+  private handSide() {
+    return this.ball.p.x >= -0.15 ? 1 : -1
   }
 
   /** 공 둘레에서 칠 수 있는 범위(px). 쉬움 모드는 더 넓다 */
@@ -226,10 +264,10 @@ export class Engine {
     const sharp = sharpness(k, v, from, 'you', serve).score
     this.lastShot = { by: 'you', kind: k, sharp }
     this.flash(sharp > 0.7 && !serve ? `${SHOT_NAME[k]} · 예리해요!` : SHOT_NAME[k], sharp > 0.7 ? C.tealBright : '#ffffff', 0.75)
-    this.cpuPlan = { decided: false, returns: false }
     this.phase = 'rally'
     this.rally++
     this.sfx('hit', q)
+    this.planCpu()
     return true
   }
 
@@ -240,14 +278,20 @@ export class Engine {
     this.rally = 0
     this.message = ''
     this.rallySaw = { boast: false, backWall: false }
+    this.pick = null
     if (this.server === 'you') {
       this.phase = 'serve-you'
       this.toss()
+      // 상대는 반대쪽 뒤에서 리시브를 기다린다
+      this.body.placeAt({ x: -this.side * 1.6, z: 7.4 })
     } else {
       this.phase = 'serve-cpu'
       // 규칙을 물어보는 중이면 읽을 시간을 조금 더 준다
-      this.timer = this.hint ? 2.6 : 0.9
-      this.ball = { p: { x: this.side * 2.2, y: 1.1, z: 6.3 }, v: { x: 0, y: 0, z: 0 } }
+      this.timer = this.hint ? 2.6 : 1.1
+      // 서비스 박스에 한 발을 두고 포핸드로 서브한다
+      this.ball = { p: { x: this.side > 0 ? 2.55 : -1.75, y: 1.1, z: 6.3 }, v: { x: 0, y: 0, z: 0 } }
+      this.body.placeAt({ x: this.ball.p.x - 0.78, z: 6.75 })
+      this.body.plan(this.ball.p, this.timer * TIME_SCALE[this.difficulty])
     }
     this.emit()
   }
@@ -258,9 +302,23 @@ export class Engine {
 
   private update(realDt: number) {
     for (const s of this.swings) s.t += realDt
-    this.swings = this.swings.filter((s) => s.t < 0.35)
+    this.swings = this.swings.filter((s) => s.t < 0.32)
     for (const f of this.flashes) f.t += realDt
     this.flashes = this.flashes.filter((f) => f.t < 1.1)
+
+    // 쉬움 모드에서 고르는 동안은 시간이 멈춘다
+    if (this.pick) {
+      const p = this.pick
+      p.k = clamp(p.k + (p.dir * realDt) / 0.24, 0, 1)
+      if (p.dir < 0 && p.k <= 0) {
+        this.pick = null
+        const s = this.project(this.ball.p)
+        this.strike(p.kind ?? 'drive', p.serve, p.q)
+        if (s) this.swings.push({ x: s.x, y: s.y, t: 0, good: true, side: this.handSide() })
+        this.emit()
+      }
+      return
+    }
 
     if (this.phase === 'point') {
       this.timer -= realDt
@@ -277,23 +335,15 @@ export class Engine {
         this.phase = 'rally'
         this.rally++
         this.hint = null
+        if (this.body.swing) this.body.swing.t = 0
         this.sfx('hit', 0.7)
         this.emit()
       }
     }
 
-    const dt = (realDt * TIME_SCALE[this.difficulty] * this.warp) / 4
-    for (let i = 0; i < 4; i++) this.physics(dt)
-
-    // 상대는 공을 따라 움직이고, 내 차례에는 T 근처로 돌아간다
-    const targetX = this.shot.by === 'you' && this.phase === 'rally' ? this.ball.p.x : 0
-    const targetZ = this.shot.by === 'you' && this.phase === 'rally' ? clamp(this.ball.p.z, 3.2, 7.2) : 5.4
-    this.cpu.x += (clamp(targetX, -2.9, 2.9) - this.cpu.x) * Math.min(1, realDt * 5)
-    this.cpu.z += (targetZ - this.cpu.z) * Math.min(1, realDt * 3)
-
-    // 쉬움 모드: 내가 칠 수 있는 동안 시간을 느리게 해서 칠 곳을 고를 여유를 준다
-    const slow = this.difficulty === 'easy' && this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot)
-    this.warp += ((slow ? 0.32 : 1) - this.warp) * Math.min(1, realDt * 8)
+    const game = realDt * TIME_SCALE[this.difficulty]
+    for (let i = 0; i < 4; i++) this.physics(game / 4)
+    this.body.update(game)
 
     const t = this.camTarget()
     const k = Math.min(1, realDt * 7)
@@ -306,8 +356,7 @@ export class Engine {
     // 공이 화면 폭의 38% 안, 점수판 아래~화면 아래 여백 위에 들어오게.
     // 뒷벽 근처(카메라 바로 앞)까지 온 공도 놓치지 않도록 실제 거리로 계산한다
     const dz = Math.max(1.3, CAM.z - Math.max(b.z, 6))
-    // 쉬움 모드에서 칠 차례면 공 둘레의 칸 표시가 화면 밖으로 나가지 않게 여백을 더 둔다
-    const margin = this.difficulty === 'easy' && this.yourBallNow() ? this.hitRadius((this.f * BALL_R) / dz) + 10 : this.w * 0.12
+    const margin = this.w * 0.12
     const maxOff = (Math.max(20, this.w / 2 - margin) * dz) / this.f
     const x = clamp(Math.sign(b.x) * Math.max(0, Math.abs(b.x) - maxOff), -2.6, 2.6)
     const above = ((this.horizon - HUD_TOP) * dz) / this.f
@@ -355,28 +404,49 @@ export class Engine {
       return
     }
 
-    // 상대 차례: 칠 수 있는 순간 받아칠지 정한다
-    if (this.shot.by === 'you' && inCpuReach(this.ball, this.shot)) {
-      if (!this.cpuPlan.decided) {
-        const last = this.lastShot
-        const p = cpuReturnChance(this.difficulty, last?.kind ?? 'drive', last?.by === 'you' ? last.sharp : 0)
-        this.cpuPlan = { decided: true, returns: Math.random() < p }
-      }
-      if (this.cpuPlan.returns && Math.abs(this.cpu.x - this.ball.p.x) < 1.8) {
+    // 상대 차례: 미리 정한 시각에 공이 칠 수 있는 곳에 오면 친다(몸은 그 시각에 맞춰 스윙하고 있다)
+    if (this.shot.by === 'you' && this.cpuPlan.returns) {
+      this.cpuClock += dt
+      if (this.cpuClock >= this.cpuPlan.t - 0.004 && inCpuReach(this.ball, this.shot)) {
         const from = { ...this.ball.p }
         const c = cpuShot(from, this.difficulty, false)
         this.ball.v = c.v
         this.shot = newShot('cpu', c.kind, from)
         this.lastShot = { by: 'cpu', kind: c.kind, sharp: 0 }
         this.rally++
+        if (this.body.swing) this.body.swing.t = 0
         this.emit()
         this.sfx('hit', 0.6)
-      }
+      } else if (this.cpuClock > this.cpuPlan.t + 0.3) this.cpuPlan.returns = false
     }
+  }
+
+  /**
+   * 내가 친 순간 상대가 받을지 정하고, 받는다면 공을 칠 곳과 시각을 미리 계산해 몸을 움직인다.
+   * 반응 0.15초, 최고 6.5m/s로 갈 수 있는 첫 지점에서 친다. 못 받는 공은 쫓아가다 놓친다.
+   */
+  private planCpu() {
+    this.cpuClock = 0
+    this.body.splitStep()
+    const last = this.lastShot
+    const chance = cpuReturnChance(this.difficulty, last?.kind ?? 'drive', last?.by === 'you' ? last.sharp : 0)
+    const pts = sampleReach(this.ball, this.shot, inCpuReach)
+    const root = this.body.root
+    const can = pts.find((q) => Math.hypot(q.p.x - root.x, q.p.z + 0.45 - root.z) / 6.5 <= q.t - 0.15)
+    if (can && Math.random() < chance) {
+      this.cpuPlan = { returns: true, t: can.t }
+      this.body.plan(can.p, can.t)
+      return
+    }
+    this.cpuPlan = { returns: false, t: 0 }
+    const chase = can ?? pts[Math.floor(pts.length / 2)]
+    if (chase) this.body.plan(chase.p, chase.t + 0.35, false)
   }
 
   private endRally(win: Hitter, label: string, reason: RuleKey | null) {
     const kept = win === this.server
+    this.cpuPlan.returns = false
+    this.body.recover()
     this.score = { ...this.score, [win]: this.score[win] + 1 }
     if (this.rally > this.bestRally) {
       this.bestRally = this.rally
@@ -525,37 +595,131 @@ export class Engine {
     c.fillText('SQUASH COURT', lx, ly)
 
     // 공보다 먼 쪽이면 상대를 먼저 그린다
-    const ballBehindCpu = this.ball.p.z < this.cpu.z
+    const ballBehindCpu = this.ball.p.z < this.body.root.z
     if (!ballBehindCpu) this.drawCpu()
     this.drawBall()
     if (ballBehindCpu) this.drawCpu()
+    if (this.pick) this.drawPick()
     this.drawRacketCursor()
     this.drawFlashes()
   }
 
+  /** 상대 선수: 관절을 화면에 투영해 굵기가 거리에 맞게 줄어드는 선으로 그린다(뒤에서 본 모습) */
   private drawCpu() {
     const c = this.ctx
-    const { x, z } = this.cpu
-    const [fx, fy] = this.pt(x, 0, z)
-    const [, hy] = this.pt(x, 1.75, z)
-    const hgt = fy - hy
-    const wdt = hgt * 0.28
-    c.globalAlpha = 0.55
-    c.fillStyle = 'rgb(0 0 0 / 0.25)'
+    const j: Joints = this.body.joints()
+    const k = (v: Vec) => this.f / Math.max(0.3, CAM.z - v.z)
+    const seg = (a: Vec, b: Vec, w: number, color: string) => {
+      const pa = this.pt(a.x, a.y, a.z)
+      const pb = this.pt(b.x, b.y, b.z)
+      c.strokeStyle = color
+      c.lineWidth = Math.max(1.5, (w * (k(a) + k(b))) / 2)
+      c.lineCap = 'round'
+      c.beginPath()
+      c.moveTo(pa[0], pa[1])
+      c.lineTo(pb[0], pb[1])
+      c.stroke()
+    }
+    const SKIN = '#d9b99a'
+    // 카메라(내 자리) 가까이 오면 공을 가리지 않게 흐리게
+    c.save()
+    c.globalAlpha = 1 - clamp((j.pelvis.z - 6.6) / 1.6, 0, 0.6)
+    // 그림자
+    const [sx, sy] = this.pt(j.pelvis.x, 0, j.pelvis.z)
+    c.fillStyle = 'rgb(0 0 0 / 0.16)'
     c.beginPath()
-    c.ellipse(fx, fy, wdt * 0.9, wdt * 0.22, 0, 0, Math.PI * 2)
+    c.ellipse(sx, sy, k(j.pelvis) * 0.42, k(j.pelvis) * 0.1, 0, 0, Math.PI * 2)
     c.fill()
+    // 다리: 반바지, 종아리, 신발
+    for (const [hip, knee, ankle, toe] of [
+      [j.hipL, j.kneeL, j.ankleL, j.toeL],
+      [j.hipR, j.kneeR, j.ankleR, j.toeR],
+    ] as const) {
+      const mid = { x: (hip.x + knee.x) / 2, y: (hip.y + knee.y) / 2, z: (hip.z + knee.z) / 2 }
+      seg(hip, mid, 0.17, C.ink)
+      seg(mid, knee, 0.12, SKIN)
+      seg(knee, ankle, 0.1, SKIN)
+      seg(ankle, toe, 0.1, '#f4f6f5')
+    }
+    // 몸통과 어깨
+    seg(j.pelvis, j.chest, 0.3, C.teal)
+    seg(j.shoulderL, j.shoulderR, 0.15, C.teal)
+    // 왼팔
+    seg(j.shoulderL, j.elbowL, 0.1, C.teal)
+    seg(j.elbowL, j.handL, 0.08, SKIN)
+    // 머리(뒤통수)
+    const [hx, hy] = this.pt(j.head.x, j.head.y, j.head.z)
+    c.fillStyle = '#2b2522'
+    c.beginPath()
+    c.arc(hx, hy, k(j.head) * BODY.headR, 0, Math.PI * 2)
+    c.fill()
+    // 오른팔과 라켓
+    seg(j.shoulderR, j.elbowR, 0.1, C.teal)
+    seg(j.elbowR, j.handR, 0.08, SKIN)
+    const along = (t: number): Vec => ({ x: j.handR.x + (j.racketTip.x - j.handR.x) * t, y: j.handR.y + (j.racketTip.y - j.handR.y) * t, z: j.handR.z + (j.racketTip.z - j.handR.z) * t })
+    seg(j.handR, along(0.42), 0.035, C.ink)
+    const head = along(0.72)
+    const [rx, ry] = this.pt(head.x, head.y, head.z)
+    const [tx, ty] = this.pt(j.racketTip.x, j.racketTip.y, j.racketTip.z)
+    const [nx, ny] = this.pt(along(0.42).x, along(0.42).y, along(0.42).z)
+    const ang = Math.atan2(ty - ny, tx - nx)
+    const long = Math.max(4, Math.hypot(tx - nx, ty - ny) / 2)
+    c.save()
+    c.translate(rx, ry)
+    c.rotate(ang)
+    c.beginPath()
+    c.ellipse(0, 0, long, Math.max(3, k(head) * 0.095), 0, 0, Math.PI * 2)
+    c.fillStyle = 'rgb(255 255 255 / 0.35)'
+    c.fill()
+    c.lineWidth = Math.max(1.5, k(head) * 0.025)
+    c.strokeStyle = C.silver
+    c.stroke()
+    c.restore()
+    c.restore()
+  }
+
+  /** 쉬움 모드: 멈춘 화면에서 공을 가운데로 크게 보여 주고 칠 곳을 고르게 한다 */
+  private drawPick() {
+    const c = this.ctx
+    const { cx, cy, R, e } = this.pickGeom()
+    const serve = this.pick!.serve
+    c.fillStyle = `rgb(10 12 13 / ${0.62 * e})`
+    c.fillRect(0, 0, this.w, this.h)
+    const ballR = R * 0.13
+    this.drawZones(cx, cy, R, ballR)
+    // 공
     c.fillStyle = C.ink
-    c.fillRect(fx - wdt * 0.35, fy - hgt * 0.45, wdt * 0.28, hgt * 0.45)
-    c.fillRect(fx + wdt * 0.07, fy - hgt * 0.45, wdt * 0.28, hgt * 0.45)
-    c.fillStyle = C.teal
     c.beginPath()
-    c.roundRect(fx - wdt / 2, fy - hgt * 0.82, wdt, hgt * 0.42, wdt * 0.2)
+    c.arc(cx, cy, ballR, 0, Math.PI * 2)
     c.fill()
-    c.fillStyle = '#d9b99a'
+    c.strokeStyle = 'rgb(255 255 255 / 0.7)'
+    c.lineWidth = 1.5
+    c.stroke()
+    c.fillStyle = '#f2c230'
     c.beginPath()
-    c.arc(fx, fy - hgt * 0.9, wdt * 0.26, 0, Math.PI * 2)
+    c.arc(cx - ballR * 0.35, cy - ballR * 0.3, ballR * 0.2, 0, Math.PI * 2)
+    c.arc(cx + ballR * 0.05, cy - ballR * 0.45, ballR * 0.2, 0, Math.PI * 2)
     c.fill()
+    if (e < 0.5) return
+    c.globalAlpha = (e - 0.5) * 2
+    c.textAlign = 'center'
+    c.fillStyle = '#ffffff'
+    c.font = `800 ${clamp(this.w / 18, 19, 26)}px 'Pretendard Variable', sans-serif`
+    c.fillText(serve ? '어떤 서브를 넣을까요?' : '공의 어디를 칠까요?', cx, cy - R - 44)
+    c.font = `600 ${clamp(this.w / 30, 13, 16)}px 'Pretendard Variable', sans-serif`
+    c.fillStyle = 'rgb(255 255 255 / 0.75)'
+    c.fillText('라켓이 공을 때릴 곳을 누르세요', cx, cy - R - 20)
+    // 공이 붙어 있는 벽: 벽 쪽을 치면 크로스, 반대쪽(안쪽)을 치면 보스트
+    if (!serve) {
+      const s = Math.sign(this.ball.p.x) || 1
+      const wx = cx + s * (R + 16)
+      c.fillStyle = 'rgb(233 236 235 / 0.9)'
+      c.fillRect(wx - 3, cy - R * 0.9, 6, R * 1.8)
+      c.font = `700 ${clamp(this.w / 32, 12, 15)}px 'Pretendard Variable', sans-serif`
+      c.fillText(s > 0 ? '오른쪽 벽' : '왼쪽 벽', Math.min(this.w - 34, Math.max(34, wx)), cy + R + 26)
+      c.fillStyle = 'rgb(255 255 255 / 0.7)'
+      c.fillText(s > 0 ? '포핸드' : '백핸드', cx, cy + R + 26)
+    }
     c.globalAlpha = 1
   }
 
@@ -579,17 +743,14 @@ export class Engine {
     })
     const s = this.project(b)
     if (!s) return
-    if (this.yourBallNow()) {
-      if (this.difficulty === 'easy') this.drawZones(s.x, s.y, this.hitRadius(s.r), s.r)
-      else {
-        // 칠 수 있을 때 공 둘레에 틸 링
-        const pulse = 1 + Math.sin(performance.now() / 90) * 0.08
-        c.strokeStyle = C.tealBright
-        c.lineWidth = 3
-        c.beginPath()
-        c.arc(s.x, s.y, this.hitRadius(s.r) * 0.55 * pulse, 0, Math.PI * 2)
-        c.stroke()
-      }
+    if (this.yourBallNow() && !this.pick) {
+      // 칠 수 있을 때 공 둘레에 틸 링
+      const pulse = 1 + Math.sin(performance.now() / 90) * 0.08
+      c.strokeStyle = C.tealBright
+      c.lineWidth = 3
+      c.beginPath()
+      c.arc(s.x, s.y, this.hitRadius(s.r) * 0.55 * pulse, 0, Math.PI * 2)
+      c.stroke()
     }
     c.fillStyle = C.ink
     c.beginPath()
@@ -609,6 +770,7 @@ export class Engine {
    * 공이 오른쪽에 있으면 왼쪽 칸이 보스트, 가운데가 드라이브, 오른쪽 칸이 크로스(왼쪽이면 반대).
    */
   private drawZones(cx: number, cy: number, R: number, ballR: number) {
+    const size = clamp(R / 6.5, 12, 21)
     const c = this.ctx
     const s = Math.sign(this.ball.p.x) || 1
     const serve = this.phase === 'serve-you'
@@ -658,7 +820,6 @@ export class Engine {
     c.lineWidth = 2.5
     c.stroke()
 
-    const size = clamp(R / 6, 12, 15)
     const label = (text: string, x: number, y: number, strong = false) => {
       c.font = `${strong ? 800 : 700} ${size}px 'Pretendard Variable', sans-serif`
       c.textAlign = 'center'
@@ -686,60 +847,96 @@ export class Engine {
     label('보스트', innerLX, cy, true)
   }
 
-  // 헤로우 Response 115 모양 라켓: 실버 프레임, 틸 포인트, 흰 그립
+  // 헤로우 Response 115 모양 라켓: 실버 프레임, 틸 포인트, 흰 그립.
+  // PC 커서는 포핸드면 라켓 손잡이가 오른쪽 아래, 백핸드면 왼쪽 아래. 칠 때는 손을 축으로 라켓을 휘두른다
   private drawRacketCursor() {
-    const c = this.ctx
-    const items: { x: number; y: number; angle: number; alpha: number }[] = []
-    if (this.pointer) items.push({ x: this.pointer.x, y: this.pointer.y, angle: -0.35, alpha: 0.9 })
-    for (const s of this.swings) {
-      const k = s.t / 0.35
-      items.push({ x: s.x, y: s.y, angle: -1.1 + k * 1.6, alpha: (1 - k) * (s.good ? 1 : 0.5) })
-    }
     const size = clamp(this.h * 0.11, 52, 92)
-    for (const it of items) {
+    const side = this.handSide()
+    if (this.pointer && !this.pick) this.drawRacket(this.pointer.x, this.pointer.y, side * -0.6, 0.9, size)
+    for (const sw of this.swings) {
+      const k = Math.min(1, sw.t / 0.32)
+      const e = 1 - (1 - k) ** 3
+      // 손(그립)은 공보다 아래·바깥쪽, 라켓 머리가 공을 지나가며 반대쪽으로 넘어간다
+      const gx = sw.x + sw.side * size * 0.55
+      const gy = sw.y + size * 0.9
+      const mid = Math.atan2(sw.x - gx, -(sw.y - gy))
+      const from = mid + sw.side * 1.35
+      const to = mid - sw.side * 1.15
+      const alpha = (1 - k * 0.85) * (sw.good ? 1 : 0.55)
+      // 휘두른 자국
+      const c = this.ctx
       c.save()
-      c.globalAlpha = it.alpha
-      c.translate(it.x, it.y)
-      c.rotate(it.angle)
-      // 그립(아래쪽)
-      c.fillStyle = '#ffffff'
-      c.strokeStyle = '#141618'
-      c.lineWidth = 1
+      c.strokeStyle = `rgb(255 255 255 / ${0.45 * (1 - k)})`
+      c.lineWidth = size * 0.12
+      c.lineCap = 'round'
       c.beginPath()
-      c.roundRect(-size * 0.07, size * 0.62, size * 0.14, size * 0.62, 3)
-      c.fill()
+      const r = size * 1.02
+      const a0 = from - Math.PI / 2
+      const a1 = from + (to - from) * e - Math.PI / 2
+      c.arc(gx, gy, r, Math.min(a0, a1), Math.max(a0, a1))
       c.stroke()
-      c.fillStyle = '#141618'
-      c.fillRect(-size * 0.075, size * 0.58, size * 0.15, size * 0.08)
-      // 샤프트
-      c.fillStyle = C.silver
-      c.fillRect(-size * 0.05, size * 0.3, size * 0.1, size * 0.3)
-      // 헤드(티어드롭)
-      c.beginPath()
-      c.ellipse(0, -size * 0.12, size * 0.34, size * 0.46, 0, 0, Math.PI * 2)
-      c.lineWidth = size * 0.07
-      c.strokeStyle = C.silver
-      c.stroke()
-      c.lineWidth = size * 0.025
-      c.strokeStyle = C.teal
-      c.beginPath()
-      c.ellipse(0, -size * 0.12, size * 0.34, size * 0.46, 0, Math.PI * 0.15, Math.PI * 0.55)
-      c.stroke()
-      // 줄
-      c.strokeStyle = 'rgb(20 22 24 / 0.25)'
-      c.lineWidth = 1
-      for (let i = -3; i <= 3; i++) {
-        c.beginPath()
-        c.moveTo(i * size * 0.08, -size * 0.52)
-        c.lineTo(i * size * 0.08, size * 0.28)
-        c.stroke()
-        c.beginPath()
-        c.moveTo(-size * 0.3, -size * 0.12 + i * size * 0.1)
-        c.lineTo(size * 0.3, -size * 0.12 + i * size * 0.1)
-        c.stroke()
-      }
       c.restore()
+      for (const lag of [0.18, 0.09, 0]) {
+        const ang = from + (to - from) * Math.max(0, e - lag)
+        this.drawRacketAt(gx, gy, ang, lag ? alpha * 0.25 : alpha, size, sw.side)
+      }
     }
+  }
+
+  /** 라켓 머리 가운데가 (x, y)에 오게 */
+  private drawRacket(x: number, y: number, angle: number, alpha: number, size: number) {
+    const gx = x - Math.sin(angle) * size * 1.02
+    const gy = y + Math.cos(angle) * size * 1.02
+    this.drawRacketAt(gx, gy, angle, alpha, size, angle < 0 ? 1 : -1)
+  }
+
+  /** 그립 끝(gx, gy)을 축으로 angle만큼 기운 라켓 */
+  private drawRacketAt(gx: number, gy: number, angle: number, alpha: number, size: number, side: number) {
+    const c = this.ctx
+    c.save()
+    c.globalAlpha = alpha
+    c.translate(gx, gy)
+    c.rotate(angle)
+    c.translate(0, -size * 0.9)
+    if (side < 0) c.scale(-1, 1)
+    // 그립(아래쪽)
+    c.fillStyle = '#ffffff'
+    c.strokeStyle = '#141618'
+    c.lineWidth = 1
+    c.beginPath()
+    c.roundRect(-size * 0.07, size * 0.62, size * 0.14, size * 0.62, 3)
+    c.fill()
+    c.stroke()
+    c.fillStyle = '#141618'
+    c.fillRect(-size * 0.075, size * 0.58, size * 0.15, size * 0.08)
+    // 샤프트
+    c.fillStyle = C.silver
+    c.fillRect(-size * 0.05, size * 0.3, size * 0.1, size * 0.3)
+    // 헤드(티어드롭)
+    c.beginPath()
+    c.ellipse(0, -size * 0.12, size * 0.34, size * 0.46, 0, 0, Math.PI * 2)
+    c.lineWidth = size * 0.07
+    c.strokeStyle = C.silver
+    c.stroke()
+    c.lineWidth = size * 0.025
+    c.strokeStyle = C.teal
+    c.beginPath()
+    c.ellipse(0, -size * 0.12, size * 0.34, size * 0.46, 0, Math.PI * 0.15, Math.PI * 0.55)
+    c.stroke()
+    // 줄
+    c.strokeStyle = 'rgb(20 22 24 / 0.25)'
+    c.lineWidth = 1
+    for (let i = -3; i <= 3; i++) {
+      c.beginPath()
+      c.moveTo(i * size * 0.08, -size * 0.52)
+      c.lineTo(i * size * 0.08, size * 0.28)
+      c.stroke()
+      c.beginPath()
+      c.moveTo(-size * 0.3, -size * 0.12 + i * size * 0.1)
+      c.lineTo(size * 0.3, -size * 0.12 + i * size * 0.1)
+      c.stroke()
+    }
+    c.restore()
   }
 
   private drawFlashes() {
