@@ -31,7 +31,6 @@ jobs:
       # 출처 하나가 실패해도 지난 데이터로 배포는 계속한다
       - run: npm run data
       - run: npm run build
-      - run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist

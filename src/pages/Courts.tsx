@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Card, PageHead, Section } from '../components/ui'
-import { loadData } from '../data/live'
+import { loadData, preloaded } from '../data/live'
+import { REGION_SLUG } from '../seo'
 
 // public/data/courts.json의 모양(scripts/fetch-courts.mjs가 만든다)
 type Facility = 'shower' | 'toilet' | 'parking' | 'locker'
@@ -77,7 +78,7 @@ function km(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
 }
 
 export default function Courts() {
-  const [data, setData] = useState<CourtsData | null>(null)
+  const [data, setData] = useState<CourtsData | null>(() => (preloaded['courts.json'] as CourtsData | undefined) ?? null)
   const [error, setError] = useState(false)
   const [region, setRegion] = useState<string | null>(null)
   const [query, setQuery] = useState('')
@@ -277,6 +278,22 @@ export default function Courts() {
             </p>
           </Card>
         </div>
+      </Section>
+
+      <Section kicker="BY REGION" title="지역별 스쿼시장 목록">
+        <p className="mb-3 text-[15px] text-muted">지역마다 모든 스쿼시장을 한 페이지에 모았어요. 주소와 코트 수, 시설을 한눈에 볼 때 좋아요.</p>
+        <ul className="flex flex-wrap gap-2">
+          {REGIONS.filter((r) => REGION_SLUG[r]).map((r) => (
+            <li key={r}>
+              <a
+                href={`${import.meta.env.BASE_URL}courts/${REGION_SLUG[r]}/`}
+                className="inline-block rounded-full bg-card px-3.5 py-1.5 text-[14px] font-semibold ring-1 ring-line hover:ring-ink"
+              >
+                {r} 스쿼시장
+              </a>
+            </li>
+          ))}
+        </ul>
       </Section>
 
       <Section kicker="ABOUT THE DATA" title="자료에 대해">

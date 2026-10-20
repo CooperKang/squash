@@ -32,8 +32,15 @@ export function inSection(route: Route, id: Route) {
   return route === id || ROUTES.find((r) => r.id === route)?.parent === id
 }
 
+// 빌드할 때 화면을 미리 그려 둘 때(검색엔진용 정적 페이지)는 브라우저 주소 대신 이 값을 쓴다
+let ssrHash: string | null = null
+export function setSsrHash(hash: string) {
+  ssrHash = hash
+}
+export const currentHash = () => ssrHash ?? location.hash
+
 function parse(): Route {
-  const id = location.hash.replace(/^#\/?/, '').split('?')[0]
+  const id = currentHash().replace(/^#\/?/, '').split('?')[0]
   return ROUTES.some((r) => r.id === id) ? (id as Route) : 'home'
 }
 
@@ -56,7 +63,7 @@ export function useRoute() {
 
 /** #/shots?s=boast 같은 주소의 값 */
 export function hashParam(name: string) {
-  const q = location.hash.split('?')[1] ?? ''
+  const q = currentHash().split('?')[1] ?? ''
   return new URLSearchParams(q).get(name)
 }
 

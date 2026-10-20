@@ -21,7 +21,7 @@ const norm = (a: V3): V3 => {
 }
 
 function useReducedMotion() {
-  const [reduced, setReduced] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches)
+  const [reduced, setReduced] = useState(() => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches)
   useEffect(() => {
     const m = matchMedia('(prefers-reduced-motion: reduce)')
     const on = () => setReduced(m.matches)

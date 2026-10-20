@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { External } from '../components/Icon'
 import { Card, PageHead } from '../components/ui'
+import { currentHash } from '../router'
 import {
   ago,
   countryName,
@@ -32,7 +33,7 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 function tabFromHash(): Tab {
-  const t = location.hash.split('?tab=')[1]
+  const t = currentHash().split('?tab=')[1]
   return TABS.some((x) => x.id === t) ? (t as Tab) : 'world'
 }
 

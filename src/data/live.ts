@@ -37,6 +37,9 @@ export type KsfEvent = {
 export type KsfRanked = { rank: number; change: string; name: string; points: number; team: string }
 export type Korea = { updated: string; events: KsfEvent[]; ranking: { men: KsfRanked[]; women: KsfRanked[] } }
 
+/** 빌드 때 미리 그리는 화면에 넣을 데이터(브라우저에선 비어 있다) */
+export const preloaded: Record<string, unknown> = {}
+
 export async function loadData<T>(name: string): Promise<T> {
   // 접속할 때마다 새로 받도록 캐시를 쓰지 않는다
   const res = await fetch(`${import.meta.env.BASE_URL}data/${name}?t=${Date.now()}`, { cache: 'no-store' })

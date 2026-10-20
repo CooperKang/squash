@@ -5,6 +5,8 @@ import { VIEWS, type View } from '../components/shotView'
 import { DRILLS, ROUTINES, TIPS, type Drill } from '../data/drills'
 import { LEVELS, SHOTS, type Level } from '../data/shots'
 import { COOLDOWN, COOLDOWN_VIDEOS, FOAM_ROLLER, ROLLER_TIPS, WARMUP, WARMUP_VIDEOS, type Stretch, type Video } from '../data/stretches'
+import { MOVES } from '../data/stretchMoves'
+import { StretchFigure } from '../components/StretchFigure'
 import { buildSequence } from '../game/sequence'
 import { hashParam, href, setHashParams } from '../router'
 
@@ -255,7 +257,8 @@ function Warmup() {
     <>
       <Section kicker="BEFORE" title="운동 전 동적 스트레칭">
         <p className="max-w-3xl text-[15.5px] leading-relaxed text-muted">
-          스쿼시는 런지와 급정지, 방향 전환이 많아요. 운동 전에는 오래 버티는 스트레칭보다 몸을 움직이며 데우는 동적 스트레칭으로 고관절, 종아리, 허벅지, 발목, 코어를 깨워요. 전체 10~12분이에요.
+          스쿼시는 런지와 급정지, 방향 전환이 많아요. 운동 전에는 오래 버티는 스트레칭보다 몸을 움직이며 데우는 동적 스트레칭으로 고관절, 종아리, 허벅지, 발목, 코어를 깨워요. 전체
+          10~12분이에요.
         </p>
         <FollowAlong items={WARMUP} title="운동 전 스트레칭 따라 하기" />
         <StretchList items={WARMUP} />
@@ -293,32 +296,61 @@ function Cooldown() {
 
 function StretchList({ items }: { items: Stretch[] }) {
   return (
-    <ol className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-      {items.map((s, i) => (
-        <li key={s.name} className="flex flex-col rounded-[20px] border border-line/80 bg-card p-4">
-          <div className="flex items-baseline justify-between gap-2">
-            <h3 className="text-[16.5px] font-extrabold">
-              <span className="mr-1.5 text-teal">{i + 1}</span>
-              {s.name}
-            </h3>
-            <span className="shrink-0 text-[13px] font-semibold text-muted">{s.dose}</span>
-          </div>
-          <div className="mt-2 flex flex-wrap gap-1">
-            {s.parts.map((p) => (
-              <span key={p} className="rounded-full bg-teal-soft px-2 py-0.5 text-[12px] font-semibold text-teal-deep">
-                {p}
-              </span>
-            ))}
-          </div>
-          <ul className="mt-2.5 space-y-1.5 text-[14.5px] leading-relaxed text-ink/80">
-            {s.how.map((h) => (
-              <li key={h}>{h}</li>
-            ))}
-          </ul>
-          {s.caution && <p className="mt-2.5 rounded-xl bg-[#fbecea] px-3 py-2 text-[13px] text-tin">{s.caution}</p>}
-        </li>
-      ))}
-    </ol>
+    <>
+      <p className="mt-5 flex items-center gap-2 text-[13px] text-muted">
+        <span className="inline-block h-1.5 w-5 rounded-full bg-teal-bright" aria-hidden />
+        청록색이 늘어나거나 힘이 들어가는 곳이에요. 그림이 지금 보여 주는 설명은 진하게 표시돼요.
+      </p>
+      <ol className="mt-3 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {items.map((s, i) => (
+          <StretchCard key={s.name} s={s} n={i + 1} />
+        ))}
+      </ol>
+    </>
+  )
+}
+
+function StretchCard({ s, n }: { s: Stretch; n: number }) {
+  const [step, setStep] = useState(0)
+  const move = MOVES[s.name]
+  return (
+    <li className="flex flex-col overflow-hidden rounded-[20px] border border-line/80 bg-card">
+      {move && <StretchFigure move={move} label={s.name} onStep={setStep} className="aspect-[4/3] w-full border-b border-line/60 bg-[#f6f8f7]" />}
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex items-baseline justify-between gap-2">
+          <h3 className="text-[16.5px] font-extrabold">
+            <span className="mr-1.5 text-teal">{n}</span>
+            {s.name}
+          </h3>
+          <span className="shrink-0 text-[13px] font-semibold text-muted">{s.dose}</span>
+        </div>
+        <div className="mt-2 flex flex-wrap gap-1">
+          {s.parts.map((p) => (
+            <span key={p} className="rounded-full bg-teal-soft px-2 py-0.5 text-[12px] font-semibold text-teal-deep">
+              {p}
+            </span>
+          ))}
+        </div>
+        <ol className="mt-2.5 space-y-1.5 text-[14.5px] leading-relaxed">
+          {s.how.map((h, k) => {
+            const on = move && s.how.length > 1 && Math.min(step, s.how.length - 1) === k
+            return (
+              <li key={h} className={`flex gap-2 transition-colors ${!move || s.how.length < 2 || on ? 'text-ink' : 'text-ink/45'}`}>
+                {s.how.length > 1 && (
+                  <span
+                    className={`mt-[3px] grid size-[18px] shrink-0 place-items-center rounded-full text-[11px] font-bold ${on ? 'bg-teal text-white' : 'bg-silver-soft text-muted'}`}
+                  >
+                    {k + 1}
+                  </span>
+                )}
+                <span>{h}</span>
+              </li>
+            )
+          })}
+        </ol>
+        {s.caution && <p className="mt-2.5 rounded-xl bg-[#fbecea] px-3 py-2 text-[13px] text-tin">{s.caution}</p>}
+      </div>
+    </li>
   )
 }
 
@@ -363,16 +395,19 @@ function FollowAlong({ items, title }: { items: Stretch[]; title: string }) {
           끝! 수고했어요.
         </p>
       ) : (
-        <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3" aria-live="polite">
-          <p className="font-wide text-[44px] leading-none text-teal-bright tabular-nums">
-            {Math.floor(left / 60)}:{String(left % 60).padStart(2, '0')}
-          </p>
-          <div className="min-w-0 flex-1">
-            <p className="text-[13px] text-white/60">
-              {i + 1}/{items.length} · {s.dose}
+        <div className="mt-4 grid items-center gap-x-6 gap-y-3 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
+          {MOVES[s.name] && <StretchFigure key={s.name} move={MOVES[s.name]} label={s.name} className="aspect-[4/3] w-full max-w-[15rem] overflow-hidden rounded-2xl bg-white" />}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3" aria-live="polite">
+            <p className="font-wide text-[44px] leading-none text-teal-bright tabular-nums">
+              {Math.floor(left / 60)}:{String(left % 60).padStart(2, '0')}
             </p>
-            <p className="text-[20px] font-extrabold">{s.name}</p>
-            <p className="mt-0.5 text-[14px] text-white/75">{s.how[0]}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-[13px] text-white/60">
+                {i + 1}/{items.length} · {s.dose}
+              </p>
+              <p className="text-[20px] font-extrabold">{s.name}</p>
+              <p className="mt-0.5 text-[14px] text-white/75">{s.how[0]}</p>
+            </div>
           </div>
         </div>
       )}
@@ -383,11 +418,7 @@ function FollowAlong({ items, title }: { items: Stretch[]; title: string }) {
         <button type="button" onClick={() => go(i - 1)} className="rounded-xl bg-white/10 px-4 py-2.5 text-[14px] font-bold hover:bg-white/20">
           이전
         </button>
-        <button
-          type="button"
-          onClick={toggle}
-          className="rounded-xl bg-teal px-5 py-2.5 text-[14px] font-bold hover:bg-teal-bright"
-        >
+        <button type="button" onClick={toggle} className="rounded-xl bg-teal px-5 py-2.5 text-[14px] font-bold hover:bg-teal-bright">
           {done ? '처음부터' : running ? '잠깐 멈춤' : '시작'}
         </button>
         <button type="button" onClick={() => go(i + 1)} className="rounded-xl bg-white/10 px-4 py-2.5 text-[14px] font-bold hover:bg-white/20">
@@ -404,7 +435,12 @@ function Videos({ title, videos }: { title: string; videos: Video[] }) {
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {videos.map((v) => (
           <li key={v.id}>
-            <a href={`https://www.youtube.com/watch?v=${v.id}`} target="_blank" rel="noreferrer" className="group block overflow-hidden rounded-[20px] border border-line/80 bg-card">
+            <a
+              href={`https://www.youtube.com/watch?v=${v.id}`}
+              target="_blank"
+              rel="noreferrer"
+              className="group block overflow-hidden rounded-[20px] border border-line/80 bg-card"
+            >
               <img src={`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`} alt="" loading="lazy" className="aspect-video w-full object-cover" />
               <div className="p-3.5">
                 <p className="text-[14.5px] leading-snug font-bold group-hover:text-teal">{v.title}</p>
