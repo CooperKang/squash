@@ -412,6 +412,10 @@ export class Engine {
       return
     }
 
+    const trackingWorkout = this.mode === 'realistic' && this.phase !== 'ready' && this.phase !== 'over'
+    const rallying = this.phase === 'rally'
+    const youDistance = this.player.distance
+    const cpuDistance = this.opponent.distance
     if (this.phase === 'point') {
       this.timer -= realDt
       if (this.timer <= 0) this.setupServe()
@@ -462,6 +466,10 @@ export class Engine {
       this.gameCarry -= SIM_DT
     }
 
+    if (trackingWorkout) {
+      this.player.workout.update(realDt, (this.player.distance - youDistance) / Math.max(game, 1e-6), this.rally, rallying)
+      this.opponent.workout.update(realDt, (this.opponent.distance - cpuDistance) / Math.max(game, 1e-6), this.rally, rallying)
+    }
     const t = this.camTarget()
     const k = Math.min(1, realDt * 7)
     this.cam.x += (t.x - this.cam.x) * k
@@ -476,7 +484,7 @@ export class Engine {
     const margin = this.w * 0.12
     const maxOff = (Math.max(20, this.w / 2 - margin) * dz) / this.f
     const x = clamp(Math.sign(b.x) * Math.max(0, Math.abs(b.x) - maxOff), -2.6, 2.6)
-    const above = ((this.horizon - HUD_TOP) * dz) / this.f
+    const above = ((this.horizon - (this.mode === 'realistic' ? 158 : HUD_TOP)) * dz) / this.f
     // 모바일은 하단 미니맵과 충전 게이지만큼만 여백을 둔다.
     const bottomReserve = this.mode === 'realistic' ? (this.w < 768 ? 190 : 265) : 56
     const below = ((this.h - bottomReserve - this.horizon) * dz) / this.f
@@ -664,6 +672,8 @@ export class Engine {
       realism:
         this.mode === 'realistic'
           ? {
+              youWorkout: this.player.workout.hud,
+              cpuWorkout: this.opponent.workout.hud,
               you: this.player.energy,
               cpu: this.opponent.energy,
               youDistance: this.player.distance,

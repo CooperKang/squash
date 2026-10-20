@@ -1,5 +1,6 @@
 import { BALL_R, clamp, type Ball, type Shot, type Vec } from './physics'
 import { T_SPOT } from './cpuBody'
+import { Workout, type WorkoutHud } from './workout'
 
 export type GameMode = 'classic' | 'realistic'
 export type CourtPoint = { x: number; z: number }
@@ -12,6 +13,7 @@ export class Athlete {
   fatigue = 0
   distance = 0
   baseSpeed = 6.8
+  workout = new Workout()
 
   get capacity() {
     return 100 - this.fatigue * 25
@@ -32,6 +34,7 @@ export class Athlete {
     this.energy = 100
     this.fatigue = 0
     this.distance = 0
+    this.workout = new Workout()
   }
 
   /** 실제 이동 거리만 소모한다. T에서 기다리면 효율적으로 회복한다. */
@@ -64,6 +67,7 @@ export class Athlete {
   }
 
   hit(power: number) {
+    this.workout.hit(power)
     this.energy = Math.max(0, this.energy - (0.35 + power * power * 1.1))
     this.fatigue = clamp(this.fatigue + power * 0.0015, 0, 1)
   }
@@ -82,6 +86,8 @@ export function realisticReach(ball: Ball, shot: Shot) {
 export const withinRacketReach = (root: CourtPoint, at: Vec) => Math.hypot(root.x - at.x, root.z - at.z) <= 1.35
 
 export type RealismHud = {
+  youWorkout: WorkoutHud
+  cpuWorkout: WorkoutHud
   you: number
   cpu: number
   youDistance: number

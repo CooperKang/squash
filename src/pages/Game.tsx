@@ -1,5 +1,6 @@
 import { RealismCoach, RealismControls } from './RealismControls'
 import type { GameMode } from '../game/realism'
+import type { WorkoutHud } from '../game/workout'
 import { useEffect, useRef, useState } from 'react'
 import { Engine, type HudState } from '../game/engine'
 import type { Difficulty } from '../game/physics'
@@ -151,7 +152,7 @@ export default function Game() {
 
           {hud && (
             <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3 md:p-4">
-              <ScoreChip label="나" value={hud.score.you} serving={hud.server === 'you'} accent />
+              <ScoreChip label="나" value={hud.score.you} serving={hud.server === 'you'} accent energy={hud.realism?.you} workout={hud.realism?.youWorkout} />
               <div className="mt-1 flex flex-col items-center gap-1.5">
                 <div className="rounded-full bg-black/45 px-3 py-1.5 text-center text-[12px] font-semibold text-white/90 backdrop-blur">
                   랠리 {hud.rally} · 최고 {hud.bestRally}
@@ -169,14 +170,15 @@ export default function Game() {
                     {hud.lastShot.by === 'you' ? '나' : '상대'}: {hud.lastShot.name}
                   </div>
                 )}
+                {hud.realism && <p className="max-w-[112px] text-center text-[9px] leading-snug text-ink/70">70kg 기준<br />실제 운동 환산 추정</p>}
               </div>
-              <ScoreChip label="상대" value={hud.score.cpu} serving={hud.server === 'cpu'} />
+              <ScoreChip label="상대" value={hud.score.cpu} serving={hud.server === 'cpu'} energy={hud.realism?.cpu} workout={hud.realism?.cpuWorkout} />
             </div>
           )}
 
           {hud?.phase === 'serve-you' && !hud.hint && (
             <p
-              className={`pointer-events-none absolute inset-x-0 px-3 text-center text-[13px] font-semibold ${mode === 'realistic' ? 'top-28 mx-auto max-w-[300px] rounded-full bg-ink/65 py-2 text-white' : 'bottom-5 text-white/85'}`}
+              className={`pointer-events-none absolute inset-x-0 px-3 text-center text-[13px] font-semibold ${mode === 'realistic' ? 'top-40 mx-auto max-w-[300px] rounded-full bg-ink/65 py-2 text-white' : 'bottom-5 text-white/85'}`}
             >
               {mode === 'realistic' ? '내 서브 · 공을 누르면 멈춰요. 파워를 정하고 놓으세요' : '내 서브예요. 떠오른 공을 눌러 치세요'}
             </p>
@@ -275,7 +277,7 @@ export default function Game() {
                     <h2 className="mt-2 text-[26px] font-extrabold leading-tight">{mode === 'realistic' ? '현실모드' : '터치 스쿼시'}</h2>
                     <p className="mt-3 text-[14px] leading-relaxed text-muted">
                       {mode === 'realistic'
-                        ? '공을 누르면 경기가 잠깐 멈춰요. 파워를 정하고 놓아서 치세요. 이동과 T 복귀는 자동이에요.'
+                        ? '강약을 조절하고 체력을 관리하며 랠리를 이어가 보세요. 공을 누르면 잠깐 멈추고, 파워를 정한 뒤 놓으면 스윙해요. 이동과 T 복귀는 자동이에요.'
                         : '공 둘레에 청록 링이 보이면 공을 눌러 치세요. 누르는 곳이 샷을 정해요.'}
                     </p>
                     {mode === 'classic' ? (
@@ -308,6 +310,9 @@ export default function Game() {
                       <li>· 뒤쪽 허리 높이에서 제때 칠수록 샷이 예리하게 들어가요. 11점 먼저 내면 이겨요.</li>
                     </ul>
                   </>
+                )}
+                {mode === 'realistic' && (
+                  <p className="mt-3 text-[11px] leading-relaxed text-muted">예상 칼로리는 70kg 성인이 같은 움직임으로 실제 운동했을 때의 환산치예요. 이동·강타·랠리에 따라 달라지며, 게임을 조작하는 사람의 실제 소모량은 아니에요. <a href="https://pacompendium.com/sports/" target="_blank" rel="noreferrer" className="underline underline-offset-2">MET 기준</a></p>
                 )}
                 {mode === 'realistic' && (
                   <button type="button" onClick={openCoach} className="mt-3 text-[13px] font-bold text-teal underline underline-offset-4">
@@ -360,7 +365,7 @@ export default function Game() {
   )
 }
 
-function ScoreChip({ label, value, serving, accent }: { label: string; value: number; serving: boolean; accent?: boolean }) {
+function ScoreChip({ label, value, serving, accent, energy, workout }: { label: string; value: number; serving: boolean; accent?: boolean; energy?: number; workout?: WorkoutHud }) {
   return (
     <div className={`min-w-[84px] rounded-2xl px-3.5 py-2 text-white shadow-lg ${accent ? 'bg-teal' : 'bg-ink/85'}`}>
       <div className="flex items-center gap-1.5 text-[12px] font-semibold text-white/80">
@@ -368,6 +373,16 @@ function ScoreChip({ label, value, serving, accent }: { label: string; value: nu
         {serving && <span className="rounded-full bg-white/20 px-1.5 text-[10px] text-white">서브</span>}
       </div>
       <div className="font-wide text-[26px] leading-tight">{value}</div>
+      {energy != null && workout && (
+        <div className="mt-1.5 border-t border-white/20 pt-1.5 text-[10px] leading-relaxed tabular-nums" aria-label={`${label} 운동 정보`}>
+          <div role="meter" aria-label={`${label} 남은 체력`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(energy)}>
+            체력 {Math.round(energy)}%
+            <div className="my-1 h-1 overflow-hidden rounded-full bg-white/20"><div className={`h-full rounded-full ${energy < 30 ? 'bg-dot' : 'bg-white/90'}`} style={{ width: `${energy}%` }} /></div>
+          </div>
+          <div className="text-white/75">{workout.intensity}</div>
+          <div>예상 {workout.calories.toFixed(1)} kcal</div>
+        </div>
+      )}
     </div>
   )
 }

@@ -87,6 +87,8 @@ describe('현실모드 누르기·놓기 입력과 기본 모드 회귀', () => 
     expect(e.player.root).toEqual(root)
     expect(e.body.root).toEqual(bot)
     expect(e.player.energy).toBe(energy)
+    expect(e.player.workout.seconds).toBe(0)
+    expect(e.player.workout.calories).toBe(0)
     expect(e.phase).toBe(phase)
     e.release(at.x, at.y)
     expect(e.lastShot?.by).toBe('you')
@@ -106,6 +108,18 @@ describe('현실모드 누르기·놓기 입력과 기본 모드 회귀', () => 
     const at = e.project(e.ball.p)
     e.press(at.x, at.y, 'touch')
     expect(e.charge).toBeNull()
+  })
+  it('칼로리 시간은 느린 재생 비율과 무관하게 누적하고 메뉴·경기 종료에는 멈춘다', () => {
+    const e = setup()
+    e.update(0.1)
+    expect(e.player.workout.seconds).toBeCloseTo(0.1)
+    expect(e.opponent.workout.seconds).toBeCloseTo(0.1)
+    const calories = e.player.workout.calories
+    e.phase = 'ready'
+    e.update(0.1)
+    e.phase = 'over'
+    e.update(0.1)
+    expect(e.player.workout.calories).toBe(calories)
   })
   it('기본모드에서는 누르는 순간 치고 놓을 때 다시 치지 않는다', () => {
     const e = setup('classic'),
@@ -146,14 +160,18 @@ describe('현실모드 누르기·놓기 입력과 기본 모드 회귀', () => 
     const e = setup()
     e.player.energy = 43
     e.player.fatigue = 0.2
+    e.player.workout.update(60, 4, 8, true)
+    const calories = e.player.workout.calories
     e.opponent.energy = 39
     e.setupServe()
     expect(e.player.energy).toBe(43)
+    expect(e.player.workout.calories).toBe(calories)
     expect(e.player.fatigue).toBe(0.2)
     expect(e.opponent.energy).toBe(39)
     e.newMatch()
     expect(e.player.energy).toBe(100)
     expect(e.player.fatigue).toBe(0)
+    expect(e.player.workout.calories).toBe(0)
     expect(e.opponent.energy).toBe(100)
   })
   it('다음 서브에 이전 랠리의 이동 목표가 남아 선수가 공에서 멀어지지 않는다', () => {
