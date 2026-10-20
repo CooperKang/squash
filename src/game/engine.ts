@@ -477,7 +477,8 @@ export class Engine {
     const maxOff = (Math.max(20, this.w / 2 - margin) * dz) / this.f
     const x = clamp(Math.sign(b.x) * Math.max(0, Math.abs(b.x) - maxOff), -2.6, 2.6)
     const above = ((this.horizon - HUD_TOP) * dz) / this.f
-    const bottomReserve = this.mode === 'realistic' ? 265 : 56
+    // 모바일은 하단 미니맵과 충전 게이지만큼만 여백을 둔다.
+    const bottomReserve = this.mode === 'realistic' ? (this.w < 768 ? 190 : 265) : 56
     const below = ((this.h - bottomReserve - this.horizon) * dz) / this.f
     const y = clamp(clamp(CAM.y, b.y - above, b.y + below), 0.5, 2.6)
     return { x, y }

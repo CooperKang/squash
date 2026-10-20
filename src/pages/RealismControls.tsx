@@ -24,8 +24,8 @@ export function RealismControls({ state: s, onHelp }: { state: RealismHud; onHel
           </div>
         </div>
       )}
-      <div className="mx-auto flex max-w-md items-center gap-3 rounded-[22px] bg-ink/90 p-3 shadow-xl backdrop-blur-md">
-        <div role="img" aria-label="선수의 자동 이동과 T 복귀 위치" className="relative h-[78px] w-[52px] shrink-0 overflow-hidden rounded-lg border border-white/25 bg-white/10">
+      <div className="mx-auto flex w-fit items-center gap-3 md:w-full md:max-w-md md:rounded-[22px] md:bg-ink/90 md:p-3 md:shadow-xl md:backdrop-blur-md">
+        <div role="img" aria-label="선수의 자동 이동과 T 복귀 위치" className="relative h-[78px] w-[52px] shrink-0 overflow-hidden rounded-lg border border-white/40 bg-ink/50 opacity-70 md:border-white/25 md:bg-white/10 md:opacity-100">
           <svg viewBox="0 0 64 98" className="size-full" aria-hidden="true">
             <path d="M0 54.4H64M32 54.4V98" fill="none" stroke="white" opacity=".4" />
             <circle cx="32" cy="56" r="9" fill="#19a3ae" opacity=".2" />
@@ -37,7 +37,7 @@ export function RealismControls({ state: s, onHelp }: { state: RealismHud; onHel
             <circle {...position(s.youAt)} r="4" fill="#19a3ae" stroke="white" strokeWidth="1.5" />
           </svg>
         </div>
-        <div className="min-w-0 flex-1">
+        <div className="hidden min-w-0 flex-1 md:block">
           <div className="mb-2 flex items-center justify-between text-[11px]">
             <span className="font-bold text-teal-bright">{s.atT ? 'T존 · 짧게 움직이기 좋아요' : '자동 이동 · 타구 후 T 복귀'}</span>
             <button
