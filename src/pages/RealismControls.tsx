@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { CourtPoint, RealismHud } from '../game/realism'
 
-export function RealismControls({ state: s, onMove, onT, onHelp }: { state: RealismHud; onMove: (p: CourtPoint) => void; onT: () => void; onHelp: () => void }) {
+export function RealismControls({ state: s, onHelp }: { state: RealismHud; onHelp: () => void }) {
   const selectedPower = (0.25 + s.charge * 0.75) * s.maxPower
   const position = (p: CourtPoint) => ({ cx: (p.x + 3.2) * 10, cy: p.z * 10 })
   return (
@@ -16,7 +16,7 @@ export function RealismControls({ state: s, onMove, onT, onHelp }: { state: Real
           aria-valuenow={Math.round(selectedPower * 100)}
         >
           <div className="flex justify-between text-[12px] font-bold">
-            <span>놓으면 스윙</span>
+            <span>멈춤 · 놓으면 스윙</span>
             <span>파워 {Math.round(selectedPower * 100)}%</span>
           </div>
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/20">
@@ -25,27 +25,7 @@ export function RealismControls({ state: s, onMove, onT, onHelp }: { state: Real
         </div>
       )}
       <div className="mx-auto flex max-w-md items-center gap-3 rounded-[22px] bg-ink/90 p-3 shadow-xl backdrop-blur-md">
-        <button
-          type="button"
-          aria-label="미니 코트에서 이동할 위치 선택"
-          className="pointer-events-auto relative h-[98px] w-16 shrink-0 touch-none overflow-hidden rounded-lg border border-white/25 bg-white/10"
-          onKeyDown={(e) => {
-            const delta = { ArrowLeft: [-0.5, 0], ArrowRight: [0.5, 0], ArrowUp: [0, -0.5], ArrowDown: [0, 0.5] }[e.key]
-            if (delta) {
-              e.preventDefault()
-              onMove({ x: s.target.x + delta[0], z: s.target.z + delta[1] })
-            }
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              onT()
-            }
-          }}
-          onPointerDown={(e) => {
-            e.preventDefault()
-            const r = e.currentTarget.getBoundingClientRect()
-            onMove({ x: ((e.clientX - r.left) / r.width) * 6.4 - 3.2, z: ((e.clientY - r.top) / r.height) * 9.75 })
-          }}
-        >
+        <div role="img" aria-label="선수의 자동 이동과 T 복귀 위치" className="relative h-[78px] w-[52px] shrink-0 overflow-hidden rounded-lg border border-white/25 bg-white/10">
           <svg viewBox="0 0 64 98" className="size-full" aria-hidden="true">
             <path d="M0 54.4H64M32 54.4V98" fill="none" stroke="white" opacity=".4" />
             <circle cx="32" cy="56" r="9" fill="#19a3ae" opacity=".2" />
@@ -56,10 +36,10 @@ export function RealismControls({ state: s, onMove, onT, onHelp }: { state: Real
             <circle {...position(s.cpuAt)} r="4" fill="#f2c230" />
             <circle {...position(s.youAt)} r="4" fill="#19a3ae" stroke="white" strokeWidth="1.5" />
           </svg>
-        </button>
+        </div>
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex items-center justify-between text-[11px]">
-            <span className="font-bold text-teal-bright">{s.atT ? 'T존 · 짧게 움직이기 좋아요' : 'T로 돌아가 체력을 아끼세요'}</span>
+            <span className="font-bold text-teal-bright">{s.atT ? 'T존 · 짧게 움직이기 좋아요' : '자동 이동 · 타구 후 T 복귀'}</span>
             <button
               type="button"
               onClick={onHelp}
@@ -87,9 +67,6 @@ export function RealismControls({ state: s, onMove, onT, onHelp }: { state: Real
           ))}
           <div className="mt-2 flex items-center justify-between gap-2">
             <span className="text-[10px] text-white/65">최대 파워 {Math.round(s.maxPower * 100)}%</span>
-            <button type="button" onClick={onT} className="pointer-events-auto min-h-11 rounded-xl bg-teal px-3 text-[12px] font-bold text-white">
-              T로 복귀
-            </button>
           </div>
         </div>
       </div>
@@ -100,12 +77,12 @@ export function RealismControls({ state: s, onMove, onT, onHelp }: { state: Real
 const STEPS = [
   {
     title: '누르고, 채우고, 놓으면 스윙',
-    body: 'PC는 마우스를, 모바일은 손가락을 누르고 있으면 파워가 차요. 공이 청록 링 안에 올 때 원하는 지점에서 놓으세요. 공은 계속 움직이니 미리 충전해도 좋아요.',
+    body: '청록 링이 보이는 공을 누르면 공과 선수의 움직임이 잠깐 멈춰요. 누른 채 파워를 정하고, 원하는 지점에서 놓으면 라켓이 휘둘러지고 경기가 다시 이어져요. PC와 모바일 모두 같아요.',
     hint: '안쪽은 보스트 · 벽 쪽은 크로스 · 가운데는 드라이브',
   },
   {
     title: '공을 따라 이동하고 T로 돌아오기',
-    body: '선수가 공 쪽으로 자동 이동하고, 친 뒤에는 T로 복귀해요. 아래 미니 코트를 누르면 기다릴 위치를 직접 정할 수 있고, T로 복귀 버튼으로 빠르게 중앙을 챙길 수 있어요.',
+    body: '선수가 공을 따라 자동으로 움직이고, 친 뒤에는 T로 돌아가요. 따로 복귀 버튼을 누를 필요가 없어요. 아래 미니 코트에서 나와 상대의 움직임을 확인하세요.',
     hint: '청록 점은 나 · 노란 점은 상대 · 점선 원은 이동 목표',
   },
   {

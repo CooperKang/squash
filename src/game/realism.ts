@@ -1,4 +1,4 @@
-import { clamp, type Ball, type Shot, type Vec } from './physics'
+import { BALL_R, clamp, type Ball, type Shot, type Vec } from './physics'
 import { T_SPOT } from './cpuBody'
 
 export type GameMode = 'classic' | 'realistic'
@@ -73,7 +73,10 @@ export const chargePower = (seconds: number) => clamp(seconds / 1.05, 0, 1)
 export const strikePower = (charge: number, athlete: Athlete) => (0.25 + clamp(charge, 0, 1) * 0.75) * athlete.powerFactor
 
 export function realisticReach(ball: Ball, shot: Shot) {
-  return shot.frontOk && shot.floorAfterFront < 2 && ball.p.y >= 0.3 && ball.p.y <= 2.1
+  // 뒷벽 뒤의 낮은 리턴도 바닥에 닿기 전이면 유효하다. 실제 선수 거리는 별도로 검사한다.
+  const minHeight = shot.backWall ? BALL_R + 0.01 : 0.3
+  const maxHeight = shot.backWall ? 2.4 : 2.1
+  return shot.frontOk && shot.floorAfterFront < 2 && ball.p.y >= minHeight && ball.p.y <= maxHeight
 }
 
 export const withinRacketReach = (root: CourtPoint, at: Vec) => Math.hypot(root.x - at.x, root.z - at.z) <= 1.35

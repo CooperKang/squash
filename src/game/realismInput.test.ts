@@ -72,6 +72,41 @@ describe('현실모드 누르기·놓기 입력과 기본 모드 회귀', () => 
       expect(e.lastShot).toBe(hit)
     })
   }
+  it('충전 중 공·선수·체력·게임 시간을 멈추고 놓은 뒤부터 다시 진행한다', () => {
+    const e = setup(),
+      at = e.project(e.ball.p)
+    e.press(at.x, at.y, 'touch')
+    const ball = structuredClone(e.ball),
+      root = { ...e.player.root },
+      bot = { ...e.body.root }
+    const energy = e.player.energy,
+      phase = e.phase
+    e.update(4)
+    expect(e.charge?.seconds).toBe(4)
+    expect(e.ball).toEqual(ball)
+    expect(e.player.root).toEqual(root)
+    expect(e.body.root).toEqual(bot)
+    expect(e.player.energy).toBe(energy)
+    expect(e.phase).toBe(phase)
+    e.release(at.x, at.y)
+    expect(e.lastShot?.by).toBe('you')
+    e.update(0.1)
+    expect(e.ball.p).not.toEqual(ball.p)
+    expect(e.phase).toBe('rally')
+    expect(Math.hypot(e.ball.p.x - ball.p.x, e.ball.p.z - ball.p.z)).toBeLessThan(3)
+  })
+  it('공 밖이나 선수가 도착하지 못한 곳을 누르면 경기를 멈추지 않는다', () => {
+    const e = setup()
+    e.press(10, 10, 'touch')
+    expect(e.charge).toBeNull()
+    const ball = structuredClone(e.ball)
+    e.update(0.1)
+    expect(e.ball).not.toEqual(ball)
+    e.player.root = { x: -2, z: 2 }
+    const at = e.project(e.ball.p)
+    e.press(at.x, at.y, 'touch')
+    expect(e.charge).toBeNull()
+  })
   it('기본모드에서는 누르는 순간 치고 놓을 때 다시 치지 않는다', () => {
     const e = setup('classic'),
       at = e.project(e.ball.p)

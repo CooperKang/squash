@@ -179,8 +179,10 @@ export function outcome(ball: Ball, shot: Shot) {
 // 드롭·보스트처럼 앞 코트로 떨어지는 공은 앞으로 달려 나가 친다
 export function inYourReach(b: Ball, shot: Shot) {
   if (!shot.frontOk || shot.floorAfterFront > 1 || b.p.y > 2.4) return false
+  // 뒷벽에서 나온 공은 원래 샷 종류나 임의의 코트 구역으로 다시 막지 않는다.
+  if (shot.backWall) return true
   if (shot.boast || shot.short) return b.p.z >= 1.4 && b.p.y <= 1.6
-  return b.p.z >= (shot.backWall ? 3.8 : 5.3)
+  return b.p.z >= 5.3
 }
 
 export type Window = { start: number; length: number; at: Vec }

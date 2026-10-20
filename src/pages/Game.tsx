@@ -76,7 +76,7 @@ export default function Game() {
   }
   const closeCoach = () => {
     try {
-      localStorage.setItem('squash.realismCoach.v1', 'seen')
+      localStorage.setItem('squash.realismCoach.v2', 'seen')
     } catch {
       /* 저장 없이도 플레이 가능 */
     }
@@ -89,7 +89,7 @@ export default function Game() {
     if (next === 'realistic') {
       let seen = false
       try {
-        seen = localStorage.getItem('squash.realismCoach.v1') === 'seen'
+        seen = localStorage.getItem('squash.realismCoach.v2') === 'seen'
       } catch {
         /* 첫 안내 표시 */
       }
@@ -178,7 +178,7 @@ export default function Game() {
             <p
               className={`pointer-events-none absolute inset-x-0 px-3 text-center text-[13px] font-semibold ${mode === 'realistic' ? 'top-28 mx-auto max-w-[300px] rounded-full bg-ink/65 py-2 text-white' : 'bottom-5 text-white/85'}`}
             >
-              {mode === 'realistic' ? '내 서브 · 누르고 파워를 모은 뒤 공에서 놓으세요' : '내 서브예요. 떠오른 공을 눌러 치세요'}
+              {mode === 'realistic' ? '내 서브 · 공을 누르면 멈춰요. 파워를 정하고 놓으세요' : '내 서브예요. 떠오른 공을 눌러 치세요'}
             </p>
           )}
 
@@ -275,7 +275,7 @@ export default function Game() {
                     <h2 className="mt-2 text-[26px] font-extrabold leading-tight">{mode === 'realistic' ? '현실모드' : '터치 스쿼시'}</h2>
                     <p className="mt-3 text-[14px] leading-relaxed text-muted">
                       {mode === 'realistic'
-                        ? '누르고 파워를 모은 뒤 놓아서 치세요. 나와 상대의 이동·강타에 체력이 소모돼요.'
+                        ? '공을 누르면 경기가 잠깐 멈춰요. 파워를 정하고 놓아서 치세요. 이동과 T 복귀는 자동이에요.'
                         : '공 둘레에 청록 링이 보이면 공을 눌러 치세요. 누르는 곳이 샷을 정해요.'}
                     </p>
                     {mode === 'classic' ? (
@@ -301,7 +301,7 @@ export default function Game() {
                     <ul hidden={mode === 'realistic'} className="mt-3 space-y-1 text-[13.5px] leading-relaxed text-muted">
                       <li>
                         {mode === 'realistic'
-                          ? '· 모든 난이도에서 경기는 멈추지 않아요. 공으로 자동 이동하고 친 뒤 T로 돌아가요. 미니 코트로 위치도 정할 수 있어요.'
+                          ? '· 공을 누르면 잠깐 멈추고, 놓으면 스윙해요. 공으로 이동하고 친 뒤 T로 돌아가는 동작은 자동이에요.'
                           : '· 쉬움 모드는 링이 보일 때 누르면 그 순간 멈추고, 공을 크게 보여 줘요. 칸마다 적힌 샷을 골라 누르면 그 샷이 나가요.'}
                       </li>
                       <li>· 상대는 공이 올 곳을 미리 읽고 스텝을 밟아 가서 실제 선수처럼 런지하고 휘둘러요.</li>
@@ -352,9 +352,7 @@ export default function Game() {
               </div>
             </div>
           )}
-          {hud?.realism && !showMenu && (
-            <RealismControls state={hud.realism} onMove={(p) => engineRef.current?.movePlayer(p)} onT={() => engineRef.current?.returnToT()} onHelp={openCoach} />
-          )}
+          {hud?.realism && !showMenu && <RealismControls state={hud.realism} onHelp={openCoach} />}
         </div>
         {coach !== null && <RealismCoach step={coach} onClose={closeCoach} onNext={() => (coach === 2 ? closeCoach() : setCoach(coach + 1))} />}
       </div>

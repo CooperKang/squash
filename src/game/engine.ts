@@ -89,6 +89,7 @@ export class Engine {
   private charge: { seconds: number; pointerType: string } | null = null
   private aimTarget: { x: number; y: number } | null = null
   private playerIntercept: CourtPoint | null = null
+  private playerPlanIn = 0
   private hudClock = 0
   private lastPower = 0
   public difficulty: Difficulty = 'normal'
@@ -164,6 +165,7 @@ export class Engine {
     this.lastPower = 0
     this.lastShot = null
     this.playerIntercept = null
+    this.playerPlanIn = 0
     this.gameCarry = 0
     this.paused = false
     this.pick = null
@@ -198,11 +200,12 @@ export class Engine {
       this.tap(x, y)
       return
     }
-    if (this.paused || !['serve-you', 'rally'].includes(this.phase) || (this.phase === 'rally' && this.shot.by !== 'cpu')) return
-    this.unlockAudio()
+    if (this.paused || this.charge || !this.yourBallNow()) return
     this.pointerMove(x, y, pointerType)
-    if (this.phase === 'serve-you') this.player.target = { x: this.ball.p.x, z: clamp(this.ball.p.z + 0.4, 1.2, 9.1) }
-    else if (this.playerIntercept) this.player.target = { ...this.playerIntercept }
+    const at = pointerType === 'mouse' ? (this.pointer ?? { x, y }) : { x, y }
+    const ball = this.project(this.ball.p)
+    if (!ball || Math.hypot(at.x - ball.x, at.y - ball.y) > this.hitRadius(ball.r)) return
+    this.unlockAudio()
     this.charge = { seconds: 0, pointerType }
     this.emit()
   }
@@ -226,16 +229,6 @@ export class Engine {
   cancelCharge() {
     this.charge = null
     this.aimTarget = null
-  }
-
-  returnToT() {
-    this.movePlayer(T_SPOT)
-  }
-
-  movePlayer(at: CourtPoint) {
-    if (this.mode !== 'realistic' || this.paused || !['rally', 'serve-you', 'serve-cpu'].includes(this.phase)) return
-    this.player.target = { x: clamp(at.x, -2.9, 2.9), z: clamp(at.z, 1.2, 9.1) }
-    this.emit()
   }
 
   private canYouHit() {
@@ -349,6 +342,7 @@ export class Engine {
 
   private setupServe() {
     this.playerIntercept = null
+    this.playerPlanIn = 0
     this.trail = []
     this.rally = 0
     this.message = ''
@@ -397,6 +391,8 @@ export class Engine {
         this.emit()
       }
     }
+    // 강도를 정하는 동안 공·몸·체력을 멈춘다. 충전한 시간을 물리에 더하지 않는다.
+    if (this.mode === 'realistic' && this.charge) return
     for (const s of this.swings) s.t += realDt
     this.swings = this.swings.filter((s) => s.t < 0.32)
     for (const f of this.flashes) f.t += realDt
@@ -449,6 +445,8 @@ export class Engine {
     while (this.gameCarry >= SIM_DT) {
       const previous = { ...this.body.root }
       if (this.mode === 'realistic') {
+        this.playerPlanIn -= SIM_DT
+        if (this.phase === 'rally' && this.shot.by === 'cpu' && this.playerPlanIn <= 0) this.planPlayer()
         const resting = this.phase !== 'rally' && this.phase !== 'serve-you'
         this.player.move(SIM_DT, resting)
         this.configureCpu()
@@ -511,6 +509,7 @@ export class Engine {
         this.flash(`${this.lastShot ? SHOT_NAME[this.lastShot.kind] : '짧은 공'}! 앞으로 나가 치세요`, C.tealBright, 0.8)
       }
       const r = this.shot.apply(e)
+      if (!r && e.hit === 'back' && this.shot.by === 'cpu') this.planPlayer()
       if (!r) continue
       const by = this.shot.by
       const other: Hitter = by === 'you' ? 'cpu' : 'you'
@@ -559,6 +558,7 @@ export class Engine {
 
   private planPlayer() {
     if (this.mode !== 'realistic') return
+    this.playerPlanIn = 0.1
     const pts = sampleReach(this.ball, this.shot, realisticReach)
     const root = this.player.root
     const speed = this.player.baseSpeed * this.player.speedFactor
@@ -814,9 +814,24 @@ export class Engine {
       seg(knee, ankle, 0.1, SKIN)
       seg(ankle, toe, 0.11, '#f4f6f5')
     }
-    const shortsLow = { x: j.pelvis.x, y: j.pelvis.y - 0.14, z: j.pelvis.z }
-    seg({ ...j.hipL, y: j.hipL.y + 0.04 }, { ...shortsLow, x: j.hipL.x - 0.02 }, 0.17, C.ink)
-    seg({ ...j.hipR, y: j.hipR.y + 0.04 }, { ...shortsLow, x: j.hipR.x + 0.02 }, 0.17, C.ink)
+    // 골반 두 덩이를 둥근 선으로 그리지 않고, 헐렁한 반바지를 하나의 옷 형태로 덮는다.
+    const shorts = [
+      { x: j.hipL.x - 0.13, y: j.pelvis.y + 0.08, z: j.pelvis.z + 0.07 },
+      { x: j.hipR.x + 0.13, y: j.pelvis.y + 0.08, z: j.pelvis.z + 0.07 },
+      { x: j.hipR.x + 0.16, y: j.pelvis.y - 0.26, z: j.pelvis.z + 0.07 },
+      { x: j.pelvis.x + 0.035, y: j.pelvis.y - 0.26, z: j.pelvis.z + 0.07 },
+      { x: j.pelvis.x, y: j.pelvis.y - 0.12, z: j.pelvis.z + 0.07 },
+      { x: j.pelvis.x - 0.035, y: j.pelvis.y - 0.26, z: j.pelvis.z + 0.07 },
+      { x: j.hipL.x - 0.16, y: j.pelvis.y - 0.26, z: j.pelvis.z + 0.07 },
+    ]
+    pieces.push({
+      depth: j.pelvis.z + 0.07,
+      draw: () =>
+        this.poly(
+          shorts.map((p) => this.pt(p.x, p.y, p.z)),
+          '#28343b',
+        ),
+    })
     // 몸통과 어깨
     seg(j.pelvis, j.chest, 0.3, C.teal)
     seg(j.shoulderL, j.shoulderR, 0.15, C.teal)
