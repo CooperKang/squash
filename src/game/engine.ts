@@ -1,8 +1,9 @@
+import { Athlete, chargePower, strikePower, realisticReach, withinRacketReach, type GameMode, type RealismHud, type CourtPoint } from './realism'
 import { CPU_LEVEL, chooseIntercept } from './cpu'
-import { BALL_R, COURT, SIM_DT, Shot, aimAt, clamp, inCpuReach, inYourReach, step, timingQuality, type Ball, type Difficulty, type Hitter, type Vec } from './physics'
+import { BALL_R, COURT, SIM_DT, Shot, aimAt, clamp, inCpuReach, inYourReach, sampleReach, step, timingQuality, type Ball, type Difficulty, type Hitter, type Vec } from './physics'
 import { status, winner, type Score, type Status } from './score'
 import type { RuleKey } from './hints'
-import { BODY, CpuBody, type Joints } from './cpuBody'
+import { BODY, CpuBody, T_SPOT, type Joints } from './cpuBody'
 import { SHOT_NAME, ZONE, cpuReturnChance, cpuShot, intentFrom, kindFor, newShot, playerShot, sharpness, type ShotKind } from './shots'
 
 export type HudState = {
@@ -16,6 +17,8 @@ export type HudState = {
   hint: RuleKey | null
   paused: boolean
   lastShot: { by: Hitter; name: string } | null // 방금 친 샷 이름
+  mode: GameMode
+  realism: RealismHud | null
   status: Status // 듀스·게임볼
 }
 
@@ -80,6 +83,14 @@ export class Engine {
   private paused = false
   private rallySaw = { boast: false, backWall: false }
   private lastStatus: Status = null
+  public mode: GameMode = 'classic'
+  public readonly player = new Athlete()
+  public readonly opponent = new Athlete()
+  private charge: { seconds: number; pointerType: string } | null = null
+  private aimTarget: { x: number; y: number } | null = null
+  private playerIntercept: CourtPoint | null = null
+  private hudClock = 0
+  private lastPower = 0
   public difficulty: Difficulty = 'normal'
   public sound = true
   public askRules = true
@@ -113,6 +124,7 @@ export class Engine {
   }
 
   stop() {
+    this.cancelCharge()
     cancelAnimationFrame(this.raf)
     void this.audio?.close()
   }
@@ -134,6 +146,7 @@ export class Engine {
 
   /** 규칙 설명을 읽는 동안 멈춘다 */
   pause() {
+    this.cancelCharge()
     this.paused = true
     this.emit()
   }
@@ -145,6 +158,12 @@ export class Engine {
   }
 
   newMatch() {
+    this.cancelCharge()
+    this.player.reset()
+    this.opponent.reset()
+    this.lastPower = 0
+    this.lastShot = null
+    this.playerIntercept = null
     this.gameCarry = 0
     this.paused = false
     this.pick = null
@@ -160,26 +179,83 @@ export class Engine {
 
   /** 자동 테스트용: 지금 칠 수 있는 공의 화면 위치 */
   debugTarget() {
-    const reach = this.phase === 'serve-you' || (this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot))
+    const reach =
+      (this.phase === 'serve-you' && (this.mode === 'classic' || withinRacketReach(this.player.root, this.ball.p))) ||
+      (this.phase === 'rally' && this.shot.by === 'cpu' && this.canYouHit())
     const s = this.project(this.ball.p)
     return reach && s ? { x: s.x, y: s.y, z: this.ball.p.z, y3: this.ball.p.y, back: this.shot.backWall } : null
   }
 
   // ---------- 입력 ----------
 
-  pointerMove(x: number, y: number) {
-    this.pointer = { x, y }
+  pointerMove(x: number, y: number, pointerType = 'mouse') {
+    this.aimTarget = { x, y }
+    if (this.mode !== 'realistic' || pointerType !== 'mouse' || !this.pointer) this.pointer = { x, y }
+  }
+
+  press(x: number, y: number, pointerType = 'mouse') {
+    if (this.mode !== 'realistic') {
+      this.tap(x, y)
+      return
+    }
+    if (this.paused || !['serve-you', 'rally'].includes(this.phase) || (this.phase === 'rally' && this.shot.by !== 'cpu')) return
+    this.unlockAudio()
+    this.pointerMove(x, y, pointerType)
+    if (this.phase === 'serve-you') this.player.target = { x: this.ball.p.x, z: clamp(this.ball.p.z + 0.4, 1.2, 9.1) }
+    else if (this.playerIntercept) this.player.target = { ...this.playerIntercept }
+    this.charge = { seconds: 0, pointerType }
+    this.emit()
+  }
+
+  release(x: number, y: number) {
+    const held = this.charge
+    if (!held) return
+    if (x < 0 || y < 0 || x > this.w || y > this.h) {
+      this.cancelCharge()
+      this.emit()
+      return
+    }
+    if (held.pointerType !== 'mouse') this.pointer = { x, y }
+    this.charge = null
+    const power = strikePower(chargePower(held.seconds), this.player)
+    const at = held.pointerType === 'mouse' ? (this.pointer ?? { x, y }) : { x, y }
+    this.tap(at.x, at.y, power)
+    this.emit()
+  }
+
+  cancelCharge() {
+    this.charge = null
+    this.aimTarget = null
+  }
+
+  returnToT() {
+    this.movePlayer(T_SPOT)
+  }
+
+  movePlayer(at: CourtPoint) {
+    if (this.mode !== 'realistic' || this.paused || !['rally', 'serve-you', 'serve-cpu'].includes(this.phase)) return
+    this.player.target = { x: clamp(at.x, -2.9, 2.9), z: clamp(at.z, 1.2, 9.1) }
+    this.emit()
+  }
+
+  private canYouHit() {
+    return this.mode === 'realistic' ? realisticReach(this.ball, this.shot) && withinRacketReach(this.player.root, this.ball.p) : inYourReach(this.ball, this.shot)
   }
 
   pointerLeave() {
-    this.pointer = null
+    if (!this.charge) {
+      this.pointer = null
+      this.aimTarget = null
+    }
   }
 
-  tap(x: number, y: number) {
+  tap(x: number, y: number, power?: number) {
     this.unlockAudio()
     if (this.phase === 'ready' || this.phase === 'over' || this.paused) return
     if (this.pick) return this.choose(x, y)
-    const yourTurn = this.phase === 'serve-you' || (this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot))
+    const yourTurn =
+      (this.phase === 'serve-you' && (this.mode === 'classic' || withinRacketReach(this.player.root, this.ball.p))) ||
+      (this.phase === 'rally' && this.shot.by === 'cpu' && this.canYouHit())
     const s = this.project(this.ball.p)
     const r = s ? this.hitRadius(s.r) : 0
     const near = s && Math.hypot(x - s.x, y - s.y) <= r
@@ -193,14 +269,14 @@ export class Engine {
     const q = serve ? 0.9 : timingQuality(this.ball.p, this.shot.backWall, this.shot.boast || this.shot.short)
     navigator.vibrate?.(12)
     // 쉬움 모드: 여기서 멈추고 칠 곳을 고르게 한다
-    if (this.difficulty === 'easy') {
+    if (this.difficulty === 'easy' && this.mode === 'classic') {
       this.pick = { k: 0, dir: 1, q, serve, sx: s.x, sy: s.y, sr: r, kind: null }
       this.pointer = null
       return
     }
     // 누른 곳 = 라켓이 공을 때린 곳: 안쪽은 보스트, 가운데는 드라이브, 벽 쪽은 크로스, 윗면은 드롭, 아랫면은 로브
-    this.strike(kindFor(intentFrom(this.ball.p.x, dx, dy), this.ball.p, serve), serve, q)
-    this.swings.push({ x: s.x, y: s.y, t: 0, good: true, side: this.handSide() })
+    this.strike(kindFor(intentFrom(this.ball.p.x, dx, dy), this.ball.p, serve), serve, q, power)
+    this.swings.push({ x: power != null ? x : s.x, y: power != null ? y : s.y, t: 0, good: true, side: this.handSide() })
     this.emit()
   }
 
@@ -235,16 +311,26 @@ export class Engine {
   }
 
   private yourBallNow() {
-    return this.phase === 'serve-you' || (this.phase === 'rally' && this.shot.by === 'cpu' && inYourReach(this.ball, this.shot))
+    return (
+      (this.phase === 'serve-you' && (this.mode === 'classic' || withinRacketReach(this.player.root, this.ball.p))) ||
+      (this.phase === 'rally' && this.shot.by === 'cpu' && this.canYouHit())
+    )
   }
 
-  /** 계획한 샷을 친다. 그 자리에서 안 되는 샷(앞 코트의 보스트 등)이면 드라이브(서브는 로브 서브)로 */
-  private strike(kind: ShotKind, serve: boolean, q: number) {
+  /** 선택한 샷의 방향을 유지한다. 이상적인 샷 후보가 없어도 드라이브로 바꾸지 않는다. */
+  private strike(kind: ShotKind, serve: boolean, q: number, power?: number) {
     const from = { ...this.ball.p }
-    let hit = playerShot(kind, from, q)
-    if (!hit) hit = playerShot(serve ? 'serve-lob' : 'drive', from, q)
-    const k = hit?.kind ?? 'drive'
-    const v = hit?.v ?? aimAt(from, { x: from.x * 0.8, y: 2.2, z: 0 }, 13)
+    const hit = playerShot(kind, from, q, Math.random, power)
+    const side = Math.sign(from.x) || 1
+    const targetX = kind === 'boast' ? side * 7 : kind.startsWith('cross') ? -side * 2 : from.x * 0.85
+    const k = kind
+    const v = hit?.v ?? aimAt(from, { x: targetX, y: serve ? 2.4 : 1.2, z: 0 }, 8 + (power ?? 0.65) * 12)
+    if (this.mode === 'realistic') {
+      this.lastPower = power ?? 0.65
+      this.player.hit(this.lastPower)
+      this.player.target = { ...T_SPOT }
+      this.playerIntercept = null
+    }
     this.ball.v = v
     this.shot = newShot('you', k, from, serve)
     this.hint = null
@@ -262,17 +348,20 @@ export class Engine {
   // ---------- 진행 ----------
 
   private setupServe() {
+    this.playerIntercept = null
     this.trail = []
     this.rally = 0
     this.message = ''
     this.rallySaw = { boast: false, backWall: false }
     this.pick = null
-    this.body.configure(CPU_LEVEL[this.difficulty])
+    this.configureCpu()
     if (this.server === 'you') {
       this.phase = 'serve-you'
       this.toss()
       // 상대는 반대쪽 뒤에서 리시브를 기다린다
       this.body.placeAt({ x: -this.side * 1.6, z: 7.4 })
+      this.player.root = { x: this.side * 1.6, z: 7.4 }
+      this.player.target = { ...this.player.root }
     } else {
       this.phase = 'serve-cpu'
       // 규칙을 물어보는 중이면 읽을 시간을 조금 더 준다
@@ -280,6 +369,8 @@ export class Engine {
       // 서비스 박스에 한 발을 두고 포핸드로 서브한다
       this.ball = { p: { x: this.side > 0 ? 2.55 : -1.75, y: 1.1, z: 6.3 }, v: { x: 0, y: 0, z: 0 } }
       this.body.placeAt({ x: this.ball.p.x - 0.78, z: 6.75 })
+      this.player.root = { x: -this.side * 1.6, z: 7.4 }
+      this.player.target = { ...this.player.root }
       this.body.plan(this.ball.p, this.timer * TIME_SCALE[this.difficulty])
     }
     this.emit()
@@ -290,6 +381,22 @@ export class Engine {
   }
 
   private update(realDt: number) {
+    if (this.mode === 'realistic') {
+      if (this.charge) this.charge.seconds += realDt
+      if (this.pointer && this.aimTarget && this.charge?.pointerType !== 'touch') {
+        const dx = this.aimTarget.x - this.pointer.x,
+          dy = this.aimTarget.y - this.pointer.y
+        const distance = Math.hypot(dx, dy)
+        const amount = Math.min(1, (1800 * this.player.speedFactor * this.player.speedFactor * realDt) / Math.max(1, distance))
+        this.pointer.x += dx * amount
+        this.pointer.y += dy * amount
+      }
+      this.hudClock += realDt
+      if (this.hudClock >= 0.08) {
+        this.hudClock = 0
+        this.emit()
+      }
+    }
     for (const s of this.swings) s.t += realDt
     this.swings = this.swings.filter((s) => s.t < 0.32)
     for (const f of this.flashes) f.t += realDt
@@ -317,10 +424,13 @@ export class Engine {
       this.timer -= realDt
       if (this.timer <= 0) {
         const from = { ...this.ball.p }
-        const c = cpuShot(from, this.difficulty, true)
+        const power = this.cpuPower(from)
+        const c = cpuShot(from, this.difficulty, true, Math.random, power)
+        if (power != null) this.opponent.hit(power)
         this.ball.v = c.v
         this.shot = newShot('cpu', c.kind, from, true)
         this.lastShot = { by: 'cpu', kind: c.kind, sharp: 0 }
+        this.planPlayer()
         this.phase = 'rally'
         this.rally++
         this.hint = null
@@ -337,7 +447,19 @@ export class Engine {
     // 예측·실제 공·몸을 같은 간격으로 갱신해 화면 fps에 따라 타구 판정이 달라지지 않게 한다.
     this.gameCarry += game
     while (this.gameCarry >= SIM_DT) {
+      const previous = { ...this.body.root }
+      if (this.mode === 'realistic') {
+        const resting = this.phase !== 'rally' && this.phase !== 'serve-you'
+        this.player.move(SIM_DT, resting)
+        this.configureCpu()
+        this.body.speed = Math.min(this.body.speed, this.body.maxSpeed)
+      }
       this.body.update(SIM_DT)
+      if (this.mode === 'realistic') {
+        this.opponent.root = { ...this.body.root }
+        const distance = Math.hypot(previous.x - this.body.root.x, previous.z - this.body.root.z)
+        this.opponent.exert(SIM_DT, distance, this.opponent.atT, this.phase !== 'rally')
+      }
       this.physics(SIM_DT)
       this.gameCarry -= SIM_DT
     }
@@ -357,7 +479,8 @@ export class Engine {
     const maxOff = (Math.max(20, this.w / 2 - margin) * dz) / this.f
     const x = clamp(Math.sign(b.x) * Math.max(0, Math.abs(b.x) - maxOff), -2.6, 2.6)
     const above = ((this.horizon - HUD_TOP) * dz) / this.f
-    const below = ((this.h - 56 - this.horizon) * dz) / this.f
+    const bottomReserve = this.mode === 'realistic' ? 265 : 56
+    const below = ((this.h - bottomReserve - this.horizon) * dz) / this.f
     const y = clamp(clamp(CAM.y, b.y - above, b.y + below), 0.5, 2.6)
     return { x, y }
   }
@@ -406,10 +529,13 @@ export class Engine {
       this.cpuClock += dt
       if (this.cpuClock >= this.cpuPlan.t - 0.004 && inCpuReach(this.ball, this.shot)) {
         const from = { ...this.ball.p }
-        const c = cpuShot(from, this.difficulty, false)
+        const power = this.cpuPower(from)
+        const c = cpuShot(from, this.difficulty, false, Math.random, power)
+        if (power != null) this.opponent.hit(power)
         this.ball.v = c.v
         this.shot = newShot('cpu', c.kind, from)
         this.lastShot = { by: 'cpu', kind: c.kind, sharp: 0 }
+        this.planPlayer()
         this.rally++
         if (this.body.swing) {
           this.body.swing.t = 0
@@ -421,10 +547,31 @@ export class Engine {
     }
   }
 
+  private configureCpu() {
+    const level = CPU_LEVEL[this.difficulty]
+    const factor = this.mode === 'realistic' ? this.opponent.speedFactor : 1
+    this.body.configure({ maxSpeed: level.maxSpeed * factor, recoverySpeed: level.recoverySpeed * factor, recoveryDelay: level.recoveryDelay })
+  }
+
+  private cpuPower(from: Vec) {
+    return this.mode === 'realistic' ? (from.z < 4 ? 0.5 : 0.85) * this.opponent.powerFactor : undefined
+  }
+
+  private planPlayer() {
+    if (this.mode !== 'realistic') return
+    const pts = sampleReach(this.ball, this.shot, realisticReach)
+    const root = this.player.root
+    const speed = this.player.baseSpeed * this.player.speedFactor
+    const can = pts.find((q) => Math.max(0, Math.hypot(q.p.x - root.x, q.p.z - root.z) - 0.8) / speed + 0.12 <= q.t)
+    const target = can ?? pts.at(-1)
+    this.playerIntercept = target ? { x: target.p.x, z: clamp(target.p.z + 0.4, 1.2, 9.1) } : null
+    if (this.playerIntercept) this.player.target = { ...this.playerIntercept }
+  }
+
   /** 공 궤적과 몸의 실제 이동을 함께 예측하고, 모션은 선택한 타점·시각을 따라간다. */
   private planCpu() {
     this.cpuClock = 0
-    this.body.configure(CPU_LEVEL[this.difficulty])
+    this.configureCpu()
     this.body.splitStep()
     const last = this.lastShot
     const chance = cpuReturnChance(this.difficulty, last?.kind ?? 'drive', last?.by === 'you' ? last.sharp : 0)
@@ -439,6 +586,7 @@ export class Engine {
   }
 
   private endRally(win: Hitter, label: string, reason: RuleKey | null) {
+    this.cancelCharge()
     const kept = win === this.server
     this.cpuPlan.returns = false
     this.body.recover()
@@ -511,6 +659,24 @@ export class Engine {
       paused: this.paused,
       lastShot: this.lastShot ? { by: this.lastShot.by, name: SHOT_NAME[this.lastShot.kind] } : null,
       status: status(this.score),
+      mode: this.mode,
+      realism:
+        this.mode === 'realistic'
+          ? {
+              you: this.player.energy,
+              cpu: this.opponent.energy,
+              youDistance: this.player.distance,
+              cpuDistance: this.opponent.distance,
+              youAt: { ...this.player.root },
+              cpuAt: { ...this.body.root },
+              target: { ...this.player.target },
+              atT: this.player.atT,
+              charge: chargePower(this.charge?.seconds ?? 0),
+              charging: !!this.charge,
+              maxPower: this.player.powerFactor,
+              lastPower: this.lastPower,
+            }
+          : null,
     })
   }
 
@@ -608,7 +774,8 @@ export class Engine {
     const c = this.ctx
     const j: Joints = this.body.joints()
     const k = (v: Vec) => this.f / Math.max(0.3, CAM.z - v.z)
-    const seg = (a: Vec, b: Vec, w: number, color: string) => {
+    const pieces: { depth: number; draw: () => void }[] = []
+    const paintSeg = (a: Vec, b: Vec, w: number, color: string) => {
       const pa = this.pt(a.x, a.y, a.z)
       const pb = this.pt(b.x, b.y, b.z)
       c.strokeStyle = color
@@ -618,6 +785,15 @@ export class Engine {
       c.moveTo(pa[0], pa[1])
       c.lineTo(pb[0], pb[1])
       c.stroke()
+    }
+    // 팔을 항상 몸통 위에 덧칠하지 않는다. 긴 선도 나눠 깊이 교차를 표현한다.
+    const seg = (a: Vec, b: Vec, w: number, color: string) => {
+      const at = (t: number): Vec => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t })
+      for (let i = 0; i < 4; i++) {
+        const start = at(i / 4),
+          end = at((i + 1) / 4)
+        pieces.push({ depth: (start.z + end.z) / 2, draw: () => paintSeg(start, end, w, color) })
+      }
     }
     const SKIN = '#d9b99a'
     // 카메라(내 자리) 가까이 오면 공을 가리지 않게 흐리게
@@ -648,11 +824,16 @@ export class Engine {
     seg(j.shoulderL, j.elbowL, 0.1, C.teal)
     seg(j.elbowL, j.handL, 0.08, SKIN)
     // 머리(뒤통수)
-    const [hx, hy] = this.pt(j.head.x, j.head.y, j.head.z)
-    c.fillStyle = '#2b2522'
-    c.beginPath()
-    c.arc(hx, hy, k(j.head) * BODY.headR, 0, Math.PI * 2)
-    c.fill()
+    pieces.push({
+      depth: j.head.z,
+      draw: () => {
+        const [hx, hy] = this.pt(j.head.x, j.head.y, j.head.z)
+        c.fillStyle = '#2b2522'
+        c.beginPath()
+        c.arc(hx, hy, k(j.head) * BODY.headR, 0, Math.PI * 2)
+        c.fill()
+      },
+    })
     // 오른팔과 라켓
     seg(j.shoulderR, j.elbowR, 0.1, C.teal)
     seg(j.elbowR, j.handR, 0.08, SKIN)
@@ -663,22 +844,28 @@ export class Engine {
     })
     seg(j.handR, along(0.42), 0.035, C.ink)
     const head = along(0.72)
-    const [rx, ry] = this.pt(head.x, head.y, head.z)
-    const [tx, ty] = this.pt(j.racketTip.x, j.racketTip.y, j.racketTip.z)
-    const [nx, ny] = this.pt(along(0.42).x, along(0.42).y, along(0.42).z)
-    const ang = Math.atan2(ty - ny, tx - nx)
-    const long = Math.max(4, Math.hypot(tx - nx, ty - ny) / 2)
-    c.save()
-    c.translate(rx, ry)
-    c.rotate(ang)
-    c.beginPath()
-    c.ellipse(0, 0, long, Math.max(3, k(head) * 0.095), 0, 0, Math.PI * 2)
-    c.fillStyle = 'rgb(255 255 255 / 0.35)'
-    c.fill()
-    c.lineWidth = Math.max(1.5, k(head) * 0.025)
-    c.strokeStyle = C.silver
-    c.stroke()
-    c.restore()
+    pieces.push({
+      depth: head.z,
+      draw: () => {
+        const [rx, ry] = this.pt(head.x, head.y, head.z)
+        const [tx, ty] = this.pt(j.racketTip.x, j.racketTip.y, j.racketTip.z)
+        const [nx, ny] = this.pt(along(0.42).x, along(0.42).y, along(0.42).z)
+        const ang = Math.atan2(ty - ny, tx - nx)
+        const long = Math.max(4, Math.hypot(tx - nx, ty - ny) / 2)
+        c.save()
+        c.translate(rx, ry)
+        c.rotate(ang)
+        c.beginPath()
+        c.ellipse(0, 0, long, Math.max(3, k(head) * 0.095), 0, 0, Math.PI * 2)
+        c.fillStyle = 'rgb(255 255 255 / 0.35)'
+        c.fill()
+        c.lineWidth = Math.max(1.5, k(head) * 0.025)
+        c.strokeStyle = C.silver
+        c.stroke()
+        c.restore()
+      },
+    })
+    pieces.sort((a, b) => a.depth - b.depth).forEach((p) => p.draw())
     c.restore()
   }
 

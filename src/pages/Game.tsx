@@ -1,3 +1,5 @@
+import { RealismCoach, RealismControls } from './RealismControls'
+import type { GameMode } from '../game/realism'
 import { useEffect, useRef, useState } from 'react'
 import { Engine, type HudState } from '../game/engine'
 import type { Difficulty } from '../game/physics'
@@ -15,6 +17,9 @@ export default function Game() {
   const engineRef = useRef<Engine | null>(null)
   const [hud, setHud] = useState<HudState | null>(null)
   const [difficulty, setDifficulty] = useState<Difficulty>('normal')
+  const [mode, setMode] = useState<GameMode>('classic')
+  const [coach, setCoach] = useState<number | null>(null)
+  const activePointer = useRef<number | null>(null)
   const [sound, setSound] = useState(true)
   const [askRules, setAskRules] = useState(true)
   // 사라질 때도 글자가 남아 있게 마지막으로 물어본 규칙을 기억한다
@@ -48,6 +53,50 @@ export default function Game() {
     if (engineRef.current) engineRef.current.askRules = askRules
   }, [askRules])
 
+  useEffect(() => {
+    if (engineRef.current) engineRef.current.mode = mode
+  }, [mode])
+
+  useEffect(() => {
+    const cancel = () => {
+      activePointer.current = null
+      engineRef.current?.cancelCharge()
+    }
+    window.addEventListener('blur', cancel)
+    document.addEventListener('visibilitychange', cancel)
+    return () => {
+      window.removeEventListener('blur', cancel)
+      document.removeEventListener('visibilitychange', cancel)
+    }
+  }, [])
+
+  const openCoach = () => {
+    engineRef.current?.pause()
+    setCoach(0)
+  }
+  const closeCoach = () => {
+    try {
+      localStorage.setItem('squash.realismCoach.v1', 'seen')
+    } catch {
+      /* 저장 없이도 플레이 가능 */
+    }
+    setCoach(null)
+    engineRef.current?.resume()
+  }
+  const selectMode = (next: GameMode) => {
+    setMode(next)
+    if (engineRef.current) engineRef.current.mode = next
+    if (next === 'realistic') {
+      let seen = false
+      try {
+        seen = localStorage.getItem('squash.realismCoach.v1') === 'seen'
+      } catch {
+        /* 첫 안내 표시 */
+      }
+      if (!seen) openCoach()
+    }
+  }
+
   const openHint = (k: RuleKey) => {
     setReading(k)
     engineRef.current?.pause()
@@ -67,161 +116,247 @@ export default function Game() {
   return (
     <section className="mx-auto max-w-5xl px-0 md:px-4 md:pt-6" aria-label="스쿼시 게임">
       <div className="relative h-[calc(100dvh-56px-76px-env(safe-area-inset-bottom))] min-h-[420px] overflow-hidden bg-ink md:h-[min(78vh,720px)] md:rounded-[28px]">
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 size-full touch-none select-none md:cursor-none"
-          onPointerDown={(e) => {
-            e.preventDefault()
-            engineRef.current?.tap(...local(e))
-          }}
-          onPointerMove={(e) => e.pointerType === 'mouse' && engineRef.current?.pointerMove(...local(e))}
-          onPointerLeave={() => engineRef.current?.pointerLeave()}
-          aria-label="공이 날아오면 공을 눌러 치세요"
-        />
+        <div className="contents" inert={coach !== null}>
+          <canvas
+            ref={canvasRef}
+            className="absolute inset-0 size-full touch-none select-none md:cursor-none"
+            onPointerDown={(e) => {
+              if (e.button !== 0 || activePointer.current !== null) return
+              e.preventDefault()
+              activePointer.current = e.pointerId
+              e.currentTarget.setPointerCapture(e.pointerId)
+              engineRef.current?.press(...local(e), e.pointerType)
+            }}
+            onPointerMove={(e) => {
+              if (e.pointerType === 'mouse' || activePointer.current === e.pointerId) engineRef.current?.pointerMove(...local(e), e.pointerType)
+            }}
+            onPointerUp={(e) => {
+              if (activePointer.current !== e.pointerId) return
+              e.preventDefault()
+              engineRef.current?.release(...local(e))
+              activePointer.current = null
+              if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId)
+            }}
+            onPointerCancel={() => {
+              activePointer.current = null
+              engineRef.current?.cancelCharge()
+            }}
+            onLostPointerCapture={() => {
+              activePointer.current = null
+              engineRef.current?.cancelCharge()
+            }}
+            onPointerLeave={() => engineRef.current?.pointerLeave()}
+            aria-label={mode === 'realistic' ? '누르고 파워를 모은 뒤 놓아서 공을 치세요' : '공이 날아오면 공을 눌러 치세요'}
+          />
 
-        {hud && (
-          <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3 md:p-4">
-            <ScoreChip label="나" value={hud.score.you} serving={hud.server === 'you'} accent />
-            <div className="mt-1 flex flex-col items-center gap-1.5">
-              <div className="rounded-full bg-black/45 px-3 py-1.5 text-center text-[12px] font-semibold text-white/90 backdrop-blur">
-                랠리 {hud.rally} · 최고 {hud.bestRally}
+          {hud && (
+            <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3 md:p-4">
+              <ScoreChip label="나" value={hud.score.you} serving={hud.server === 'you'} accent />
+              <div className="mt-1 flex flex-col items-center gap-1.5">
+                <div className="rounded-full bg-black/45 px-3 py-1.5 text-center text-[12px] font-semibold text-white/90 backdrop-blur">
+                  랠리 {hud.rally} · 최고 {hud.bestRally}
+                </div>
+                {hud.status && (
+                  <div
+                    className={`rounded-full px-3 py-1 text-[12px] font-extrabold ${hud.status === 'deuce' ? 'bg-dot text-ink' : hud.status === 'game-ball-you' ? 'bg-teal-bright text-white' : 'bg-tin text-white'}`}
+                    aria-live="polite"
+                  >
+                    {hud.status === 'deuce' ? '듀스' : hud.status === 'game-ball-you' ? '게임볼 · 나' : '게임볼 · 상대'}
+                  </div>
+                )}
+                {hud.lastShot && hud.phase === 'rally' && (
+                  <div className="rounded-full bg-white/85 px-3 py-1 text-[12px] font-bold text-ink">
+                    {hud.lastShot.by === 'you' ? '나' : '상대'}: {hud.lastShot.name}
+                  </div>
+                )}
               </div>
-              {hud.status && (
-                <div
-                  className={`rounded-full px-3 py-1 text-[12px] font-extrabold ${hud.status === 'deuce' ? 'bg-dot text-ink' : hud.status === 'game-ball-you' ? 'bg-teal-bright text-white' : 'bg-tin text-white'}`}
-                  aria-live="polite"
+              <ScoreChip label="상대" value={hud.score.cpu} serving={hud.server === 'cpu'} />
+            </div>
+          )}
+
+          {hud?.phase === 'serve-you' && !hud.hint && (
+            <p
+              className={`pointer-events-none absolute inset-x-0 px-3 text-center text-[13px] font-semibold ${mode === 'realistic' ? 'top-28 mx-auto max-w-[300px] rounded-full bg-ink/65 py-2 text-white' : 'bottom-5 text-white/85'}`}
+            >
+              {mode === 'realistic' ? '내 서브 · 누르고 파워를 모은 뒤 공에서 놓으세요' : '내 서브예요. 떠오른 공을 눌러 치세요'}
+            </p>
+          )}
+
+          {lastHint && (
+            <div
+              className={`absolute inset-x-0 bottom-4 flex justify-center px-3 transition duration-500 ${asking ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'}`}
+              aria-hidden={!asking}
+            >
+              <div className="flex items-center gap-1 rounded-full bg-white/95 py-1.5 pr-1.5 pl-4 text-[14px] text-ink shadow-xl">
+                <span className="font-semibold">{HINTS[lastHint].name}, 궁금하세요?</span>
+                <button
+                  type="button"
+                  onClick={() => openHint(lastHint)}
+                  tabIndex={asking ? 0 : -1}
+                  className="ml-1 rounded-full bg-teal px-3.5 py-1.5 text-[13px] font-bold text-white"
                 >
-                  {hud.status === 'deuce' ? '듀스' : hud.status === 'game-ball-you' ? '게임볼 · 나' : '게임볼 · 상대'}
-                </div>
-              )}
-              {hud.lastShot && hud.phase === 'rally' && (
-                <div className="rounded-full bg-white/85 px-3 py-1 text-[12px] font-bold text-ink">
-                  {hud.lastShot.by === 'you' ? '나' : '상대'}: {hud.lastShot.name}
-                </div>
-              )}
-            </div>
-            <ScoreChip label="상대" value={hud.score.cpu} serving={hud.server === 'cpu'} />
-          </div>
-        )}
-
-        {hud?.phase === 'serve-you' && !hud.hint && (
-          <p className="pointer-events-none absolute inset-x-0 bottom-5 text-center text-[14px] font-semibold text-white/85">
-            내 서브예요. 떠오른 공을 눌러 치세요
-          </p>
-        )}
-
-        {lastHint && (
-          <div
-            className={`absolute inset-x-0 bottom-4 flex justify-center px-3 transition duration-500 ${asking ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'}`}
-            aria-hidden={!asking}
-          >
-            <div className="flex items-center gap-1 rounded-full bg-white/95 py-1.5 pr-1.5 pl-4 text-[14px] text-ink shadow-xl">
-              <span className="font-semibold">{HINTS[lastHint].name}, 궁금하세요?</span>
-              <button type="button" onClick={() => openHint(lastHint)} tabIndex={asking ? 0 : -1} className="ml-1 rounded-full bg-teal px-3.5 py-1.5 text-[13px] font-bold text-white">
-                보기
-              </button>
-              <button
-                type="button"
-                onClick={() => setDismissed(lastHint)}
-                tabIndex={asking ? 0 : -1}
-                aria-label="닫기"
-                className="grid size-8 place-items-center rounded-full text-[18px] leading-none text-muted"
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        )}
-
-        {reading && (
-          <div className="absolute inset-0 z-10 flex items-end justify-center bg-ink/55 p-3 md:items-center" role="dialog" aria-modal="true" aria-labelledby="hint-title">
-            <div className="w-full max-w-md rounded-[26px] bg-white p-6 text-ink shadow-2xl">
-              <p className="text-[13px] font-semibold text-teal">게임을 잠깐 멈췄어요</p>
-              <h2 id="hint-title" className="mt-1 text-[24px] font-extrabold">
-                {HINTS[reading].name}
-              </h2>
-              <ul className="mt-3 space-y-2 text-[15px] leading-relaxed text-ink/80">
-                {HINTS[reading].body.map((b) => (
-                  <li key={b} className="flex gap-2">
-                    <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-teal" />
-                    {b}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-5 flex items-center gap-3">
-                <button type="button" autoFocus onClick={closeHint} className="flex-1 rounded-2xl bg-teal py-3 text-[16px] font-bold text-white transition hover:bg-teal-deep">
-                  계속하기
+                  보기
                 </button>
-                <a href={reading === 'boast' ? `${href('shots')}?s=boast` : href('rules')} className="text-[14px] font-semibold text-muted underline underline-offset-4">
-                  {reading === 'boast' ? '기술 더 보기' : '규칙 전체 보기'}
-                </a>
+                <button
+                  type="button"
+                  onClick={() => setDismissed(lastHint)}
+                  tabIndex={asking ? 0 : -1}
+                  aria-label="닫기"
+                  className="grid size-8 place-items-center rounded-full text-[18px] leading-none text-muted"
+                >
+                  ×
+                </button>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {showMenu && (
-          <div className="absolute inset-0 grid place-items-center bg-ink/70 p-5 backdrop-blur-[2px]">
-            <div className="max-h-full w-full max-w-sm overflow-y-auto rounded-[26px] bg-white p-6 text-ink shadow-2xl">
-              {hud?.result ? (
-                <>
-                  <p className="font-wide text-[11px] tracking-[0.2em] text-teal">GAME</p>
-                  <h2 className="mt-2 text-[28px] font-extrabold">{hud.result === 'you' ? '이겼어요!' : '아쉽게 졌어요'}</h2>
-                  <p className="mt-1 text-[15px] text-muted">
-                    {hud.score.you} : {hud.score.cpu} · 최고 랠리 {hud.bestRally}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="font-wide text-[11px] tracking-[0.2em] text-teal">MINI GAME</p>
-                  <h2 className="mt-2 text-[26px] font-extrabold leading-tight">터치 스쿼시</h2>
-                  <p className="mt-3 text-[14px] leading-relaxed text-muted">공 둘레에 청록 링이 보이면 공을 눌러 치세요. 누르는 곳이 샷을 정해요.</p>
-                  <ShotPad />
-                  <ul className="mt-3 space-y-1 text-[13.5px] leading-relaxed text-muted">
-                    <li>· 쉬움 모드는 링이 보일 때 누르면 그 순간 멈추고, 공을 크게 보여 줘요. 칸마다 적힌 샷을 골라 누르면 그 샷이 나가요.</li>
-                    <li>· 상대는 공이 올 곳을 미리 읽고 스텝을 밟아 가서 실제 선수처럼 런지하고 휘둘러요.</li>
-                    <li>· 뒤쪽 허리 높이에서 제때 칠수록 샷이 예리하게 들어가요. 11점 먼저 내면 이겨요.</li>
-                  </ul>
-                </>
-              )}
-              <fieldset className="mt-5">
-                <legend className="text-[13px] font-semibold text-muted">난이도</legend>
-                <div className="mt-2 grid grid-cols-3 gap-1.5 rounded-2xl bg-court p-1">
-                  {DIFF.map((d) => (
-                    <button
-                      key={d.id}
-                      type="button"
-                      aria-pressed={difficulty === d.id}
-                      onClick={() => setDifficulty(d.id)}
-                      className="rounded-xl py-2 text-[14px] font-semibold text-muted aria-pressed:bg-ink aria-pressed:text-white"
-                    >
-                      {d.label}
-                    </button>
+          {reading && (
+            <div className="absolute inset-0 z-10 flex items-end justify-center bg-ink/55 p-3 md:items-center" role="dialog" aria-modal="true" aria-labelledby="hint-title">
+              <div className="w-full max-w-md rounded-[26px] bg-white p-6 text-ink shadow-2xl">
+                <p className="text-[13px] font-semibold text-teal">게임을 잠깐 멈췄어요</p>
+                <h2 id="hint-title" className="mt-1 text-[24px] font-extrabold">
+                  {HINTS[reading].name}
+                </h2>
+                <ul className="mt-3 space-y-2 text-[15px] leading-relaxed text-ink/80">
+                  {HINTS[reading].body.map((b) => (
+                    <li key={b} className="flex gap-2">
+                      <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-teal" />
+                      {b}
+                    </li>
                   ))}
+                </ul>
+                <div className="mt-5 flex items-center gap-3">
+                  <button type="button" autoFocus onClick={closeHint} className="flex-1 rounded-2xl bg-teal py-3 text-[16px] font-bold text-white transition hover:bg-teal-deep">
+                    계속하기
+                  </button>
+                  <a href={reading === 'boast' ? `${href('shots')}?s=boast` : href('rules')} className="text-[14px] font-semibold text-muted underline underline-offset-4">
+                    {reading === 'boast' ? '기술 더 보기' : '규칙 전체 보기'}
+                  </a>
                 </div>
-              </fieldset>
-              <label className="mt-3 flex items-center gap-2 text-[14px] text-muted">
-                <input type="checkbox" checked={sound} onChange={(e) => setSound(e.target.checked)} className="size-4 accent-teal" />
-                효과음
-              </label>
-              <label className="mt-2 flex items-center gap-2 text-[14px] text-muted">
-                <input type="checkbox" checked={askRules} onChange={(e) => setAskRules(e.target.checked)} className="size-4 accent-teal" />
-                점수가 날 때 관련 규칙 물어보기
-              </label>
-              <button
-                type="button"
-                onClick={() => {
-                  // 누른 순간에 소리를 켠다(브라우저 정책)
-                  engineRef.current?.unlockAudio()
-                  engineRef.current?.newMatch()
-                }}
-                className="mt-5 w-full rounded-2xl bg-teal py-3.5 text-[16px] font-bold text-white transition hover:bg-teal-deep active:scale-[0.99]"
-              >
-                {hud?.result ? '다시 하기' : '시작하기'}
-              </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {showMenu && (
+            <div className="absolute inset-0 grid place-items-center bg-ink/70 p-5 backdrop-blur-[2px]">
+              <div className="max-h-full w-full max-w-sm overflow-y-auto rounded-[26px] bg-white p-6 text-ink shadow-2xl">
+                <fieldset className="mb-5">
+                  <legend className="sr-only">게임 모드</legend>
+                  <div className="grid grid-cols-2 gap-1 rounded-2xl bg-court p-1">
+                    {(
+                      [
+                        { id: 'classic', label: '기본모드' },
+                        { id: 'realistic', label: '현실모드' },
+                      ] as const
+                    ).map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        aria-pressed={mode === m.id}
+                        onClick={() => selectMode(m.id)}
+                        className="min-h-11 rounded-xl text-[14px] font-bold text-muted aria-pressed:bg-teal aria-pressed:text-white"
+                      >
+                        {m.label}
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+                {hud?.result ? (
+                  <>
+                    <p className="font-wide text-[11px] tracking-[0.2em] text-teal">GAME</p>
+                    <h2 className="mt-2 text-[28px] font-extrabold">{hud.result === 'you' ? '이겼어요!' : '아쉽게 졌어요'}</h2>
+                    <p className="mt-1 text-[15px] text-muted">
+                      {hud.score.you} : {hud.score.cpu} · 최고 랠리 {hud.bestRally}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-wide text-[11px] tracking-[0.2em] text-teal">MINI GAME</p>
+                    <h2 className="mt-2 text-[26px] font-extrabold leading-tight">{mode === 'realistic' ? '현실모드' : '터치 스쿼시'}</h2>
+                    <p className="mt-3 text-[14px] leading-relaxed text-muted">
+                      {mode === 'realistic'
+                        ? '누르고 파워를 모은 뒤 놓아서 치세요. 나와 상대의 이동·강타에 체력이 소모돼요.'
+                        : '공 둘레에 청록 링이 보이면 공을 눌러 치세요. 누르는 곳이 샷을 정해요.'}
+                    </p>
+                    {mode === 'classic' ? (
+                      <ShotPad />
+                    ) : (
+                      <div className="mt-3 grid grid-cols-3 gap-1 rounded-2xl bg-teal-soft p-3 text-center text-[11px] font-bold leading-relaxed text-teal-deep">
+                        <span>
+                          공 안쪽
+                          <br />
+                          보스트
+                        </span>
+                        <span>
+                          가운데
+                          <br />
+                          드라이브
+                        </span>
+                        <span>
+                          벽 쪽<br />
+                          크로스
+                        </span>
+                      </div>
+                    )}
+                    <ul hidden={mode === 'realistic'} className="mt-3 space-y-1 text-[13.5px] leading-relaxed text-muted">
+                      <li>
+                        {mode === 'realistic'
+                          ? '· 모든 난이도에서 경기는 멈추지 않아요. 공으로 자동 이동하고 친 뒤 T로 돌아가요. 미니 코트로 위치도 정할 수 있어요.'
+                          : '· 쉬움 모드는 링이 보일 때 누르면 그 순간 멈추고, 공을 크게 보여 줘요. 칸마다 적힌 샷을 골라 누르면 그 샷이 나가요.'}
+                      </li>
+                      <li>· 상대는 공이 올 곳을 미리 읽고 스텝을 밟아 가서 실제 선수처럼 런지하고 휘둘러요.</li>
+                      <li>· 뒤쪽 허리 높이에서 제때 칠수록 샷이 예리하게 들어가요. 11점 먼저 내면 이겨요.</li>
+                    </ul>
+                  </>
+                )}
+                {mode === 'realistic' && (
+                  <button type="button" onClick={openCoach} className="mt-3 text-[13px] font-bold text-teal underline underline-offset-4">
+                    조작 방법 다시 보기
+                  </button>
+                )}
+                <fieldset className="mt-5">
+                  <legend className="text-[13px] font-semibold text-muted">난이도</legend>
+                  <div className="mt-2 grid grid-cols-3 gap-1.5 rounded-2xl bg-court p-1">
+                    {DIFF.map((d) => (
+                      <button
+                        key={d.id}
+                        type="button"
+                        aria-pressed={difficulty === d.id}
+                        onClick={() => setDifficulty(d.id)}
+                        className="rounded-xl py-2 text-[14px] font-semibold text-muted aria-pressed:bg-ink aria-pressed:text-white"
+                      >
+                        {d.label}
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+                <label className="mt-3 flex items-center gap-2 text-[14px] text-muted">
+                  <input type="checkbox" checked={sound} onChange={(e) => setSound(e.target.checked)} className="size-4 accent-teal" />
+                  효과음
+                </label>
+                <label className="mt-2 flex items-center gap-2 text-[14px] text-muted">
+                  <input type="checkbox" checked={askRules} onChange={(e) => setAskRules(e.target.checked)} className="size-4 accent-teal" />
+                  점수가 날 때 관련 규칙 물어보기
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    // 누른 순간에 소리를 켠다(브라우저 정책)
+                    engineRef.current?.unlockAudio()
+                    engineRef.current?.newMatch()
+                  }}
+                  className="mt-5 w-full rounded-2xl bg-teal py-3.5 text-[16px] font-bold text-white transition hover:bg-teal-deep active:scale-[0.99]"
+                >
+                  {hud?.result ? '다시 하기' : '시작하기'}
+                </button>
+              </div>
+            </div>
+          )}
+          {hud?.realism && !showMenu && (
+            <RealismControls state={hud.realism} onMove={(p) => engineRef.current?.movePlayer(p)} onT={() => engineRef.current?.returnToT()} onHelp={openCoach} />
+          )}
+        </div>
+        {coach !== null && <RealismCoach step={coach} onClose={closeCoach} onNext={() => (coach === 2 ? closeCoach() : setCoach(coach + 1))} />}
       </div>
     </section>
   )
@@ -262,8 +397,8 @@ function ShotPad() {
         <span className="absolute top-1/2 left-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink" aria-hidden="true" />
       </div>
       <p className="text-[13px] leading-relaxed text-muted">
-        누른 곳이 <b className="text-ink">라켓이 공을 때리는 곳</b>이에요. 공이 오른쪽 벽 가까이 있으면 왼쪽을 때리면 오른쪽 벽으로 가는 보스트, 가운데는 벽을 따라 가는 드라이브, 오른쪽을 때리면 크로스.
-        윗부분은 낮게(드롭), 아랫부분은 높게(로브). 왼쪽 벽이면 좌우가 바뀌어요.
+        누른 곳이 <b className="text-ink">라켓이 공을 때리는 곳</b>이에요. 공이 오른쪽 벽 가까이 있으면 왼쪽을 때리면 오른쪽 벽으로 가는 보스트, 가운데는 벽을 따라 가는 드라이브,
+        오른쪽을 때리면 크로스. 윗부분은 낮게(드롭), 아랫부분은 높게(로브). 왼쪽 벽이면 좌우가 바뀌어요.
       </p>
     </div>
   )

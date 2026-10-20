@@ -166,10 +166,30 @@ export function judge(kind: ShotKind, sim: Sim, s: number): number | null {
   }
 }
 
+/** 경기에서는 완벽한 길이보다 실제 샷의 방향·벽 충돌 순서를 판별한다. */
+export function gameplayScore(kind: ShotKind, sim: Sim, side: number): number | null {
+  const ideal = judge(kind, sim, side)
+  if (ideal != null) return ideal
+  if (sim.result !== 'double') return null
+  const { front, before, f1, f2 } = parts(sim)
+  if (!front || !f1 || !f2) return null
+  if (kind === 'boast') return before.length === 1 && sideHit(before[0], side) ? 0.45 : null
+  if (before.length) return null
+  if (kind === 'cross' || kind === 'cross-lob') return f1.x * -side > 0.2 || f2.x * -side > 0.8 ? 0.45 : null
+  if (kind === 'drive' || kind === 'lob') return f1.x * side > 0.2 ? 0.4 : null
+  if (kind === 'cross-drop') return front.at.y < 1.3 && f1.z < 4 && f2.x * -side > 0.2 ? 0.45 : null
+  if (kind === 'drop') return front.at.y < 1.3 && f1.z < 4 && f2.x * side > 0.2 ? 0.4 : null
+  return null
+}
+
 export type Plan = { kind: ShotKind; v: Vec; score: number; sim: Sim }
 
 /** 조건을 맞는 후보를 찾아 점수 순으로 돌려준다 */
-export function plan(kind: ShotKind, from: Vec, opts: { by: Hitter; side?: number; serve?: boolean; samples?: number; rand?: () => number } = { by: 'you' }): Plan[] {
+export function plan(
+  kind: ShotKind,
+  from: Vec,
+  opts: { by: Hitter; side?: number; serve?: boolean; samples?: number; rand?: () => number; gameplay?: boolean; power?: number } = { by: 'you' },
+): Plan[] {
   const rand = opts.rand ?? Math.random
   const s = opts.side ?? (Math.sign(from.x) || 1)
   const a = AIM[kind]
@@ -177,9 +197,12 @@ export function plan(kind: ShotKind, from: Vec, opts: { by: Hitter; side?: numbe
   const r = (lo: number, hi: number) => lo + rand() * (hi - lo)
   const out: Plan[] = []
   for (let i = 0; i < (opts.samples ?? 110); i++) {
-    const speed = r(...a.speed)
+    const speed = opts.power == null ? r(...a.speed) : a.speed[0] * 0.7 + (a.speed[1] * 1.1 - a.speed[0] * 0.7) * clamp(opts.power + r(-0.06, 0.06), 0.2, 1)
     let v: Vec
-    if (a.wall === 'front') {
+    if (opts.gameplay && kind === 'boast') {
+      // 옆벽에 반사된 가상의 앞벽 목표를 겨냥해 앞 코트에서도 보스트 각도를 만든다.
+      v = aimAt(from, { x: s * (6.22 + r(0.1, 2.5)), y: r(0.7, 1.7), z: 0 }, speed)
+    } else if (a.wall === 'front') {
       v = aimAt(from, { x: s * r(...a.x), y: r(...a.y), z: 0 }, speed)
     } else {
       const yaw = (r(...a.yaw) * Math.PI) / 180
@@ -190,7 +213,7 @@ export function plan(kind: ShotKind, from: Vec, opts: { by: Hitter; side?: numbe
     }
     const shot = new Shot(opts.by, serve, serve ? s : 0)
     const sim = simulate({ p: { ...from }, v }, shot)
-    const score = judge(kind, sim, s)
+    const score = opts.gameplay ? gameplayScore(kind, sim, s) : judge(kind, sim, s)
     if (score != null) out.push({ kind, v, score, sim })
   }
   return out.sort((x, y) => y.score - x.score)
@@ -237,17 +260,17 @@ export function kindFor(intent: Intent, ball: Vec, serve: boolean): ShotKind {
   const cross = intent.col === 'outer'
   if (intent.height === 'high') return cross ? 'cross-lob' : 'lob'
   if (intent.height === 'low') {
-    if (ball.y > 1.15 && ball.z < 7) return 'kill'
+    if (!cross && ball.y > 1.15 && ball.z < 7) return 'kill'
     return cross ? 'cross-drop' : 'drop'
   }
   return cross ? 'cross' : 'drive'
 }
 
 /** 내가 친 샷: 타이밍이 좋을수록 계획한 대로, 나쁠수록 흔들린다 */
-export function playerShot(kind: ShotKind, from: Vec, quality: number, rand = Math.random) {
+export function playerShot(kind: ShotKind, from: Vec, quality: number, rand = Math.random, power?: number) {
   const serve = kind.startsWith('serve')
-  let plans = plan(kind, from, { by: 'you', serve, samples: 400, rand })
-  if (plans.length === 0) plans = plan(kind, from, { by: 'you', serve, samples: 1500, rand })
+  let plans = plan(kind, from, { by: 'you', serve, samples: 400, rand, gameplay: true, power })
+  if (plans.length === 0) plans = plan(kind, from, { by: 'you', serve, samples: 1500, rand, gameplay: true, power })
   if (plans.length === 0) return null
   // 좋은 타이밍은 상위 후보, 나쁜 타이밍은 아래쪽 후보 + 실행 오차
   const pick = plans[Math.min(plans.length - 1, Math.floor((1 - quality) * plans.length * 0.6))]
@@ -292,11 +315,11 @@ function cpuKinds(from: Vec, rand: () => number): ShotKind[] {
 }
 
 /** 상대(CPU)의 샷. 내가 칠 수 있는 시간이 남는 샷만 고른다 */
-export function cpuShot(from: Vec, diff: Difficulty, serve: boolean, rand = Math.random): { v: Vec; kind: ShotKind } {
+export function cpuShot(from: Vec, diff: Difficulty, serve: boolean, rand = Math.random, power?: number): { v: Vec; kind: ShotKind } {
   let fallback: { v: Vec; kind: ShotKind; window: number } | null = null
   const kinds: ShotKind[] = serve ? (rand() < 0.7 ? ['serve-lob', 'serve-hard'] : ['serve-hard', 'serve-lob']) : cpuKinds(from, rand)
   for (const kind of kinds) {
-    const plans = plan(kind, from, { by: 'cpu', serve, samples: 300, rand })
+    const plans = plan(kind, from, { by: 'cpu', serve, samples: 300, rand, power, gameplay: power != null })
     // 어려울수록 가장 예리한 후보, 쉬울수록 무난한 후보
     const start = Math.floor(plans.length * CPU_LEVEL[diff].candidateOffset)
     for (const p of plans.slice(start).concat(plans.slice(0, start))) {
