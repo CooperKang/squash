@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { COURT, Shot, findReachWindow, inCpuReach, inYourReach, simulate, step, type Ball, type Vec } from './physics'
+import { SIM_DT, COURT, Shot, findReachWindow, inCpuReach, inYourReach, simulate, step, type Ball, type Vec } from './physics'
 import { cpuReturnChance, cpuShot, intentFrom, judge, kindFor, newShot, plan, playerShot, type ShotKind } from './shots'
 import { status, winner } from './score'
 
@@ -229,8 +229,7 @@ describe('기술 백과와 혼자 연습 3D', () => {
   it('모든 연습이 끝까지 이어진다', async () => {
     const { DRILLS } = await import('../data/drills')
     const { buildSequence } = await import('./sequence')
-    for (const d of DRILLS)
-      for (const back of [false, true]) expect(buildSequence(d.id, d.start, d.sequence, back).length, `${d.id} ${back}`).toBe(d.sequence.length)
+    for (const d of DRILLS) for (const back of [false, true]) expect(buildSequence(d.id, d.start, d.sequence, back).length, `${d.id} ${back}`).toBe(d.sequence.length)
   })
 })
 
@@ -241,8 +240,35 @@ describe('쉬움 연습 상대의 수비', () => {
     expect(cpuReturnChance('easy', 'drop', 1)).toBeGreaterThanOrEqual(0.79)
     expect(cpuReturnChance('easy', 'drop', 1)).toBeLessThan(cpuReturnChance('easy', 'drive', 0))
   })
-  it('보통·어려움의 수비 확률은 유지한다', () => {
-    expect(cpuReturnChance('normal', 'drive', 0.5)).toBeCloseTo(0.72)
-    expect(cpuReturnChance('hard', 'drop', 0.5)).toBeCloseTo(0.69)
+  it('모든 샷에서 난이도가 높을수록 수비가 강하고 좋은 샷도 쉽게 포기하지 않는다', () => {
+    for (const kind of ['drive', 'drop', 'boast', 'kill'] as ShotKind[])
+      for (const sharp of [0, 0.5, 1]) {
+        const easy = cpuReturnChance('easy', kind, sharp)
+        const normal = cpuReturnChance('normal', kind, sharp)
+        const hard = cpuReturnChance('hard', kind, sharp)
+        expect(normal).toBeGreaterThan(easy)
+        expect(hard).toBeGreaterThan(normal)
+        expect(easy).toBeGreaterThanOrEqual(0.9)
+        expect(normal).toBeGreaterThan(0.96)
+        expect(hard).toBeGreaterThan(0.98)
+        expect(hard).toBeLessThan(1)
+      }
+  })
+})
+
+describe('앞 코트 리턴과 실제 경기 간격의 샷 검증', () => {
+  it('앞벽 가까운 타점에서 대체 샷을 높이 띄워 아웃시키지 않는다', () => {
+    for (const diff of ['easy', 'normal', 'hard'] as const)
+      for (const side of [-1, 1]) {
+        for (const from of [
+          { x: side * 2.7, y: 0.8, z: 0.35 },
+          { x: side * 2.5, y: 1.65, z: 7.1 },
+        ]) {
+          const { v, kind } = cpuShot(from, diff, false, seeded(43))
+          const result = simulate({ p: { ...from }, v }, newShot('cpu', kind, from), 6, SIM_DT)
+          expect(result.result, `${diff} ${JSON.stringify(from)}`).toBe('double')
+          expect(findReachWindow({ p: { ...from }, v }, newShot('cpu', kind, from), inYourReach, 4, SIM_DT)).not.toBeNull()
+        }
+      }
   })
 })

@@ -73,11 +73,33 @@ type Swing = {
   swingIt: boolean // 못 받는 공이면 휘두르지 않고 쫓아가기만
 }
 
+/** 공에서 팔·라켓 길이만큼 옆으로 떨어진 타구 자세. 예측과 실제 이동이 함께 쓴다. */
+export function strikeStance(at: Vec, root: P2) {
+  const side: 1 | -1 = at.x >= root.x - 0.15 ? 1 : -1
+  return { side, stand: { x: clamp(at.x - side * (side > 0 ? 0.92 : 0.6), -2.85, 2.85), z: clamp(at.z + 0.55, 1.2, 9.2) } }
+}
+
+/** 목표에 다가가면 감속한다. 예측과 렌더링 프레임의 이동에 같은 식을 쓴다. */
+function move(root: P2, vel: P2, target: P2, speed: number, dt: number) {
+  const dx = target.x - root.x,
+    dz = target.z - root.z
+  const d = Math.hypot(dx, dz)
+  const want = d < 0.01 ? 0 : Math.min(speed, d * 8)
+  const k = Math.min(1, dt * 12)
+  vel.x += ((d ? (dx / d) * want : 0) - vel.x) * k
+  vel.z += ((d ? (dz / d) * want : 0) - vel.z) * k
+  root.x += vel.x * dt
+  root.z += vel.z * dt
+}
+
 export class CpuBody {
   root: P2 = { ...T_SPOT }
   vel: P2 = { x: 0, z: 0 }
   target: P2 = { ...T_SPOT }
   speed = 3
+  maxSpeed = 6.5
+  recoverySpeed = 2.8
+  recoveryDelay = 0.5
   hop = 1 // 스플릿 스텝 진행(1이면 끝)
   swing: Swing | null = null
   private phase = 0 // 걸음 주기
@@ -99,22 +121,40 @@ export class CpuBody {
 
   /** at에서 inT초 뒤에 공을 친다. 그 전에 공 옆으로 가서 런지한다 */
   plan(at: Vec, inT: number, swingIt = true) {
-    const side: 1 | -1 = at.x >= this.root.x - 0.15 ? 1 : -1
-    // 공이 라켓 쪽 옆에 오게 선다. 백핸드는 라켓 쥔 어깨가 공에서 멀어 조금 더 붙는다
-    const stand = { x: clamp(at.x - side * (side > 0 ? 0.92 : 0.6), -2.85, 2.85), z: clamp(at.z + 0.55, 1.2, 9.2) }
+    const { side, stand } = strikeStance(at, this.root)
     // 앞 코트는 라켓 쪽 발로 런지, 뒤 코트 포핸드는 왼발이 앞으로(닫힌 자세), 백핸드는 오른발이 앞으로
     const lead: 0 | 1 = side > 0 ? (at.z < 5 ? 1 : 0) : 1
     const lunge = { x: clamp(at.x - side * 0.45, -3, 3), z: clamp(at.z + 0.2, 0.8, 9.4) }
     const dist = Math.hypot(stand.x - this.root.x, stand.z - this.root.z)
     this.target = stand
-    this.speed = clamp(dist / Math.max(0.25, inT - 0.35), 1.5, swingIt ? 6.5 : 3.5)
+    this.speed = this.approachSpeed(dist, inT, swingIt ? this.maxSpeed : 3.5)
     this.swing = { t: inT, side, at: { ...at }, lead, lunge, swingIt }
+  }
+
+  configure(level: { maxSpeed: number; recoverySpeed: number; recoveryDelay: number }) {
+    this.maxSpeed = level.maxSpeed
+    this.recoverySpeed = level.recoverySpeed
+    this.recoveryDelay = level.recoveryDelay
+  }
+
+  private approachSpeed(distance: number, inT: number, limit = this.maxSpeed) {
+    return clamp(distance / Math.max(0.08, inT - 0.2), 1.5, limit)
+  }
+
+  /** 가속·감속을 포함해 스윙 시작 전에 타구 자세에 가까이 도착할 수 있는가 */
+  canArrive(at: Vec, inT: number) {
+    const { stand } = strikeStance(at, this.root)
+    const root = { ...this.root },
+      vel = { ...this.vel }
+    const speed = this.approachSpeed(Math.hypot(stand.x - root.x, stand.z - root.z), inT)
+    for (let t = 0; t < inT - 0.06; t += 1 / 120) move(root, vel, stand, speed, Math.min(1 / 120, inT - 0.06 - t))
+    return Math.hypot(root.x - stand.x, root.z - stand.z) < 0.24
   }
 
   /** T로 돌아간다 */
   recover() {
     this.target = { ...T_SPOT }
-    this.speed = 2.8
+    this.speed = this.recoverySpeed
   }
 
   update(dt: number) {
@@ -122,6 +162,7 @@ export class CpuBody {
     const s = this.swing
     if (s) {
       s.t -= dt
+      if (s.t < -this.recoveryDelay) this.recover()
       if (s.t < -0.5) {
         this.swing = null
         this.recover()
@@ -129,16 +170,7 @@ export class CpuBody {
     }
     if (this.hop < 1) this.hop = Math.min(1, this.hop + dt / 0.24)
 
-    // 몸통: 목표를 향해 부드럽게 가속하고 다가가면 줄인다
-    const dx = this.target.x - this.root.x
-    const dz = this.target.z - this.root.z
-    const d = Math.hypot(dx, dz)
-    const want = d < 0.01 ? 0 : Math.min(this.speed, d * 5)
-    const k = Math.min(1, dt * 7)
-    this.vel.x += ((d ? (dx / d) * want : 0) - this.vel.x) * k
-    this.vel.z += ((d ? (dz / d) * want : 0) - this.vel.z) * k
-    this.root.x += this.vel.x * dt
-    this.root.z += this.vel.z * dt
+    move(this.root, this.vel, this.target, this.speed, dt)
     // 걸음: 1.1m에 한 주기(두 걸음)
     this.phase += (Math.hypot(this.vel.x, this.vel.z) * dt * Math.PI * 2) / 1.1
 

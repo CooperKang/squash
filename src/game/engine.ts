@@ -1,19 +1,5 @@
-import {
-  BALL_R,
-  COURT,
-  Shot,
-  aimAt,
-  clamp,
-  inCpuReach,
-  inYourReach,
-  sampleReach,
-  step,
-  timingQuality,
-  type Ball,
-  type Difficulty,
-  type Hitter,
-  type Vec,
-} from './physics'
+import { CPU_LEVEL, chooseIntercept } from './cpu'
+import { BALL_R, COURT, SIM_DT, Shot, aimAt, clamp, inCpuReach, inYourReach, step, timingQuality, type Ball, type Difficulty, type Hitter, type Vec } from './physics'
 import { status, winner, type Score, type Status } from './score'
 import type { RuleKey } from './hints'
 import { BODY, CpuBody, type Joints } from './cpuBody'
@@ -74,6 +60,7 @@ export class Engine {
   // 상대가 공을 칠 시각(내가 친 뒤 경과한 게임 시간 기준)
   private cpuPlan: { returns: boolean; t: number } = { returns: false, t: 0 }
   private cpuClock = 0
+  private gameCarry = 0
   private body = new CpuBody()
   // 쉬움 모드: 칠 타이밍에 누르면 멈추고 공을 크게 보여 칠 곳을 고르게 한다
   private pick: { k: number; dir: 1 | -1; q: number; serve: boolean; sx: number; sy: number; sr: number; kind: ShotKind | null } | null = null
@@ -158,6 +145,7 @@ export class Engine {
   }
 
   newMatch() {
+    this.gameCarry = 0
     this.paused = false
     this.pick = null
     this.hint = null
@@ -279,6 +267,7 @@ export class Engine {
     this.message = ''
     this.rallySaw = { boast: false, backWall: false }
     this.pick = null
+    this.body.configure(CPU_LEVEL[this.difficulty])
     if (this.server === 'you') {
       this.phase = 'serve-you'
       this.toss()
@@ -335,15 +324,23 @@ export class Engine {
         this.phase = 'rally'
         this.rally++
         this.hint = null
-        if (this.body.swing) this.body.swing.t = 0
+        if (this.body.swing) {
+          this.body.swing.t = 0
+          this.body.swing.at = { ...from }
+        }
         this.sfx('hit', 0.7)
         this.emit()
       }
     }
 
     const game = realDt * TIME_SCALE[this.difficulty]
-    for (let i = 0; i < 4; i++) this.physics(game / 4)
-    this.body.update(game)
+    // 예측·실제 공·몸을 같은 간격으로 갱신해 화면 fps에 따라 타구 판정이 달라지지 않게 한다.
+    this.gameCarry += game
+    while (this.gameCarry >= SIM_DT) {
+      this.body.update(SIM_DT)
+      this.physics(SIM_DT)
+      this.gameCarry -= SIM_DT
+    }
 
     const t = this.camTarget()
     const k = Math.min(1, realDt * 7)
@@ -414,32 +411,30 @@ export class Engine {
         this.shot = newShot('cpu', c.kind, from)
         this.lastShot = { by: 'cpu', kind: c.kind, sharp: 0 }
         this.rally++
-        if (this.body.swing) this.body.swing.t = 0
+        if (this.body.swing) {
+          this.body.swing.t = 0
+          this.body.swing.at = { ...from }
+        }
         this.emit()
         this.sfx('hit', 0.6)
       } else if (this.cpuClock > this.cpuPlan.t + 0.3) this.cpuPlan.returns = false
     }
   }
 
-  /**
-   * 내가 친 순간 상대가 받을지 정하고, 받는다면 공을 칠 곳과 시각을 미리 계산해 몸을 움직인다.
-   * 반응 0.15초, 최고 6.5m/s로 갈 수 있는 첫 지점에서 친다. 못 받는 공은 쫓아가다 놓친다.
-   */
+  /** 공 궤적과 몸의 실제 이동을 함께 예측하고, 모션은 선택한 타점·시각을 따라간다. */
   private planCpu() {
     this.cpuClock = 0
+    this.body.configure(CPU_LEVEL[this.difficulty])
     this.body.splitStep()
     const last = this.lastShot
     const chance = cpuReturnChance(this.difficulty, last?.kind ?? 'drive', last?.by === 'you' ? last.sharp : 0)
-    const pts = sampleReach(this.ball, this.shot, inCpuReach)
-    const root = this.body.root
-    const can = pts.find((q) => Math.hypot(q.p.x - root.x, q.p.z + 0.45 - root.z) / 6.5 <= q.t - 0.15)
-    if (can && Math.random() < chance) {
-      this.cpuPlan = { returns: true, t: can.t }
-      this.body.plan(can.p, can.t)
+    const { hit, chase } = chooseIntercept(this.ball, this.shot, this.body, this.difficulty)
+    if (hit && Math.random() < chance) {
+      this.cpuPlan = { returns: true, t: hit.t }
+      this.body.plan(hit.p, hit.t)
       return
     }
     this.cpuPlan = { returns: false, t: 0 }
-    const chase = can ?? pts[Math.floor(pts.length / 2)]
     if (chase) this.body.plan(chase.p, chase.t + 0.35, false)
   }
 
@@ -481,7 +476,11 @@ export class Engine {
     // 점수 알림 뒤에 듀스·게임볼을 이어서 알린다(상태가 바뀔 때만)
     const st = status(this.score)
     if (st && st !== this.lastStatus) {
-      const msg = { deuce: ['듀스! 2점 앞서야 이겨요', '#f2c230'], 'game-ball-you': ['게임볼! 1점이면 이겨요', C.tealBright], 'game-ball-cpu': ['상대 게임볼! 지키세요', '#ff8a7a'] }[st]
+      const msg = {
+        deuce: ['듀스! 2점 앞서야 이겨요', '#f2c230'],
+        'game-ball-you': ['게임볼! 1점이면 이겨요', C.tealBright],
+        'game-ball-cpu': ['상대 게임볼! 지키세요', '#ff8a7a'],
+      }[st]
       this.flash(msg[0], msg[1], 0.8, 0.75)
       this.sfx('alert', 1)
     }
@@ -657,7 +656,11 @@ export class Engine {
     // 오른팔과 라켓
     seg(j.shoulderR, j.elbowR, 0.1, C.teal)
     seg(j.elbowR, j.handR, 0.08, SKIN)
-    const along = (t: number): Vec => ({ x: j.handR.x + (j.racketTip.x - j.handR.x) * t, y: j.handR.y + (j.racketTip.y - j.handR.y) * t, z: j.handR.z + (j.racketTip.z - j.handR.z) * t })
+    const along = (t: number): Vec => ({
+      x: j.handR.x + (j.racketTip.x - j.handR.x) * t,
+      y: j.handR.y + (j.racketTip.y - j.handR.y) * t,
+      z: j.handR.z + (j.racketTip.z - j.handR.z) * t,
+    })
     seg(j.handR, along(0.42), 0.035, C.ink)
     const head = along(0.72)
     const [rx, ry] = this.pt(head.x, head.y, head.z)

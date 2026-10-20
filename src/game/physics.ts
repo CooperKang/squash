@@ -9,6 +9,7 @@ export const COURT = {
   shortLine: 5.44,
 }
 
+export const SIM_DT = 1 / 240
 export const G = 9.8
 export const BALL_R = 0.09 // 실제(2cm)보다 크게 그려 잘 보이게
 const E_FRONT = 0.68
@@ -205,7 +206,7 @@ export function findReachWindow(ball: Ball, shot: Shot, reach: (b: Ball, s: Shot
 }
 
 /** 공을 앞으로 굴려 보며 reach가 참인 순간들(시각과 위치)을 모은다. 샷이 끝나면 멈춘다 */
-export function sampleReach(ball: Ball, shot: Shot, reach: (b: Ball, s: Shot) => boolean, maxT = 4, dt = 1 / 120) {
+export function sampleReach(ball: Ball, shot: Shot, reach: (b: Ball, s: Shot) => boolean, maxT = 5, dt = SIM_DT) {
   const b: Ball = { p: { ...ball.p }, v: { ...ball.v } }
   const s = Object.assign(new Shot(shot.by, shot.serve, shot.serveSide), shot)
   const out: { t: number; p: Vec }[] = []
@@ -225,11 +226,10 @@ export function timingQuality(p: Vec, offBackWall = false, frontCourt = false) {
   return clamp(0.25 + depth * 0.45 + height * 0.3, 0, 1)
 }
 
-/** 상대가 칠 수 있는 순간: 한 번 튄 뒤 내려오는 공이 무릎~허리 높이이거나, 뒤에서 발리 */
+/** 상대의 유효 타점: 앞벽을 맞은 뒤 두 번 튀기 전, 라켓을 뻗을 수 있는 높이 */
 export function inCpuReach(b: Ball, shot: Shot) {
-  if (!shot.frontOk) return false
-  if (shot.floorAfterFront === 1) return b.p.y < 1.2 && b.v.y < 0
-  return b.p.z > 5 && b.p.y < 1.5 && b.p.y > 0.4
+  // 앞 코트 발리와 바운드 직후의 공도 친다. 바닥·틴 높이의 공을 억지로 치지는 않는다.
+  return shot.frontOk && shot.floorAfterFront < 2 && b.p.y >= 0.35 && b.p.y <= 1.65
 }
 
 export function clamp(n: number, lo: number, hi: number) {
