@@ -14,15 +14,34 @@ export class Athlete {
   distance = 0
   baseSpeed = 6.8
   workout = new Workout()
+  recovery = 0
 
   get capacity() {
     return 100 - this.fatigue * 25
   }
   get speedFactor() {
-    return 0.52 + 0.48 * clamp((this.energy - 12) / 60, 0, 1)
+    return 0.28 + 0.72 * this.readiness
   }
   get powerFactor() {
-    return 0.65 + 0.35 * clamp(this.energy / 65, 0, 1)
+    return 0.4 + 0.6 * this.readiness
+  }
+  get readiness() {
+    return clamp(this.energy / 70, 0, 1)
+  }
+  get racketReach() {
+    return 1.1 + 0.25 * this.readiness
+  }
+  get recoveryTime() {
+    return 0.12 + (1 - this.readiness) * 0.55
+  }
+  /** 지치면 무리한 높이의 공에는 닿지 않는다. 예측과 실제 타격에 같은 조건을 쓴다. */
+  strikeHeight(at: Vec, backWall = false) {
+    const minY = (backWall ? BALL_R + 0.01 : 0.3) + (1 - this.readiness) * 0.15
+    const maxY = (backWall ? 2.4 : 2.1) - (1 - this.readiness) * 0.55
+    return at.y >= minY && at.y <= maxY
+  }
+  canStrike(at: Vec, backWall = false) {
+    return this.recovery <= 0 && withinRacketReach(this.root, at, this.racketReach) && this.strikeHeight(at, backWall)
   }
   get atT() {
     return Math.hypot(this.root.x - T_SPOT.x, this.root.z - T_SPOT.z) < 0.9
@@ -35,10 +54,12 @@ export class Athlete {
     this.fatigue = 0
     this.distance = 0
     this.workout = new Workout()
+    this.recovery = 0
   }
 
   /** 실제 이동 거리만 소모한다. T에서 기다리면 효율적으로 회복한다. */
   exert(dt: number, meters: number, atT: boolean, resting = false) {
+    this.recovery = Math.max(0, this.recovery - dt)
     this.distance += meters
     const speed = meters / Math.max(dt, 1e-6)
     if (meters > 0.0001) {
@@ -67,6 +88,7 @@ export class Athlete {
   }
 
   hit(power: number) {
+    this.recovery = this.recoveryTime
     this.workout.hit(power)
     this.energy = Math.max(0, this.energy - (0.35 + power * power * 1.1))
     this.fatigue = clamp(this.fatigue + power * 0.0015, 0, 1)
@@ -83,7 +105,7 @@ export function realisticReach(ball: Ball, shot: Shot) {
   return shot.frontOk && shot.floorAfterFront < 2 && ball.p.y >= minHeight && ball.p.y <= maxHeight
 }
 
-export const withinRacketReach = (root: CourtPoint, at: Vec) => Math.hypot(root.x - at.x, root.z - at.z) <= 1.35
+export const withinRacketReach = (root: CourtPoint, at: Vec, radius = 1.35) => Math.hypot(root.x - at.x, root.z - at.z) <= radius
 
 export type RealismHud = {
   youWorkout: WorkoutHud

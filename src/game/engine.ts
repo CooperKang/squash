@@ -1,4 +1,4 @@
-import { Athlete, chargePower, strikePower, realisticReach, withinRacketReach, type GameMode, type RealismHud, type CourtPoint } from './realism'
+import { Athlete, chargePower, strikePower, realisticReach, type GameMode, type RealismHud, type CourtPoint } from './realism'
 import { CPU_LEVEL, chooseIntercept } from './cpu'
 import { BALL_R, COURT, SIM_DT, Shot, aimAt, clamp, inCpuReach, inYourReach, sampleReach, step, timingQuality, type Ball, type Difficulty, type Hitter, type Vec } from './physics'
 import { status, winner, type Score, type Status } from './score'
@@ -182,7 +182,7 @@ export class Engine {
   /** 자동 테스트용: 지금 칠 수 있는 공의 화면 위치 */
   debugTarget() {
     const reach =
-      (this.phase === 'serve-you' && (this.mode === 'classic' || withinRacketReach(this.player.root, this.ball.p))) ||
+      (this.phase === 'serve-you' && (this.mode === 'classic' || this.player.canStrike(this.ball.p))) ||
       (this.phase === 'rally' && this.shot.by === 'cpu' && this.canYouHit())
     const s = this.project(this.ball.p)
     return reach && s ? { x: s.x, y: s.y, z: this.ball.p.z, y3: this.ball.p.y, back: this.shot.backWall } : null
@@ -232,7 +232,7 @@ export class Engine {
   }
 
   private canYouHit() {
-    return this.mode === 'realistic' ? realisticReach(this.ball, this.shot) && withinRacketReach(this.player.root, this.ball.p) : inYourReach(this.ball, this.shot)
+    return this.mode === 'realistic' ? realisticReach(this.ball, this.shot) && this.player.canStrike(this.ball.p, this.shot.backWall) : inYourReach(this.ball, this.shot)
   }
 
   pointerLeave() {
@@ -247,7 +247,7 @@ export class Engine {
     if (this.phase === 'ready' || this.phase === 'over' || this.paused) return
     if (this.pick) return this.choose(x, y)
     const yourTurn =
-      (this.phase === 'serve-you' && (this.mode === 'classic' || withinRacketReach(this.player.root, this.ball.p))) ||
+      (this.phase === 'serve-you' && (this.mode === 'classic' || this.player.canStrike(this.ball.p))) ||
       (this.phase === 'rally' && this.shot.by === 'cpu' && this.canYouHit())
     const s = this.project(this.ball.p)
     const r = s ? this.hitRadius(s.r) : 0
@@ -305,7 +305,7 @@ export class Engine {
 
   private yourBallNow() {
     return (
-      (this.phase === 'serve-you' && (this.mode === 'classic' || withinRacketReach(this.player.root, this.ball.p))) ||
+      (this.phase === 'serve-you' && (this.mode === 'classic' || this.player.canStrike(this.ball.p))) ||
       (this.phase === 'rally' && this.shot.by === 'cpu' && this.canYouHit())
     )
   }
@@ -535,7 +535,7 @@ export class Engine {
     // 상대 차례: 미리 정한 시각에 공이 칠 수 있는 곳에 오면 친다(몸은 그 시각에 맞춰 스윙하고 있다)
     if (this.shot.by === 'you' && this.cpuPlan.returns) {
       this.cpuClock += dt
-      if (this.cpuClock >= this.cpuPlan.t - 0.004 && inCpuReach(this.ball, this.shot)) {
+      if (this.cpuClock >= this.cpuPlan.t - 0.004 && inCpuReach(this.ball, this.shot) && (this.mode !== 'realistic' || this.opponent.canStrike(this.ball.p))) {
         const from = { ...this.ball.p }
         const power = this.cpuPower(from)
         const c = cpuShot(from, this.difficulty, false, Math.random, power)
@@ -558,7 +558,7 @@ export class Engine {
   private configureCpu() {
     const level = CPU_LEVEL[this.difficulty]
     const factor = this.mode === 'realistic' ? this.opponent.speedFactor : 1
-    this.body.configure({ maxSpeed: level.maxSpeed * factor, recoverySpeed: level.recoverySpeed * factor, recoveryDelay: level.recoveryDelay })
+    this.body.configure({ maxSpeed: level.maxSpeed * factor, recoverySpeed: level.recoverySpeed * factor, recoveryDelay: level.recoveryDelay + (this.mode === 'realistic' ? this.opponent.recoveryTime - 0.12 : 0) })
   }
 
   private cpuPower(from: Vec) {
@@ -568,10 +568,10 @@ export class Engine {
   private planPlayer() {
     if (this.mode !== 'realistic') return
     this.playerPlanIn = 0.1
-    const pts = sampleReach(this.ball, this.shot, realisticReach)
+    const pts = sampleReach(this.ball, this.shot, (b, s) => realisticReach(b, s) && this.player.strikeHeight(b.p, s.backWall))
     const root = this.player.root
     const speed = this.player.baseSpeed * this.player.speedFactor
-    const can = pts.find((q) => Math.max(0, Math.hypot(q.p.x - root.x, q.p.z - root.z) - 0.8) / speed + 0.12 <= q.t)
+    const can = pts.find((q) => q.t >= this.player.recovery && Math.max(0, Math.hypot(q.p.x - root.x, q.p.z - root.z) - (this.player.racketReach - 0.55)) / speed + 0.12 <= q.t)
     const target = can ?? pts.at(-1)
     this.playerIntercept = target ? { x: target.p.x, z: clamp(target.p.z + 0.4, 1.2, 9.1) } : null
     if (this.playerIntercept) this.player.target = { ...this.playerIntercept }
@@ -584,7 +584,7 @@ export class Engine {
     this.body.splitStep()
     const last = this.lastShot
     const chance = cpuReturnChance(this.difficulty, last?.kind ?? 'drive', last?.by === 'you' ? last.sharp : 0)
-    const { hit, chase } = chooseIntercept(this.ball, this.shot, this.body, this.difficulty)
+    const { hit, chase } = chooseIntercept(this.ball, this.shot, this.body, this.difficulty, (b, s) => inCpuReach(b, s) && (this.mode !== 'realistic' || this.opponent.strikeHeight(b.p)))
     if (hit && Math.random() < chance) {
       this.cpuPlan = { returns: true, t: hit.t }
       this.body.plan(hit.p, hit.t)
@@ -780,117 +780,74 @@ export class Engine {
     this.drawFlashes()
   }
 
-  /** 상대 선수: 관절을 화면에 투영해 굵기가 거리에 맞게 줄어드는 선으로 그린다(뒤에서 본 모습) */
+  /** 옷·피부·머리카락 없이 단색 관절 실루엣으로 표시한다. */
   private drawCpu() {
     const c = this.ctx
     const j: Joints = this.body.joints()
+    const color = '#426875'
     const k = (v: Vec) => this.f / Math.max(0.3, CAM.z - v.z)
     const pieces: { depth: number; draw: () => void }[] = []
-    const paintSeg = (a: Vec, b: Vec, w: number, color: string) => {
-      const pa = this.pt(a.x, a.y, a.z)
-      const pb = this.pt(b.x, b.y, b.z)
-      c.strokeStyle = color
-      c.lineWidth = Math.max(1.5, (w * (k(a) + k(b))) / 2)
-      c.lineCap = 'round'
-      c.beginPath()
-      c.moveTo(pa[0], pa[1])
-      c.lineTo(pb[0], pb[1])
-      c.stroke()
-    }
-    // 팔을 항상 몸통 위에 덧칠하지 않는다. 긴 선도 나눠 깊이 교차를 표현한다.
-    const seg = (a: Vec, b: Vec, w: number, color: string) => {
-      const at = (t: number): Vec => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t })
-      for (let i = 0; i < 4; i++) {
-        const start = at(i / 4),
-          end = at((i + 1) / 4)
-        pieces.push({ depth: (start.z + end.z) / 2, draw: () => paintSeg(start, end, w, color) })
+    // 두 조각으로 나눠 팔이 몸통 앞뒤를 지나는 순서를 유지한다.
+    const seg = (a: Vec, b: Vec, width: number) => {
+      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, z: (a.z + b.z) / 2 }
+      for (const [from, to] of [[a, mid], [mid, b]]) {
+        pieces.push({ depth: (from.z + to.z) / 2, draw: () => {
+          const pa = this.pt(from.x, from.y, from.z), pb = this.pt(to.x, to.y, to.z)
+          c.strokeStyle = color
+          c.lineWidth = Math.max(1.5, width * (k(from) + k(to)) / 2)
+          c.lineCap = 'round'
+          c.beginPath()
+          c.moveTo(...pa)
+          c.lineTo(...pb)
+          c.stroke()
+        } })
       }
     }
-    const SKIN = '#d9b99a'
-    // 카메라(내 자리) 가까이 오면 공을 가리지 않게 흐리게
     c.save()
     c.globalAlpha = 1 - clamp((j.pelvis.z - 7.4) / 1.4, 0, 0.45)
-    // 그림자
     const [sx, sy] = this.pt(j.pelvis.x, 0, j.pelvis.z)
-    c.fillStyle = 'rgb(0 0 0 / 0.16)'
+    c.fillStyle = 'rgb(0 0 0 / 0.12)'
     c.beginPath()
-    c.ellipse(sx, sy, k(j.pelvis) * 0.42, k(j.pelvis) * 0.1, 0, 0, Math.PI * 2)
+    c.ellipse(sx, sy, k(j.pelvis) * 0.35, k(j.pelvis) * 0.08, 0, 0, Math.PI * 2)
     c.fill()
-    // 다리: 맨다리, 신발. 반바지는 골반에 붙여 그려 무릎을 굽혀도 뭉쳐 보이지 않게
     for (const [hip, knee, ankle, toe] of [
       [j.hipL, j.kneeL, j.ankleL, j.toeL],
       [j.hipR, j.kneeR, j.ankleR, j.toeR],
-    ] as const) {
-      seg(hip, knee, 0.12, SKIN)
-      seg(knee, ankle, 0.1, SKIN)
-      seg(ankle, toe, 0.11, '#f4f6f5')
+    ]) {
+      seg(hip, knee, 0.12)
+      seg(knee, ankle, 0.1)
+      seg(ankle, toe, 0.1)
     }
-    // 골반 두 덩이를 둥근 선으로 그리지 않고, 헐렁한 반바지를 하나의 옷 형태로 덮는다.
-    const shorts = [
-      { x: j.hipL.x - 0.13, y: j.pelvis.y + 0.08, z: j.pelvis.z + 0.07 },
-      { x: j.hipR.x + 0.13, y: j.pelvis.y + 0.08, z: j.pelvis.z + 0.07 },
-      { x: j.hipR.x + 0.16, y: j.pelvis.y - 0.26, z: j.pelvis.z + 0.07 },
-      { x: j.pelvis.x + 0.035, y: j.pelvis.y - 0.26, z: j.pelvis.z + 0.07 },
-      { x: j.pelvis.x, y: j.pelvis.y - 0.12, z: j.pelvis.z + 0.07 },
-      { x: j.pelvis.x - 0.035, y: j.pelvis.y - 0.26, z: j.pelvis.z + 0.07 },
-      { x: j.hipL.x - 0.16, y: j.pelvis.y - 0.26, z: j.pelvis.z + 0.07 },
-    ]
-    pieces.push({
-      depth: j.pelvis.z + 0.07,
-      draw: () =>
-        this.poly(
-          shorts.map((p) => this.pt(p.x, p.y, p.z)),
-          '#28343b',
-        ),
-    })
-    // 몸통과 어깨
-    seg(j.pelvis, j.chest, 0.3, C.teal)
-    seg(j.shoulderL, j.shoulderR, 0.15, C.teal)
-    // 왼팔
-    seg(j.shoulderL, j.elbowL, 0.1, C.teal)
-    seg(j.elbowL, j.handL, 0.08, SKIN)
-    // 머리(뒤통수)
-    pieces.push({
-      depth: j.head.z,
-      draw: () => {
-        const [hx, hy] = this.pt(j.head.x, j.head.y, j.head.z)
-        c.fillStyle = '#2b2522'
-        c.beginPath()
-        c.arc(hx, hy, k(j.head) * BODY.headR, 0, Math.PI * 2)
-        c.fill()
-      },
-    })
-    // 오른팔과 라켓
-    seg(j.shoulderR, j.elbowR, 0.1, C.teal)
-    seg(j.elbowR, j.handR, 0.08, SKIN)
+    seg(j.pelvis, j.chest, 0.27)
+    seg(j.shoulderL, j.shoulderR, 0.12)
+    seg(j.shoulderL, j.elbowL, 0.09)
+    seg(j.elbowL, j.handL, 0.075)
+    seg(j.shoulderR, j.elbowR, 0.09)
+    seg(j.elbowR, j.handR, 0.075)
+    pieces.push({ depth: j.head.z, draw: () => {
+      const [x, y] = this.pt(j.head.x, j.head.y, j.head.z)
+      c.fillStyle = color
+      c.beginPath()
+      c.arc(x, y, k(j.head) * BODY.headR, 0, Math.PI * 2)
+      c.fill()
+    } })
     const along = (t: number): Vec => ({
       x: j.handR.x + (j.racketTip.x - j.handR.x) * t,
       y: j.handR.y + (j.racketTip.y - j.handR.y) * t,
       z: j.handR.z + (j.racketTip.z - j.handR.z) * t,
     })
-    seg(j.handR, along(0.42), 0.035, C.ink)
+    seg(j.handR, along(0.42), 0.025)
     const head = along(0.72)
-    pieces.push({
-      depth: head.z,
-      draw: () => {
-        const [rx, ry] = this.pt(head.x, head.y, head.z)
-        const [tx, ty] = this.pt(j.racketTip.x, j.racketTip.y, j.racketTip.z)
-        const [nx, ny] = this.pt(along(0.42).x, along(0.42).y, along(0.42).z)
-        const ang = Math.atan2(ty - ny, tx - nx)
-        const long = Math.max(4, Math.hypot(tx - nx, ty - ny) / 2)
-        c.save()
-        c.translate(rx, ry)
-        c.rotate(ang)
-        c.beginPath()
-        c.ellipse(0, 0, long, Math.max(3, k(head) * 0.095), 0, 0, Math.PI * 2)
-        c.fillStyle = 'rgb(255 255 255 / 0.35)'
-        c.fill()
-        c.lineWidth = Math.max(1.5, k(head) * 0.025)
-        c.strokeStyle = C.silver
-        c.stroke()
-        c.restore()
-      },
-    })
+    pieces.push({ depth: head.z, draw: () => {
+      const [x, y] = this.pt(head.x, head.y, head.z)
+      const [tx, ty] = this.pt(j.racketTip.x, j.racketTip.y, j.racketTip.z)
+      const neck = along(0.42), [nx, ny] = this.pt(neck.x, neck.y, neck.z)
+      c.beginPath()
+      c.ellipse(x, y, Math.max(4, Math.hypot(tx - nx, ty - ny) / 2), Math.max(3, k(head) * 0.095), Math.atan2(ty - ny, tx - nx), 0, Math.PI * 2)
+      c.lineWidth = Math.max(1.5, k(head) * 0.025)
+      c.strokeStyle = color
+      c.stroke()
+    } })
     pieces.sort((a, b) => a.depth - b.depth).forEach((p) => p.draw())
     c.restore()
   }

@@ -44,9 +44,9 @@ export const CPU_LEVEL = {
 export type Intercept = { t: number; p: Vec }
 
 /** 타구 위치까지 가는 실제 이동을 예측한다. 팔꿈치·발걸음의 표시 상태와는 무관하다. */
-export function chooseIntercept(ball: Ball, shot: Shot, body: CpuBody, difficulty: Difficulty): { hit: Intercept | null; chase: Intercept | null } {
+export function chooseIntercept(ball: Ball, shot: Shot, body: CpuBody, difficulty: Difficulty, reach = inCpuReach): { hit: Intercept | null; chase: Intercept | null } {
   const level = CPU_LEVEL[difficulty]
-  const pts = sampleReach(ball, shot, inCpuReach)
+  const pts = sampleReach(ball, shot, reach)
   let hit: Intercept | null = null
   let best = Infinity
   for (const q of pts) {
@@ -54,7 +54,7 @@ export function chooseIntercept(ball: Ball, shot: Shot, body: CpuBody, difficult
     if (hit && q.t > hit.t + 0.18) break
     const { stand } = strikeStance(q.p, body.root)
     const distance = Math.hypot(stand.x - body.root.x, stand.z - body.root.z)
-    if (q.t < level.reaction || distance > level.maxSpeed * (q.t - level.reaction)) continue
+    if (q.t < level.reaction || distance > body.maxSpeed * (q.t - level.reaction)) continue
     if (!body.canArrive(q.p, q.t)) continue
     const score = q.t + Math.abs(q.p.y - 0.85) * 0.16 + Math.hypot(stand.x - T_SPOT.x, stand.z - T_SPOT.z) * 0.025
     if (score < best) {

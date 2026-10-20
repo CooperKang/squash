@@ -127,7 +127,7 @@ export class CpuBody {
     const lunge = { x: clamp(at.x - side * 0.45, -3, 3), z: clamp(at.z + 0.2, 0.8, 9.4) }
     const dist = Math.hypot(stand.x - this.root.x, stand.z - this.root.z)
     this.target = stand
-    this.speed = this.approachSpeed(dist, inT, swingIt ? this.maxSpeed : 3.5)
+    this.speed = this.approachSpeed(dist, inT, swingIt ? this.maxSpeed : Math.min(3.5, this.maxSpeed))
     this.swing = { t: inT, side, at: { ...at }, lead, lunge, swingIt }
   }
 
@@ -163,7 +163,7 @@ export class CpuBody {
     if (s) {
       s.t -= dt
       if (s.t < -this.recoveryDelay) this.recover()
-      if (s.t < -0.5) {
+      if (s.t < -Math.max(0.5, this.recoveryDelay + 0.1)) {
         this.swing = null
         this.recover()
       }

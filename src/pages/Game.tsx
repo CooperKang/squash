@@ -379,7 +379,7 @@ function ScoreChip({ label, value, serving, accent, energy, workout }: { label: 
             체력 {Math.round(energy)}%
             <div className="my-1 h-1 overflow-hidden rounded-full bg-white/20"><div className={`h-full rounded-full ${energy < 30 ? 'bg-dot' : 'bg-white/90'}`} style={{ width: `${energy}%` }} /></div>
           </div>
-          <div className="text-white/75">{workout.intensity}</div>
+          <div className="text-white/75">{energy < 20 ? '탈진 · 범위 축소' : energy < 40 ? '지침 · 속도 저하' : workout.intensity}</div>
           <div>예상 {workout.calories.toFixed(1)} kcal</div>
         </div>
       )}
