@@ -3,7 +3,7 @@ import { clamp, type Vec } from './physics'
 // 상대 선수의 몸. 공을 칠 곳과 시각을 미리 받아 스플릿 스텝 → 이동 → 런지 → 스윙 → T로 복귀를 보여 준다.
 // 관절을 하나하나 맞추기보다 매끄럽게 보이도록 단순하게 만든다:
 // 걸음은 이동한 거리에 맞춰 다리를 앞뒤로 흔들고, 런지는 한 자세로 부드럽게 섞고,
-// 스윙은 팔과 라켓이 어깨를 축으로 큰 호를 그린다. 앞벽을 보고 서 있으므로 오른손(라켓)은 +x 쪽이다.
+// 스윙은 타구 쪽에 맞춰 팔을 준비하고, 손목과 팔꿈치를 부드럽게 굽혀 큰 호를 그린다. 앞벽을 보고 서 있으므로 오른손(라켓)은 +x 쪽이다.
 
 type P2 = { x: number; z: number }
 
@@ -28,7 +28,7 @@ export type Joints = {
   racketTip: Vec
 }
 
-export const BODY = { thigh: 0.46, shin: 0.46, torso: 0.5, arm: 0.52, racket: 0.62, headR: 0.11, ankle: 0.07 }
+export const BODY = { thigh: 0.46, shin: 0.46, torso: 0.5, arm: 0.52, upperArm: 0.28, forearm: 0.27, racket: 0.62, headR: 0.11, ankle: 0.07 }
 export const T_SPOT = { x: 0, z: 5.6 }
 
 const add = (a: Vec, b: Vec): Vec => ({ x: a.x + b.x, y: a.y + b.y, z: a.z + b.z })
@@ -38,7 +38,15 @@ const len = (a: Vec) => Math.hypot(a.x, a.y, a.z)
 const norm = (a: Vec) => mul(a, 1 / (len(a) || 1))
 const dot = (a: Vec, b: Vec) => a.x * b.x + a.y * b.y + a.z * b.z
 /** 두 방향 사이를 고르게 돈다 */
-const turn = (a: Vec, b: Vec, k: number) => norm(add(mul(a, 1 - k), mul(b, k)))
+const turn = (a: Vec, b: Vec, k: number) => {
+  const cosine = clamp(dot(a, b), -1, 1)
+  if (cosine > 0.999) return norm(add(mul(a, 1 - k), mul(b, k)))
+  const angle = Math.acos(cosine)
+  // 반대 방향으로 돌아도 중간에 방향 벡터가 0이 되거나 갑자기 뒤집히지 않는다.
+  const axis = Math.abs(a.y) < 0.9 ? { x: 0, y: 1, z: 0 } : { x: 1, y: 0, z: 0 }
+  const tangent = cosine < -0.999 ? norm(sub(axis, mul(a, dot(axis, a)))) : norm(sub(b, mul(a, cosine)))
+  return add(mul(a, Math.cos(angle * k)), mul(tangent, Math.sin(angle * k)))
+}
 const smooth = (k: number) => {
   const t = clamp(k, 0, 1)
   return t * t * (3 - 2 * t)
@@ -206,16 +214,28 @@ export class CpuBody {
     const hipL = { x: pelvis.x - 0.1, y: pelvis.y, z: pelvis.z }
     const hipR = { x: pelvis.x + 0.1, y: pelvis.y, z: pelvis.z }
 
-    // 라켓 팔: 어깨에서 뻗은 방향 하나로 팔과 라켓을 함께 돌린다(팔꿈치는 살짝만 굽힘)
-    const ready = norm({ x: 0.45, y: 0.15, z: -0.85 })
-    const back = side > 0 ? norm({ x: 0.55, y: 0.85, z: 0.45 }) : norm({ x: -0.85, y: 0.7, z: 0.25 })
-    const contact = s ? norm(sub(s.at, shoulderR)) : ready
-    const follow = side > 0 ? norm({ x: -0.75, y: 0.55, z: -0.45 }) : norm({ x: 0.75, y: 0.75, z: -0.2 })
-    const keys = [ready, back, contact, follow, ready]
-    const dir = s && s.swingIt ? turn(keys[i], keys[i + 1], f) : ready
-    const handR = add(shoulderR, mul(dir, BODY.arm))
-    const elbowR = add(add(shoulderR, mul(dir, BODY.arm * 0.5)), { x: 0, y: -0.05, z: 0.02 })
-    const racketTip = add(handR, mul(dir, BODY.racket))
+    // 오른손잡이: 백핸드는 오른팔을 가슴 앞으로 가져와 왼쪽에서 준비한다.
+    // 손과 라켓의 경로를 분리해 팔 전체가 곧은 막대처럼 회전하지 않게 한다.
+    const local = (p: Vec): Vec => ({ x: p.x * Math.cos(yaw) - p.z * Math.sin(yaw), y: p.y, z: p.x * Math.sin(yaw) + p.z * Math.cos(yaw) })
+    const readyHand = local({ x: 0.04, y: -0.22, z: -0.34 })
+    const backHand = local(side > 0 ? { x: 0.3, y: 0.12, z: 0.28 } : { x: -0.4, y: 0.08, z: -0.3 })
+    const contact = s ? norm(sub(s.at, shoulderR)) : norm(readyHand)
+    // 라켓 면이 공에 닿도록 타점 높이·거리에 맞춰 손을 뻗는다. 팔 길이는 일정하다.
+    const extension = s ? clamp(len(sub(s.at, shoulderR)) - BODY.racket * 0.72, 0.18, BODY.arm) : BODY.arm
+    const contactHand = mul(contact, extension)
+    const followHand = local(side > 0 ? { x: -0.36, y: 0.14, z: -0.3 } : { x: 0.3, y: 0.22, z: -0.28 })
+    const handKeys = [readyHand, backHand, contactHand, followHand, readyHand]
+    const handOffset = s && s.swingIt ? add(mul(handKeys[i], 1 - f), mul(handKeys[i + 1], f)) : readyHand
+    // 팔꿈치는 항상 몸 바깥·아래로 굽힌다. 백핸드 때도 뒤로 뒤집히지 않는다.
+    const arm = ik(shoulderR, add(shoulderR, handOffset), BODY.upperArm, BODY.forearm, local({ x: 0.85, y: -0.55, z: -0.2 }))
+    const handR = arm.end
+    const elbowR = arm.mid
+    const readyRacket = norm(local({ x: 0.18, y: 0.85, z: -0.35 }))
+    const backRacket = norm(local(side > 0 ? { x: 0.25, y: 0.95, z: 0.2 } : { x: -0.4, y: 0.9, z: -0.15 }))
+    const followRacket = norm(local(side > 0 ? { x: -0.7, y: 0.7, z: -0.2 } : { x: 0.65, y: 0.75, z: -0.15 }))
+    const racketKeys = [readyRacket, backRacket, contact, followRacket, readyRacket]
+    const racketDir = s && s.swingIt ? turn(racketKeys[i], racketKeys[i + 1], f) : readyRacket
+    const racketTip = add(handR, mul(racketDir, BODY.racket))
 
     // 반대 팔: 준비 땐 앞에, 포핸드 스윙 땐 앞으로 뻗어 균형, 백핸드 땐 뒤로
     const relaxed = norm({ x: -0.35, y: -0.55, z: -0.6 })

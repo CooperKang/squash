@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { COURT, Shot, findReachWindow, inCpuReach, inYourReach, simulate, step, type Ball, type Vec } from './physics'
-import { cpuShot, intentFrom, judge, kindFor, newShot, plan, playerShot, type ShotKind } from './shots'
+import { cpuReturnChance, cpuShot, intentFrom, judge, kindFor, newShot, plan, playerShot, type ShotKind } from './shots'
 import { status, winner } from './score'
 
 function seeded(seed: number) {
@@ -231,5 +231,18 @@ describe('기술 백과와 혼자 연습 3D', () => {
     const { buildSequence } = await import('./sequence')
     for (const d of DRILLS)
       for (const back of [false, true]) expect(buildSequence(d.id, d.start, d.sequence, back).length, `${d.id} ${back}`).toBe(d.sequence.length)
+  })
+})
+
+describe('쉬움 연습 상대의 수비', () => {
+  it('좋은 샷과 짧은 샷에도 랠리를 이어갈 만큼 리턴을 시도한다', () => {
+    expect(cpuReturnChance('easy', 'drive', 0)).toBeGreaterThanOrEqual(0.95)
+    expect(cpuReturnChance('easy', 'drive', 1)).toBeGreaterThanOrEqual(0.83)
+    expect(cpuReturnChance('easy', 'drop', 1)).toBeGreaterThanOrEqual(0.79)
+    expect(cpuReturnChance('easy', 'drop', 1)).toBeLessThan(cpuReturnChance('easy', 'drive', 0))
+  })
+  it('보통·어려움의 수비 확률은 유지한다', () => {
+    expect(cpuReturnChance('normal', 'drive', 0.5)).toBeCloseTo(0.72)
+    expect(cpuReturnChance('hard', 'drop', 0.5)).toBeCloseTo(0.69)
   })
 })

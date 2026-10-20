@@ -325,12 +325,15 @@ export function cpuShot(from: Vec, diff: Difficulty, serve: boolean, rand = Math
   return { v: aimAt(from, { x: 0, y: 2.6, z: 0 }, 11), kind: 'drive' }
 }
 
-const CPU_BASE: Record<Difficulty, number> = { easy: 0.78, normal: 0.9, hard: 0.97 }
+const CPU_BASE: Record<Difficulty, number> = { easy: 0.96, normal: 0.9, hard: 0.97 }
 
 /** 내 샷이 얼마나 예리했는지에 따라 상대가 받아낼 확률 */
 export function cpuReturnChance(diff: Difficulty, kind: ShotKind, sharp: number) {
-  const short = SHORT_KINDS.includes(kind) ? 0.1 : 0
-  return clamp(CPU_BASE[diff] - sharp * 0.36 - short, 0.15, 0.97)
+  // 쉬움은 랠리를 이어 주는 연습 상대: 공격은 편하게 받되 좋은 샷에도 쉽게 포기하지 않는다.
+  // 실제 이동으로 닿지 못하는 공은 엔진의 도달 판정에서 그대로 놓친다.
+  const short = SHORT_KINDS.includes(kind) ? (diff === 'easy' ? 0.04 : 0.1) : 0
+  const pressure = diff === 'easy' ? 0.12 : 0.36
+  return clamp(CPU_BASE[diff] - clamp(sharp, 0, 1) * pressure - short, 0.15, 0.97)
 }
 
 export function canBoast(p: Vec) {
