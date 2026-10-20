@@ -256,19 +256,41 @@ export const MOVES: Record<string, Move> = {
     ],
   },
 
-  '허리 비틀기와 아기 자세': (() => {
-    const lie: Pose = { lean: -90, a: floor(30), b: floor(30), ha: [270, 270, 0, 0.55], hb: [270, 270, 0, 0.55] }
-    const child: Pose = { lean: 100, head: 30, a: [75, -95, -5], b: [75, -95, -5], ha: floor(56), hb: floor(54), step: 1 }
+  '누워서 허리 비틀기': (() => {
+    // 위에서 내려다본 모습: 팔은 T자, 무릎이 좌우로 넘어간다
+    const up: Pose = { h: 52, a: [4, -2, 0, 0.5, 0.6], b: [-4, 2, 0, 0.5, 0.6], ha: [90, 90], hb: [-90, -90] }
+    return {
+      view: 'front',
+      top: true,
+      caption: '위에서 본 모습',
+      focus: ['torso'],
+      keys: [
+        { ...up, dur: 1, hold: 0.6 },
+        { ...up, a: [62, -35, 0, 0.95, 0.8], b: [72, -25, 0, 0.95, 0.8], head: -14, dur: 1.4, hold: 2, step: 1 },
+        { ...up, dur: 1, hold: 0.6 },
+        { ...up, a: [-72, 25, 0, 0.95, 0.8], b: [-62, 35, 0, 0.95, 0.8], head: 14, dur: 1.4, hold: 2, step: 1 },
+      ],
+    }
+  })(),
+
+  '고양이 자세와 아기 자세': (() => {
+    // 무릎은 제자리, 손은 바닥에 둔 채 등을 말고 펴다가 엉덩이를 뒤로 내린다
+    const fours: Pose = { lean: 88, a: [0, -90, 0], b: [0, -90, 0], ha: floor(32), hb: floor(32) }
+    const cat: Pose = { ...fours, bow: 7, head: 45, dur: 1.2, hold: 0.5 }
+    const cow: Pose = { ...fours, bow: -5, head: -30, dur: 1.2, hold: 0.5 }
     return {
       view: 'side',
+      anchor: 'kneeA',
       focus: ['torso'],
       mat: true,
       keys: [
-        { ...lie, cut: true, hold: 0.5 },
-        { ...lie, a: [100, 30], b: [104, 36], dur: 1.2, hold: 1.8 },
-        { ...lie, dur: 1, hold: 0.4 },
-        { ...child, cut: true, hold: 1.4 },
-        { ...child, lean: 104, ha: floor(60), hb: floor(58), dur: 1.2, hold: 1.4 },
+        { ...fours, dur: 1.2, hold: 0.4 },
+        cat,
+        cow,
+        cat,
+        cow,
+        { ...fours, dur: 0.8, hold: 0.2 },
+        { lean: 100, bow: 4, head: 20, a: [60, -95, 0], b: [60, -95, 0], ha: floor(46), hb: floor(44), dur: 1.5, hold: 2.4, step: 1 },
       ],
     }
   })(),

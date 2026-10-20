@@ -53,6 +53,7 @@ export function StretchFigure({ move, label, onStep, className }: Props) {
       <svg viewBox={`${box.x} ${-box.y1} ${box.w} ${box.h}`} className="h-full w-full" role="img" aria-label={`${label} 동작 그림`}>
         <Scene fig={fig} move={move} />
       </svg>
+      {move.caption && <span className="absolute top-2.5 left-3 text-[12px] font-semibold text-muted">{move.caption}</span>}
       <button
         type="button"
         onClick={() => setPaused((p) => !p)}
@@ -142,8 +143,14 @@ function Scene({ fig, move }: { fig: Figure; move: Move }) {
 
   return (
     <g>
-      {move.mat && <rect x={-200} y={-1.5} width={400} height={3} rx={1.5} fill="#d4ebed" />}
-      <line x1={-400} y1={0} x2={400} y2={0} stroke="#c9cdcc" strokeWidth={1.5} />
+      {move.top ? (
+        <rect x={-38} y={-118} width={76} height={122} rx={8} fill="#d4ebed" />
+      ) : (
+        <>
+          {move.mat && <rect x={-200} y={-1.5} width={400} height={3} rx={1.5} fill="#d4ebed" />}
+          <line x1={-400} y1={0} x2={400} y2={0} stroke="#c9cdcc" strokeWidth={1.5} />
+        </>
+      )}
       {move.wall != null && <rect x={move.wall} y={-140} width={6} height={140} fill="#dfe2e1" stroke="#c9cdcc" strokeWidth={1} />}
       {move.bar != null && <line x1={move.bar} y1={-62} x2={move.bar} y2={0} stroke="#c9cdcc" strokeWidth={3} strokeLinecap="round" />}
       {farArm.map((s) => line(s, limbW * 0.9, far))}
@@ -161,7 +168,7 @@ function Scene({ fig, move }: { fig: Figure; move: Move }) {
           strokeLinecap="round"
         />
       )}
-      {line('torso', limbW + 3, false)}
+      <Torso fig={fig} on={focus.has('torso')} w={limbW + 3} />
       <line x1={p.shoulder.x} y1={flip(p.shoulder.y)} x2={p.neck.x} y2={flip(p.neck.y)} stroke={INK} strokeWidth={limbW - 1} strokeLinecap="round" />
       {dot('head', L.head, INK)}
       {fig.racket > 0.05 && <Racket fig={fig} />}
@@ -169,6 +176,13 @@ function Scene({ fig, move }: { fig: Figure; move: Move }) {
       {nearArm.map((s) => line(s, limbW * 0.9, false))}
     </g>
   )
+}
+
+/** 몸통: 등이 휘면 곡선으로 */
+function Torso({ fig, on, w }: { fig: Figure; on: boolean; w: number }) {
+  const { hip: a, shoulder: b } = fig.p
+  const c = { x: 2 * fig.spine.x - (a.x + b.x) / 2, y: 2 * fig.spine.y - (a.y + b.y) / 2 }
+  return <path d={`M${a.x} ${flip(a.y)} Q${c.x} ${flip(c.y)} ${b.x} ${flip(b.y)}`} fill="none" stroke={on ? FOCUS : INK} strokeWidth={w} strokeLinecap="round" />
 }
 
 function Roller({ c, r, turn }: { c: { x: number; y: number }; r: number; turn: number }) {

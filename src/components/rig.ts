@@ -44,6 +44,7 @@ export type Pose = {
   lift?: number // 바닥에서 뜬 높이(뛰기)
   roll?: number // 폼롤러가 닿는 자리(구간 비율)
   racket?: number // 라켓 보임(0~1)
+  bow?: number // 등이 휜 정도: +는 둥글게 맒(고양이), -는 젖힘(소)
   dur?: number // 앞 자세에서 오는 시간(초)
   hold?: number // 이 자세로 머무는 시간
   step?: number // 설명 몇 번째 줄인지
@@ -62,6 +63,8 @@ export type Move = {
   wall?: number // 벽의 x
   bar?: number // 짚는 봉의 x
   mat?: boolean
+  top?: boolean // 위에서 내려다본 그림(누운 자세): 바닥선 대신 매트를 그린다
+  caption?: string // 그림 구석에 적는 말(보는 방향 등)
 }
 
 export const L = { torso: 30, neck: 4.5, head: 6.5, upper: 15, fore: 14, palm: 5, thigh: 23, shin: 22, foot: 7 }
@@ -75,7 +78,7 @@ const sub = (p: V, q: V): V => ({ x: p.x - q.x, y: p.y - q.y })
 export const angleOf = (v: V) => (Math.atan2(v.x, -v.y) * 180) / Math.PI
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 
-export type Figure = { p: Record<Name, V>; racket: number; roller?: { c: V; r: number; turn: number } }
+export type Figure = { p: Record<Name, V>; racket: number; spine: V; roller?: { c: V; r: number; turn: number } }
 
 const isReach = (l: Limb): l is Reach => !Array.isArray(l)
 
@@ -203,7 +206,10 @@ export function resolve(pose: Pose, move: Move): Figure {
   reachLeg('A', pose.a)
   reachArm('A', pose.ha)
   reachArm('B', pose.hb)
-  return { p, racket: pose.racket ?? 0, roller }
+  // 등이 휘면 몸통 한가운데가 등 쪽으로 나온다
+  const back = dir(tDir + 90, pose.bow ?? 0)
+  const spine = { x: (p.hip.x + p.shoulder.x) / 2 + back.x, y: (p.hip.y + p.shoulder.y) / 2 + back.y }
+  return { p, racket: pose.racket ?? 0, spine, roller }
 }
 
 export function segEnds(s: Seg): [Name, Name] {
@@ -310,6 +316,7 @@ function mix(k0: Pose, k1: Pose, t: number, f0: Figure, f1: Figure, move: Move):
     roll: n(k0.roll, k1.roll, 0.5),
     x: n(k0.x, k1.x, 0),
     racket: n(k0.racket, k1.racket, 0),
+    bow: n(k0.bow, k1.bow, 0),
     a: mixLimb(k0.a, k1.a, t, f0, f1, 'leg', 'A'),
     b: mixLimb(k0.b, k1.b, t, f0, f1, 'leg', 'B'),
     ha: mixLimb(k0.ha, k1.ha, t, f0, f1, 'arm', 'A'),
