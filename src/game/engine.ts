@@ -623,24 +623,25 @@ export class Engine {
     const SKIN = '#d9b99a'
     // 카메라(내 자리) 가까이 오면 공을 가리지 않게 흐리게
     c.save()
-    c.globalAlpha = 1 - clamp((j.pelvis.z - 6.6) / 1.6, 0, 0.6)
+    c.globalAlpha = 1 - clamp((j.pelvis.z - 7.4) / 1.4, 0, 0.45)
     // 그림자
     const [sx, sy] = this.pt(j.pelvis.x, 0, j.pelvis.z)
     c.fillStyle = 'rgb(0 0 0 / 0.16)'
     c.beginPath()
     c.ellipse(sx, sy, k(j.pelvis) * 0.42, k(j.pelvis) * 0.1, 0, 0, Math.PI * 2)
     c.fill()
-    // 다리: 반바지, 종아리, 신발
+    // 다리: 맨다리, 신발. 반바지는 골반에 붙여 그려 무릎을 굽혀도 뭉쳐 보이지 않게
     for (const [hip, knee, ankle, toe] of [
       [j.hipL, j.kneeL, j.ankleL, j.toeL],
       [j.hipR, j.kneeR, j.ankleR, j.toeR],
     ] as const) {
-      const mid = { x: (hip.x + knee.x) / 2, y: (hip.y + knee.y) / 2, z: (hip.z + knee.z) / 2 }
-      seg(hip, mid, 0.17, C.ink)
-      seg(mid, knee, 0.12, SKIN)
+      seg(hip, knee, 0.12, SKIN)
       seg(knee, ankle, 0.1, SKIN)
-      seg(ankle, toe, 0.1, '#f4f6f5')
+      seg(ankle, toe, 0.11, '#f4f6f5')
     }
+    const shortsLow = { x: j.pelvis.x, y: j.pelvis.y - 0.14, z: j.pelvis.z }
+    seg({ ...j.hipL, y: j.hipL.y + 0.04 }, { ...shortsLow, x: j.hipL.x - 0.02 }, 0.17, C.ink)
+    seg({ ...j.hipR, y: j.hipR.y + 0.04 }, { ...shortsLow, x: j.hipR.x + 0.02 }, 0.17, C.ink)
     // 몸통과 어깨
     seg(j.pelvis, j.chest, 0.3, C.teal)
     seg(j.shoulderL, j.shoulderR, 0.15, C.teal)
@@ -852,16 +853,16 @@ export class Engine {
   private drawRacketCursor() {
     const size = clamp(this.h * 0.11, 52, 92)
     const side = this.handSide()
-    if (this.pointer && !this.pick) this.drawRacket(this.pointer.x, this.pointer.y, side * -0.6, 0.9, size)
+    if (this.pointer && !this.pick) this.drawRacket(this.pointer.x, this.pointer.y, side * 0.6, 0.9, size)
     for (const sw of this.swings) {
       const k = Math.min(1, sw.t / 0.32)
       const e = 1 - (1 - k) ** 3
-      // 손(그립)은 공보다 아래·바깥쪽, 라켓 머리가 공을 지나가며 반대쪽으로 넘어간다
-      const gx = sw.x + sw.side * size * 0.55
+      // 손(그립)은 공보다 아래·몸 쪽, 라켓 머리가 공 쪽(포핸드는 오른쪽, 백핸드는 왼쪽)을 향한 채 공을 지나간다
+      const gx = sw.x - sw.side * size * 0.55
       const gy = sw.y + size * 0.9
       const mid = Math.atan2(sw.x - gx, -(sw.y - gy))
-      const from = mid + sw.side * 1.35
-      const to = mid - sw.side * 1.15
+      const from = mid - sw.side * 1.35
+      const to = mid + sw.side * 1.15
       const alpha = (1 - k * 0.85) * (sw.good ? 1 : 0.55)
       // 휘두른 자국
       const c = this.ctx
@@ -887,7 +888,7 @@ export class Engine {
   private drawRacket(x: number, y: number, angle: number, alpha: number, size: number) {
     const gx = x - Math.sin(angle) * size * 1.02
     const gy = y + Math.cos(angle) * size * 1.02
-    this.drawRacketAt(gx, gy, angle, alpha, size, angle < 0 ? 1 : -1)
+    this.drawRacketAt(gx, gy, angle, alpha, size, angle > 0 ? 1 : -1)
   }
 
   /** 그립 끝(gx, gy)을 축으로 angle만큼 기운 라켓 */

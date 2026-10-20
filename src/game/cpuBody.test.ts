@@ -27,7 +27,7 @@ describe('상대 선수 몸', () => {
       const face = { x: j.handR.x + (j.racketTip.x - j.handR.x) * 0.72, y: j.handR.y + (j.racketTip.y - j.handR.y) * 0.72, z: j.handR.z + (j.racketTip.z - j.handR.z) * 0.72 }
       expect(dist(face, at)).toBeLessThan(0.3)
       // 임팩트 때 런지 보폭은 1.3m 안쪽(달릴 때 보폭은 더 넓어도 된다)
-      expect(Math.hypot(b.feet[0].at.x - b.feet[1].at.x, b.feet[0].at.z - b.feet[1].at.z)).toBeLessThan(1.32)
+      expect(Math.hypot(b.feet()[0].x - b.feet()[1].x, b.feet()[0].z - b.feet()[1].z)).toBeLessThan(1.32)
     })
   }
 })
