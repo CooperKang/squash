@@ -11,6 +11,7 @@ import {
   loadLiveResults,
   mergeMatches,
   findVideo,
+  isStale,
   roundLabel,
   youtubeSearch,
   tierLabel,
@@ -37,13 +38,13 @@ function tabFromHash(): Tab {
   return TABS.some((x) => x.id === t) ? (t as Tab) : 'world'
 }
 
-type State<T> = { data: T | null; error: boolean }
-function useData<T>(name: string) {
+type State<T> = { data: T | null; error: boolean; stale?: boolean }
+function useData<T extends { updated: string }>(name: string) {
   const [s, setS] = useState<State<T>>({ data: null, error: false })
   useEffect(() => {
     let alive = true
     loadData<T>(name)
-      .then((data) => alive && setS({ data, error: false }))
+      .then((data) => alive && setS(isStale(data.updated) ? { data: null, error: false, stale: true } : { data, error: false }))
       .catch(() => alive && setS({ data: null, error: true }))
     return () => {
       alive = false
@@ -89,7 +90,7 @@ export default function Live() {
       </PageHead>
 
       <div className="mx-auto max-w-6xl px-4">
-        <LiveNow calendar={calendar.data} korea={korea.data} onPick={pick} />
+        {!(calendar.stale && korea.stale) && <LiveNow calendar={calendar.data} korea={korea.data} onPick={pick} />}
 
         <div className="sticky top-14 z-20 -mx-4 mt-8 bg-court/90 px-4 py-3 backdrop-blur md:top-16">
           <div role="tablist" aria-label="현황판 보기" className="flex gap-1.5 overflow-x-auto rounded-2xl bg-white p-1.5 [scrollbar-width:none]">
@@ -116,7 +117,7 @@ export default function Live() {
           {tab === 'world' && <WorldEvents s={calendar} />}
           {tab === 'korea' && <KoreaEvents s={korea} />}
           {tab === 'results' && (
-            <ResultsView matches={matches} videos={videos.data?.videos ?? []} onPlay={setPlaying} loading={!results.data && !results.error && !fresh} />
+            <ResultsView matches={matches} videos={videos.data?.videos ?? []} onPlay={setPlaying} loading={!results.data && !results.error && !results.stale && !fresh} />
           )}
           {tab === 'rankings' && <RankingsView s={rankings} korea={korea.data} />}
         </div>
@@ -191,6 +192,7 @@ function WorldEvents({ s }: { s: State<Calendar> }) {
   const [group, setGroup] = useState<(typeof GROUPS)[number]['id']>('world')
   const [showDone, setShowDone] = useState(false)
   if (s.error) return <Failed />
+  if (s.stale) return <Stopped />
   if (!s.data) return <Skeleton rows={6} />
   const list = s.data.events.filter((e) => (group === 'all' || e.group === group) && (showDone || eventState(e.start, e.end).state !== 'done'))
   const byMonth = new Map<string, PsaEvent[]>()
@@ -274,6 +276,7 @@ function EventRow({ e }: { e: PsaEvent }) {
 function KoreaEvents({ s }: { s: State<Korea> }) {
   const [showDone, setShowDone] = useState(false)
   if (s.error) return <Failed />
+  if (s.stale) return <Stopped />
   if (!s.data) return <Skeleton rows={5} />
   const list = s.data.events.filter((e) => showDone || eventState(e.start, e.end).state !== 'done')
   const done = s.data.events.filter((e) => eventState(e.start, e.end).state === 'done').reverse()
@@ -457,6 +460,7 @@ function MatchCard({ m, video, onPlay }: { m: Match; video: Video | null; onPlay
 function RankingsView({ s, korea }: { s: State<Rankings>; korea: Korea | null }) {
   const [sex, setSex] = useState<'male' | 'female'>('male')
   if (s.error) return <Failed />
+  if (s.stale) return <Stopped />
   if (!s.data) return <Skeleton rows={8} />
   const r = s.data[sex]
   const kr = korea?.ranking[sex === 'male' ? 'men' : 'women'] ?? []
@@ -644,6 +648,10 @@ function Skeleton({ rows }: { rows: number }) {
       ))}
     </div>
   )
+}
+
+function Stopped() {
+  return <Card className="text-muted">이 데이터는 업데이트가 멈췄어요. 오래된 정보라 보여주지 않아요.</Card>
 }
 
 function Failed() {

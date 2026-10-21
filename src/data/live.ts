@@ -40,6 +40,13 @@ export type Korea = { updated: string; events: KsfEvent[]; ranking: { men: KsfRa
 /** 빌드 때 미리 그리는 화면에 넣을 데이터(브라우저에선 비어 있다) */
 export const preloaded: Record<string, unknown> = {}
 
+/** 이보다 오래 갱신되지 않은 파일은 수집이 멈춘 것으로 보고 보여주지 않는다 */
+export const STALE_DAYS = 7
+
+export function isStale(updated: string | undefined, now = Date.now()) {
+  return !updated || now - Date.parse(updated) > STALE_DAYS * 864e5
+}
+
 export async function loadData<T>(name: string): Promise<T> {
   // 접속할 때마다 새로 받도록 캐시를 쓰지 않는다
   const res = await fetch(`${import.meta.env.BASE_URL}data/${name}?t=${Date.now()}`, { cache: 'no-store' })

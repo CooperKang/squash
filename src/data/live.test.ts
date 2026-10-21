@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findVideo, type Match, type Video } from './live'
+import { findVideo, isStale, type Match, type Video } from './live'
 
 const match = (a: string, b: string, date = '2026-10-16T18:00:00Z'): Match => ({
   id: 1,
@@ -34,5 +34,18 @@ describe('findVideo', () => {
 
   it('이름이 없는 선수가 있으면 찾지 않는다', () => {
     expect(findVideo(match('Mostafa Asal', '미정'), videos)).toBeNull()
+  })
+})
+
+describe('isStale', () => {
+  const now = Date.parse('2026-10-21T00:00:00Z')
+
+  it('7일 안에 갱신된 파일은 그대로 보여준다', () => {
+    expect(isStale('2026-10-14T12:00:00Z', now)).toBe(false)
+  })
+
+  it('7일 넘게 갱신되지 않았거나 시각이 없으면 멈춘 것으로 본다', () => {
+    expect(isStale('2026-10-13T23:00:00Z', now)).toBe(true)
+    expect(isStale(undefined, now)).toBe(true)
   })
 })

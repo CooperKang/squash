@@ -1,5 +1,6 @@
 // 대회 현황판 데이터를 모아 public/data/*.json으로 쓴다.
 // GitHub Actions가 몇 시간마다 실행하고, 화면은 접속할 때마다 이 파일을 새로 읽는다.
+// 매번 출처가 지금 주는 것만 쓰고 지난 데이터와 합치지 않는다(따로 관리하지 않아도 잃을 기록이 없게).
 // 한 출처가 실패하면 지금 배포된 파일(그것도 없으면 저장소의 초기 파일)을 그대로 둔다.
 import { readFile, writeFile } from 'node:fs/promises'
 
@@ -70,9 +71,9 @@ async function rankings() {
   return out
 }
 
-// ---------- PSA 최근 결과(최근 1주일치만 주므로 지난 결과와 합친다) ----------
+// ---------- PSA 최근 결과(최근 1주일치) ----------
 
-async function results(prev) {
+async function results() {
   const fresh = (await get(`${PSA_API}/results`)).map((m) => ({
     id: m.matchId,
     tournament: m.tournament,
@@ -85,10 +86,7 @@ async function results(prev) {
       scores: p.scores,
     })),
   }))
-  const byId = new Map((prev?.matches ?? []).map((m) => [m.id, m]))
-  for (const m of fresh) byId.set(m.id, m)
-  const matches = [...byId.values()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 400)
-  return { matches }
+  return { matches: fresh.sort((a, b) => b.date.localeCompare(a.date)) }
 }
 
 // ---------- PSA 대회 일정 ----------
@@ -277,10 +275,10 @@ async function ksfRanking() {
 
 // ---------- PSA 공식 유튜브(SQUASHTV) 영상 ----------
 
-// 채널 RSS는 키 없이 최근 15개만 주므로, 실행할 때마다 지난 목록과 합쳐 쌓는다
+// 채널 RSS는 키 없이 최근 15개만 준다
 const SQUASHTV = 'UCklie6BM0fhFvzWYqQVoCTA'
 
-async function videos(prev) {
+async function videos() {
   const res = await get(`https://www.youtube.com/feeds/videos.xml?channel_id=${SQUASHTV}`, 'raw')
   const xml = await res.text()
   const fresh = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].map(([, e]) => ({
@@ -289,18 +287,16 @@ async function videos(prev) {
     published: /<published>([^<]+)/.exec(e)?.[1],
   }))
   if (fresh.length === 0) throw new Error('empty feed')
-  const byId = new Map((prev?.videos ?? []).map((v) => [v.id, v]))
-  for (const v of fresh) if (v.id) byId.set(v.id, v)
-  return { channel: SQUASHTV, videos: [...byId.values()].sort((a, b) => b.published.localeCompare(a.published)).slice(0, 300) }
+  return { channel: SQUASHTV, videos: fresh.filter((v) => v.id).sort((a, b) => b.published.localeCompare(a.published)) }
 }
 
 // ---------- 실행 ----------
 
 const jobs = [
   ['rankings.json', async () => rankings()],
-  ['results.json', async () => results(await previous('results.json'))],
+  ['results.json', async () => results()],
   ['calendar.json', async () => calendar()],
-  ['videos.json', async () => videos(await previous('videos.json'))],
+  ['videos.json', async () => videos()],
   ['korea.json', async () => ({ ...(await ksfEvents()), ranking: await ksfRanking() })],
 ]
 

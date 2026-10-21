@@ -40,14 +40,14 @@ npm run build
 | 파일 | 출처 | 갱신 |
 |---|---|---|
 | `public/data/calendar.json` | PSA 투어 사이트의 WordPress REST API | GitHub Actions가 3시간마다 |
-| `public/data/results.json` | PSA 결과 API(최근 1주일치를 받아 지난 결과와 합침) | 3시간마다 + 화면을 열 때 브라우저에서 한 번 더 |
+| `public/data/results.json` | PSA 결과 API(최근 1주일치) | 3시간마다 + 화면을 열 때 브라우저에서 한 번 더 |
 | `public/data/rankings.json` | PSA 랭킹 API | 3시간마다 |
-| `public/data/videos.json` | PSA 공식 유튜브(SQUASHTV) 채널 RSS(최근 15개를 받아 지난 목록과 합침) | 3시간마다 |
+| `public/data/videos.json` | PSA 공식 유튜브(SQUASHTV) 채널 RSS(최근 15개) | 3시간마다 |
 | `public/data/korea.json` | 대한스쿼시연맹(koreasquash.or.kr) 대회 일정·랭킹 | 3시간마다 |
 | `public/data/courts.json` | [스쿼시 센터(코트) 안내](https://www.squash.pe.kr/)(목록·좌표·코트 수·전화) + 대한스쿼시연맹 공인 코트 현황. 샤워·주차 등 시설과 수용 인원은 출처에 없어 비워 둠 | 수동(`npm run courts`). 출처가 GitHub Actions 서버의 접속을 막아(403) 자동 갱신에서 뺌 |
 | `src/data/rackets.ts` | 영산스포츠 스쿼시 라켓 목록 | 손으로(판매처 robots.txt가 자동 수집을 막아 둠) |
 
-수집 스크립트는 `scripts/fetch-data.mjs`입니다. 출처 하나가 실패하면 지금 배포된 파일을 그대로 씁니다.
+수집 스크립트는 `scripts/fetch-data.mjs`입니다. 매번 출처가 지금 주는 것만 쓰고 지난 데이터와 합치지 않습니다. 출처 하나가 실패하면 지금 배포된 파일을 그대로 씁니다. 화면은 7일 넘게 갱신되지 않은 파일을 보여주지 않고 "업데이트가 멈췄어요"라고 알립니다(수집이 깨졌거나, 저장소에 60일 동안 커밋이 없어 GitHub가 예약 실행을 꺼 버린 경우).
 GitHub는 저장소에 60일 동안 활동이 없으면 예약 실행을 멈추니, 멈췄다면 Actions 탭에서 다시 켜 주세요.
 
 ## 라켓 목록 고치기
