@@ -100,6 +100,7 @@ export class CpuBody {
   maxSpeed = 6.5
   recoverySpeed = 2.8
   recoveryDelay = 0.5
+  private earlyArrival = false
   hop = 1 // 스플릿 스텝 진행(1이면 끝)
   swing: Swing | null = null
   private phase = 0 // 걸음 주기
@@ -131,14 +132,16 @@ export class CpuBody {
     this.swing = { t: inT, side, at: { ...at }, lead, lunge, swingIt }
   }
 
-  configure(level: { maxSpeed: number; recoverySpeed: number; recoveryDelay: number }) {
+  configure(level: { maxSpeed: number; recoverySpeed: number; recoveryDelay: number; earlyArrival?: boolean }) {
     this.maxSpeed = level.maxSpeed
     this.recoverySpeed = level.recoverySpeed
     this.recoveryDelay = level.recoveryDelay
+    this.earlyArrival = level.earlyArrival ?? false
   }
 
   private approachSpeed(distance: number, inT: number, limit = this.maxSpeed) {
-    return clamp(distance / Math.max(0.08, inT - 0.2), 1.5, limit)
+    // 플레이어처럼 일찍 도착해 준비한다. 공이 올 때까지 계속 걷게 해 회복을 막지 않는다.
+    return this.earlyArrival ? limit : clamp(distance / Math.max(0.08, inT - 0.2), 1.5, limit)
   }
 
   /** 가속·감속을 포함해 스윙 시작 전에 타구 자세에 가까이 도착할 수 있는가 */

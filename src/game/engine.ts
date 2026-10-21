@@ -1,5 +1,6 @@
 import { Athlete, chargePower, strikePower, realisticReach, type GameMode, type RealismHud, type CourtPoint } from './realism'
 import { CPU_LEVEL, chooseIntercept } from './cpu'
+import { rallySummary, type MatchSummary, type PlayerSummary } from './matchStats'
 import { BALL_R, COURT, SIM_DT, Shot, aimAt, clamp, inCpuReach, inYourReach, sampleReach, step, timingQuality, type Ball, type Difficulty, type Hitter, type Vec } from './physics'
 import { status, winner, type Score, type Status } from './score'
 import type { RuleKey } from './hints'
@@ -20,6 +21,8 @@ export type HudState = {
   mode: GameMode
   realism: RealismHud | null
   status: Status // 듀스·게임볼
+  summary: MatchSummary
+  lastRally: MatchSummary | null
 }
 
 type Phase = 'ready' | 'serve-you' | 'serve-cpu' | 'rally' | 'point' | 'over'
@@ -57,6 +60,10 @@ export class Engine {
   private server: Hitter = 'you'
   private side = 1 // 서브 박스: 1 오른쪽, -1 왼쪽
   private rally = 0
+  private totals = { seconds: 0, rallySeconds: 0, hits: 0, bestRally: 0 }
+  private matchMode: GameMode = 'classic'
+  private rallyStart: MatchSummary | null = null
+  private lastRally: MatchSummary | null = null
   private bestRally = 0
   private message = ''
   private timer = 0
@@ -162,6 +169,10 @@ export class Engine {
     this.cancelCharge()
     this.player.reset()
     this.opponent.reset()
+    this.matchMode = this.mode
+    this.totals = { seconds: 0, rallySeconds: 0, hits: 0, bestRally: 0 }
+    this.rallyStart = null
+    this.lastRally = null
     this.lastPower = 0
     this.lastShot = null
     this.playerIntercept = null
@@ -312,6 +323,7 @@ export class Engine {
 
   /** 선택한 샷의 방향을 유지한다. 이상적인 샷 후보가 없어도 드라이브로 바꾸지 않는다. */
   private strike(kind: ShotKind, serve: boolean, q: number, power?: number) {
+    if (serve) this.rallyStart = this.summary()
     const from = { ...this.ball.p }
     const hit = playerShot(kind, from, q, Math.random, power)
     const side = Math.sign(from.x) || 1
@@ -333,6 +345,7 @@ export class Engine {
     this.flash(sharp > 0.7 && !serve ? `${SHOT_NAME[k]} · 예리해요!` : SHOT_NAME[k], sharp > 0.7 ? C.tealBright : '#ffffff', 0.75)
     this.phase = 'rally'
     this.rally++
+    this.totals.hits++
     this.sfx('hit', q)
     this.planCpu()
     return true
@@ -412,10 +425,6 @@ export class Engine {
       return
     }
 
-    const trackingWorkout = this.mode === 'realistic' && this.phase !== 'ready' && this.phase !== 'over'
-    const rallying = this.phase === 'rally'
-    const youDistance = this.player.distance
-    const cpuDistance = this.opponent.distance
     if (this.phase === 'point') {
       this.timer -= realDt
       if (this.timer <= 0) this.setupServe()
@@ -423,6 +432,7 @@ export class Engine {
     if (this.phase === 'serve-cpu') {
       this.timer -= realDt
       if (this.timer <= 0) {
+        this.rallyStart = this.summary()
         const from = { ...this.ball.p }
         const power = this.cpuPower(from)
         const c = cpuShot(from, this.difficulty, true, Math.random, power)
@@ -433,6 +443,7 @@ export class Engine {
         this.planPlayer()
         this.phase = 'rally'
         this.rally++
+        this.totals.hits++
         this.hint = null
         if (this.body.swing) {
           this.body.swing.t = 0
@@ -447,11 +458,21 @@ export class Engine {
     // 예측·실제 공·몸을 같은 간격으로 갱신해 화면 fps에 따라 타구 판정이 달라지지 않게 한다.
     this.gameCarry += game
     while (this.gameCarry >= SIM_DT) {
+      if (this.phase === 'ready' || this.phase === 'over') {
+        this.gameCarry = 0
+        break
+      }
       const previous = { ...this.body.root }
+      const youDistance = this.player.distance
+      const cpuDistance = this.opponent.distance
+      const elapsed = SIM_DT / TIME_SCALE[this.difficulty]
+      const rallying = this.phase === 'rally'
+      const resting = !rallying
+      this.totals.seconds += elapsed
+      if (rallying) this.totals.rallySeconds += elapsed
       if (this.mode === 'realistic') {
         this.playerPlanIn -= SIM_DT
         if (this.phase === 'rally' && this.shot.by === 'cpu' && this.playerPlanIn <= 0) this.planPlayer()
-        const resting = this.phase !== 'rally' && this.phase !== 'serve-you'
         this.player.move(SIM_DT, resting)
         this.configureCpu()
         this.body.speed = Math.min(this.body.speed, this.body.maxSpeed)
@@ -460,16 +481,14 @@ export class Engine {
       if (this.mode === 'realistic') {
         this.opponent.root = { ...this.body.root }
         const distance = Math.hypot(previous.x - this.body.root.x, previous.z - this.body.root.z)
-        this.opponent.exert(SIM_DT, distance, this.opponent.atT, this.phase !== 'rally')
+        this.opponent.exert(SIM_DT, distance, this.opponent.atT, resting)
+        this.player.workout.update(elapsed, (this.player.distance - youDistance) / SIM_DT, this.rally, rallying)
+        this.opponent.workout.update(elapsed, (this.opponent.distance - cpuDistance) / SIM_DT, this.rally, rallying)
       }
       this.physics(SIM_DT)
       this.gameCarry -= SIM_DT
     }
 
-    if (trackingWorkout) {
-      this.player.workout.update(realDt, (this.player.distance - youDistance) / Math.max(game, 1e-6), this.rally, rallying)
-      this.opponent.workout.update(realDt, (this.opponent.distance - cpuDistance) / Math.max(game, 1e-6), this.rally, rallying)
-    }
     const t = this.camTarget()
     const k = Math.min(1, realDt * 7)
     this.cam.x += (t.x - this.cam.x) * k
@@ -545,6 +564,7 @@ export class Engine {
         this.lastShot = { by: 'cpu', kind: c.kind, sharp: 0 }
         this.planPlayer()
         this.rally++
+        this.totals.hits++
         if (this.body.swing) {
           this.body.swing.t = 0
           this.body.swing.at = { ...from }
@@ -558,7 +578,7 @@ export class Engine {
   private configureCpu() {
     const level = CPU_LEVEL[this.difficulty]
     const factor = this.mode === 'realistic' ? this.opponent.speedFactor : 1
-    this.body.configure({ maxSpeed: level.maxSpeed * factor, recoverySpeed: level.recoverySpeed * factor, recoveryDelay: level.recoveryDelay + (this.mode === 'realistic' ? this.opponent.recoveryTime - 0.12 : 0) })
+    this.body.configure({ maxSpeed: level.maxSpeed * factor, recoverySpeed: (this.mode === 'realistic' ? this.opponent.baseSpeed * 0.65 : level.recoverySpeed) * factor, recoveryDelay: this.mode === 'realistic' ? this.opponent.recoveryTime : level.recoveryDelay, earlyArrival: this.mode === 'realistic' })
   }
 
   private cpuPower(from: Vec) {
@@ -599,6 +619,9 @@ export class Engine {
     const kept = win === this.server
     this.cpuPlan.returns = false
     this.body.recover()
+    this.player.target = { ...T_SPOT }
+    this.totals.bestRally = Math.max(this.totals.bestRally, this.rally)
+    this.lastRally = rallySummary(this.summary(), this.rallyStart ?? this.summary(), this.rally)
     this.score = { ...this.score, [win]: this.score[win] + 1 }
     if (this.rally > this.bestRally) {
       this.bestRally = this.rally
@@ -668,6 +691,8 @@ export class Engine {
       paused: this.paused,
       lastShot: this.lastShot ? { by: this.lastShot.by, name: SHOT_NAME[this.lastShot.kind] } : null,
       status: status(this.score),
+      summary: this.summary(),
+      lastRally: this.lastRally,
       mode: this.mode,
       realism:
         this.mode === 'realistic'
@@ -689,6 +714,11 @@ export class Engine {
             }
           : null,
     })
+  }
+
+  private summary(): MatchSummary {
+    const player = (a: Athlete): PlayerSummary => ({ distance: a.distance, calories: a.workout.calories, restCalories: a.workout.hud.restCalories, activeCalories: a.workout.hud.activeCalories, spent: a.spent, recovered: a.recovered })
+    return { ...this.totals, mode: this.matchMode, points: this.score.you + this.score.cpu, you: player(this.player), cpu: player(this.opponent) }
   }
 
   // ---------- 그리기 ----------

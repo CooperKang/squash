@@ -83,7 +83,7 @@ describe('현실모드 파워와 지구력', () => {
       t.exert(SIM_DT, 0, true)
       corner.exert(SIM_DT, 0, false)
     }
-    expect(t.energy).toBeGreaterThan(corner.energy + 2)
+    expect(t.energy).toBeGreaterThan(corner.energy + 0.8)
     t.exert(10, 50, false)
     const fatigue = t.fatigue
     t.exert(3, 0, true, true)

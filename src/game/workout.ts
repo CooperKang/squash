@@ -6,7 +6,7 @@ import { clamp } from './physics'
  */
 export const REFERENCE_WEIGHT_KG = 70
 export const caloriesFor = (met: number, seconds: number, kg = REFERENCE_WEIGHT_KG) => (met * 3.5 * kg * seconds) / 12000
-export type WorkoutHud = { calories: number; intensity: string }
+export type WorkoutHud = { calories: number; restCalories: number; activeCalories: number; intensity: string }
 
 export class Workout {
   calories = 0
@@ -35,6 +35,7 @@ export class Workout {
   }
 
   get hud(): WorkoutHud {
-    return { calories: this.calories, intensity: !this.rallying ? '준비·회복' : this.effort > 0.65 ? '치열함' : this.effort > 0.3 ? '활발함' : '여유로움' }
+    const restCalories = caloriesFor(1, this.seconds)
+    return { calories: this.calories, restCalories, activeCalories: Math.max(0, this.calories - restCalories), intensity: !this.rallying ? '준비·회복' : this.effort > 0.65 ? '치열함' : this.effort > 0.3 ? '활발함' : '여유로움' }
   }
 }

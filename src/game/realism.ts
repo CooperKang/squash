@@ -15,6 +15,8 @@ export class Athlete {
   baseSpeed = 6.8
   workout = new Workout()
   recovery = 0
+  spent = 0
+  recovered = 0
 
   get capacity() {
     return 100 - this.fatigue * 25
@@ -55,42 +57,50 @@ export class Athlete {
     this.distance = 0
     this.workout = new Workout()
     this.recovery = 0
+    this.spent = 0
+    this.recovered = 0
   }
 
-  /** 실제 이동 거리만 소모한다. T에서 기다리면 효율적으로 회복한다. */
+  /** 감속 중 미세 이동도 속도에 비례해 회복한다. 양쪽 모두 같은 식을 쓴다. */
   exert(dt: number, meters: number, atT: boolean, resting = false) {
     this.recovery = Math.max(0, this.recovery - dt)
     this.distance += meters
     const speed = meters / Math.max(dt, 1e-6)
-    if (meters > 0.0001) {
-      this.fatigue = clamp(this.fatigue + meters * 0.00075, 0, 1)
-      this.energy -= meters * (0.25 + 0.055 * speed)
-    } else {
-      this.energy += dt * (resting ? 4 : atT ? 6 : 1)
-    }
-    this.energy = clamp(this.energy, 0, this.capacity)
+    this.fatigue = clamp(this.fatigue + meters * 0.00075, 0, 1)
+    const cost = meters * (0.25 + 0.055 * speed)
+    // T 보너스가 이동 소모를 압도하지 않도록 3:2로 제한한다.
+    // 포인트 사이에는 양쪽 모두 복귀 중에도 숨을 돌린다(이동 비용은 계속 차감).
+    const recover = dt * (resting ? 4 : (atT ? 3 : 2) * (1 - clamp(speed / 2, 0, 1)))
+    this.spent += Math.min(this.energy, cost)
+    const afterCost = Math.max(0, this.energy - cost)
+    const next = clamp(afterCost + recover, 0, this.capacity)
+    this.recovered += Math.max(0, next - afterCost)
+    this.energy = next
   }
 
   move(dt: number, resting = false) {
-    if (resting) {
-      this.exert(dt, 0, this.atT, true)
+    const returning = Math.hypot(this.target.x - T_SPOT.x, this.target.z - T_SPOT.z) < 0.01
+    if (returning && this.recovery > 0) {
+      this.exert(dt, 0, this.atT, resting)
       return
     }
     const dx = this.target.x - this.root.x,
       dz = this.target.z - this.root.z
     const distance = Math.hypot(dx, dz)
-    const step = Math.min(distance, this.baseSpeed * this.speedFactor * dt)
+    const step = Math.min(distance, this.baseSpeed * this.speedFactor * (returning ? 0.65 : 1) * dt)
     if (distance > 0.01) {
       this.root.x += (dx / distance) * step
       this.root.z += (dz / distance) * step
     }
-    this.exert(dt, distance > 0.01 ? step : 0, this.atT)
+    this.exert(dt, distance > 0.01 ? step : 0, this.atT, resting)
   }
 
   hit(power: number) {
     this.recovery = this.recoveryTime
     this.workout.hit(power)
-    this.energy = Math.max(0, this.energy - (0.35 + power * power * 1.1))
+    const cost = 0.35 + power * power * 1.1
+    this.spent += Math.min(this.energy, cost)
+    this.energy = Math.max(0, this.energy - cost)
     this.fatigue = clamp(this.fatigue + power * 0.0015, 0, 1)
   }
 }

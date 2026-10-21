@@ -20,6 +20,11 @@ describe('게임 속 선수의 실제 운동 환산 칼로리', () => {
     expect(intense.hud.intensity).toBe('치열함')
     expect(intense.calories).toBeLessThanOrEqual(220.5)
   })
+  it('총 예상량은 활동분과 안정 시 대사분의 합이며 안정 대사를 중복 가산하지 않는다', () => {
+    const w = play(900, 3, 8)
+    expect(w.hud.restCalories).toBeCloseTo(caloriesFor(1, 900))
+    expect(w.hud.activeCalories + w.hud.restCalories).toBeCloseTo(w.calories)
+  })
   it('고정 움직임의 누적값이 30fps와 120fps에서 같다', () => {
     expect(play(60, 2, 6, 1 / 30).calories).toBeCloseTo(play(60, 2, 6, 1 / 120).calories, 7)
   })

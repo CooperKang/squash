@@ -147,6 +147,8 @@ describe('뒷벽 이후 실제 타격과 이동', () => {
     expect(e.player.target).toEqual({ x: 0, z: 5.6 })
     const before = Math.hypot(e.player.root.x, e.player.root.z - 5.6)
     e.update(0.1)
+    expect(Math.hypot(e.player.root.x, e.player.root.z - 5.6)).toBe(before)
+    e.update(0.15)
     expect(Math.hypot(e.player.root.x, e.player.root.z - 5.6)).toBeLessThan(before)
   })
   it('기다리다 두 번 튄 공은 늦게 눌러도 타격하지 못한다', () => {

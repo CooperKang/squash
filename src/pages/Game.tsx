@@ -1,6 +1,8 @@
 import { RealismCoach, RealismControls } from './RealismControls'
 import type { GameMode } from '../game/realism'
 import type { WorkoutHud } from '../game/workout'
+import type { MatchSummary } from '../game/matchStats'
+import { MatchReport } from './MatchReport'
 import { useEffect, useRef, useState } from 'react'
 import { Engine, type HudState } from '../game/engine'
 import type { Difficulty } from '../game/physics'
@@ -20,6 +22,8 @@ export default function Game() {
   const [difficulty, setDifficulty] = useState<Difficulty>('normal')
   const [mode, setMode] = useState<GameMode>('classic')
   const [coach, setCoach] = useState<number | null>(null)
+  const [rallyReport, setRallyReport] = useState<MatchSummary | null>(null)
+  const [showMatchTotals, setShowMatchTotals] = useState(false)
   const activePointer = useRef<number | null>(null)
   const [sound, setSound] = useState(true)
   const [askRules, setAskRules] = useState(true)
@@ -65,9 +69,14 @@ export default function Game() {
     }
     window.addEventListener('blur', cancel)
     document.addEventListener('visibilitychange', cancel)
+    const preventDrag = (e: Event) => { if (activePointer.current !== null) e.preventDefault() }
+    document.addEventListener('selectstart', preventDrag)
+    document.addEventListener('dragstart', preventDrag)
     return () => {
       window.removeEventListener('blur', cancel)
       document.removeEventListener('visibilitychange', cancel)
+      document.removeEventListener('selectstart', preventDrag)
+      document.removeEventListener('dragstart', preventDrag)
     }
   }, [])
 
@@ -114,16 +123,68 @@ export default function Game() {
 
   const showMenu = !hud || hud.phase === 'ready' || hud.phase === 'over'
 
+  const blockDrag = !showMenu && coach === null && rallyReport === null && reading === null
+  const modeChoices = (
+    <fieldset className="mb-5">
+      <legend className="sr-only">게임 모드</legend>
+      <div className="grid grid-cols-2 gap-1 rounded-2xl bg-court p-1">
+        {([
+          { id: 'classic', label: '기본모드' },
+          { id: 'realistic', label: '현실모드' },
+        ] as const).map((m) => (
+          <button
+            key={m.id}
+            type="button"
+            aria-pressed={mode === m.id}
+            onClick={() => selectMode(m.id)}
+            className="min-h-11 rounded-xl text-[14px] font-bold text-muted aria-pressed:bg-teal aria-pressed:text-white"
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  )
+  const options = (
+    <>
+      <fieldset className="mt-5">
+        <legend className="text-[13px] font-semibold text-muted">난이도</legend>
+        <div className="mt-2 grid grid-cols-3 gap-1.5 rounded-2xl bg-court p-1">
+          {DIFF.map((d) => (
+            <button
+              key={d.id}
+              type="button"
+              aria-pressed={difficulty === d.id}
+              onClick={() => setDifficulty(d.id)}
+              className="rounded-xl py-2 text-[14px] font-semibold text-muted aria-pressed:bg-ink aria-pressed:text-white"
+            >
+              {d.label}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+      <label className="mt-3 flex items-center gap-2 text-[14px] text-muted">
+        <input type="checkbox" checked={sound} onChange={(e) => setSound(e.target.checked)} className="size-4 accent-teal" />
+        효과음
+      </label>
+      <label className="mt-2 flex items-center gap-2 text-[14px] text-muted">
+        <input type="checkbox" checked={askRules} onChange={(e) => setAskRules(e.target.checked)} className="size-4 accent-teal" />
+        점수가 날 때 관련 규칙 물어보기
+      </label>
+    </>
+  )
+
   return (
     <section className="mx-auto max-w-5xl px-0 md:px-4 md:pt-6" aria-label="스쿼시 게임">
-      <div className="relative h-[calc(100dvh-56px-76px-env(safe-area-inset-bottom))] min-h-[420px] overflow-hidden bg-ink md:h-[min(78vh,720px)] md:rounded-[28px]">
-        <div className="contents" inert={coach !== null}>
+      <div className="relative h-[calc(100dvh-56px-76px-env(safe-area-inset-bottom))] min-h-[420px] overflow-hidden bg-ink md:h-[min(78vh,720px)] md:rounded-[28px]" style={blockDrag ? { userSelect: 'none', WebkitUserSelect: 'none' } : undefined} onDragStart={(e) => { if (blockDrag) e.preventDefault() }}>
+        <div className="contents" inert={coach !== null || rallyReport !== null}>
           <canvas
             ref={canvasRef}
             className="absolute inset-0 size-full touch-none select-none md:cursor-none"
             onPointerDown={(e) => {
               if (e.button !== 0 || activePointer.current !== null) return
               e.preventDefault()
+              window.getSelection()?.removeAllRanges()
               activePointer.current = e.pointerId
               e.currentTarget.setPointerCapture(e.pointerId)
               engineRef.current?.press(...local(e), e.pointerType)
@@ -178,10 +239,15 @@ export default function Game() {
 
           {hud?.phase === 'serve-you' && !hud.hint && (
             <p
-              className={`pointer-events-none absolute inset-x-0 px-3 text-center text-[13px] font-semibold ${mode === 'realistic' ? 'top-40 mx-auto max-w-[300px] rounded-full bg-ink/65 py-2 text-white' : 'bottom-5 text-white/85'}`}
+              className={`pointer-events-none absolute inset-x-0 px-3 text-center text-[13px] font-semibold ${mode === 'realistic' ? `${hud.lastRally ? 'top-52' : 'top-40'} mx-auto max-w-[300px] rounded-full bg-ink/65 py-2 text-white` : 'bottom-5 text-white/85'}`}
             >
               {mode === 'realistic' ? '내 서브 · 공을 누르면 멈춰요. 파워를 정하고 놓으세요' : '내 서브예요. 떠오른 공을 눌러 치세요'}
             </p>
+          )}
+          {hud?.realism && hud.lastRally && !showMenu && hud.phase !== 'rally' && (
+            <button type="button" className="absolute inset-x-0 top-40 mx-auto w-fit rounded-full bg-ink/80 px-4 py-2 text-[12px] font-bold text-white" onClick={() => { engineRef.current?.pause(); setShowMatchTotals(false); setRallyReport(hud.lastRally) }}>
+              이번 랠리 {hud.lastRally.hits}타 · {Math.floor(hud.lastRally.seconds)}초 · 기록 보기
+            </button>
           )}
 
           {lastHint && (
@@ -242,34 +308,15 @@ export default function Game() {
           {showMenu && (
             <div className="absolute inset-0 grid place-items-center bg-ink/70 p-5 backdrop-blur-[2px]">
               <div className="max-h-full w-full max-w-sm overflow-y-auto rounded-[26px] bg-white p-6 text-ink shadow-2xl">
-                <fieldset className="mb-5">
-                  <legend className="sr-only">게임 모드</legend>
-                  <div className="grid grid-cols-2 gap-1 rounded-2xl bg-court p-1">
-                    {(
-                      [
-                        { id: 'classic', label: '기본모드' },
-                        { id: 'realistic', label: '현실모드' },
-                      ] as const
-                    ).map((m) => (
-                      <button
-                        key={m.id}
-                        type="button"
-                        aria-pressed={mode === m.id}
-                        onClick={() => selectMode(m.id)}
-                        className="min-h-11 rounded-xl text-[14px] font-bold text-muted aria-pressed:bg-teal aria-pressed:text-white"
-                      >
-                        {m.label}
-                      </button>
-                    ))}
-                  </div>
-                </fieldset>
+                {!hud?.result && modeChoices}
                 {hud?.result ? (
                   <>
                     <p className="font-wide text-[11px] tracking-[0.2em] text-teal">GAME</p>
                     <h2 className="mt-2 text-[28px] font-extrabold">{hud.result === 'you' ? '이겼어요!' : '아쉽게 졌어요'}</h2>
                     <p className="mt-1 text-[15px] text-muted">
-                      {hud.score.you} : {hud.score.cpu} · 최고 랠리 {hud.bestRally}
+                      {hud.score.you} : {hud.score.cpu} · 이번 경기 최장 {hud.summary.bestRally}타
                     </p>
+                    <MatchReport summary={hud.summary} />
                   </>
                 ) : (
                   <>
@@ -311,38 +358,15 @@ export default function Game() {
                     </ul>
                   </>
                 )}
-                {mode === 'realistic' && (
-                  <p className="mt-3 text-[11px] leading-relaxed text-muted">예상 칼로리는 70kg 성인이 같은 움직임으로 실제 운동했을 때의 환산치예요. 이동·강타·랠리에 따라 달라지며, 게임을 조작하는 사람의 실제 소모량은 아니에요. <a href="https://pacompendium.com/sports/" target="_blank" rel="noreferrer" className="underline underline-offset-2">MET 기준</a></p>
+                {mode === 'realistic' && !hud?.result && (
+                  <p className="mt-3 text-[11px] leading-relaxed text-muted">예상 칼로리는 70kg 성인의 실제 운동 환산치이며 안정 시 대사량을 포함해요. 이동·강타·랠리에 따라 달라지며, 게임 조작자의 실제 소모량은 아니에요. <a href="https://pacompendium.com/sports/" target="_blank" rel="noreferrer" className="underline underline-offset-2">MET 기준</a></p>
                 )}
-                {mode === 'realistic' && (
+                {mode === 'realistic' && !hud?.result && (
                   <button type="button" onClick={openCoach} className="mt-3 text-[13px] font-bold text-teal underline underline-offset-4">
                     조작 방법 다시 보기
                   </button>
                 )}
-                <fieldset className="mt-5">
-                  <legend className="text-[13px] font-semibold text-muted">난이도</legend>
-                  <div className="mt-2 grid grid-cols-3 gap-1.5 rounded-2xl bg-court p-1">
-                    {DIFF.map((d) => (
-                      <button
-                        key={d.id}
-                        type="button"
-                        aria-pressed={difficulty === d.id}
-                        onClick={() => setDifficulty(d.id)}
-                        className="rounded-xl py-2 text-[14px] font-semibold text-muted aria-pressed:bg-ink aria-pressed:text-white"
-                      >
-                        {d.label}
-                      </button>
-                    ))}
-                  </div>
-                </fieldset>
-                <label className="mt-3 flex items-center gap-2 text-[14px] text-muted">
-                  <input type="checkbox" checked={sound} onChange={(e) => setSound(e.target.checked)} className="size-4 accent-teal" />
-                  효과음
-                </label>
-                <label className="mt-2 flex items-center gap-2 text-[14px] text-muted">
-                  <input type="checkbox" checked={askRules} onChange={(e) => setAskRules(e.target.checked)} className="size-4 accent-teal" />
-                  점수가 날 때 관련 규칙 물어보기
-                </label>
+                {hud?.result ? <details className="mt-4 text-[13px] text-muted"><summary className="cursor-pointer font-bold">다음 경기 설정</summary>{modeChoices}{options}</details> : options}
                 <button
                   type="button"
                   onClick={() => {
@@ -360,6 +384,16 @@ export default function Game() {
           {hud?.realism && !showMenu && <RealismControls state={hud.realism} onHelp={openCoach} />}
         </div>
         {coach !== null && <RealismCoach step={coach} onClose={closeCoach} onNext={() => (coach === 2 ? closeCoach() : setCoach(coach + 1))} />}
+        {rallyReport && <div className="absolute inset-0 z-20 grid place-items-center bg-ink/65 p-4" role="dialog" aria-modal="true" aria-label="이번 랠리 결과" onKeyDown={(e) => { if (e.key === 'Escape') { setRallyReport(null); engineRef.current?.resume() } }}>
+          <div className="max-h-full w-full max-w-sm overflow-y-auto rounded-[26px] bg-white p-4">
+            <div className="grid grid-cols-2 gap-1 rounded-xl bg-court p-1" role="group" aria-label="기록 범위">
+              <button type="button" aria-pressed={!showMatchTotals} className="rounded-lg py-2 text-[13px] font-bold text-muted aria-pressed:bg-teal aria-pressed:text-white" onClick={() => setShowMatchTotals(false)}>이번 랠리</button>
+              <button type="button" aria-pressed={showMatchTotals} className="rounded-lg py-2 text-[13px] font-bold text-muted aria-pressed:bg-teal aria-pressed:text-white" onClick={() => setShowMatchTotals(true)}>경기 누적</button>
+            </div>
+            <MatchReport summary={showMatchTotals && hud ? hud.summary : rallyReport} rally={!showMatchTotals} />
+            <button type="button" autoFocus className="mt-4 w-full rounded-2xl bg-teal py-3 font-bold text-white" onClick={() => { setRallyReport(null); engineRef.current?.resume() }}>계속하기</button>
+          </div>
+        </div>}
       </div>
     </section>
   )
