@@ -20,12 +20,12 @@ describe('kit', () => {
     for (const g of KIT_GROUPS) expect(KIT_TIPS.some((t) => t.group === g.id), g.id).toBe(true)
   })
 
-  it('상담 12개가 스펙 표의 id와 같다', () => {
+  it('상담 목록이 스펙 표의 id와 같다', () => {
     expect(KIT_TIPS.map((t) => t.id)).toEqual([
       'sweat-hand', 'thin-grip', 'thick-grip', 'new-racket',
       'weak-ankle', 'running-shoes', 'wide-foot',
       'sweat-eyes', 'sweat-wrist',
-      'eye-guard',
+      'eye-guard', 'knee',
       'sore-calf', 'dead-ball',
     ])
   })
@@ -58,6 +58,9 @@ describe('picksFor', () => {
 })
 
 describe('상담 문구 사실 확인', () => {
+  it('발목 보호대 대신 미드컷 인도어화를 권한다', () => {
+    expect(KIT_TIPS.find((t) => t.id === 'weak-ankle')!.links).toEqual(['shoes-mid', 'shoes-court'])
+  })
   const tip = (id: string) => KIT_TIPS.find((t) => t.id === id)!
   const text = (id: string) => [tip(id).a, ...tip(id).tries, tip(id).look].join(' ')
   it('교체용 그립은 판다(원그립을 못 구한다고 하지 않는다)', () => {

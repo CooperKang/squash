@@ -19,7 +19,7 @@
   - `kit/grip/` 그립
   - `kit/shoes/` 신발
   - `kit/sweat/` 머리띠·손목밴드
-  - `kit/protect/` 보호안경·발목 보호대
+  - `kit/protect/` 보호안경·무릎 보호대
   - `kit/recovery/` 폼롤러·공
 
 ## 화면
@@ -43,12 +43,13 @@
 | thin-grip | grip | 얇게 쥐는 게 좋아요 | grip-dry |
 | thick-grip | grip | 손이 커서 그립이 가늘게 느껴져요 | grip-tacky |
 | new-racket | grip | 라켓을 새로 샀는데 원그립은 벗겨야 해요? | grip-dry, grip-tacky |
-| weak-ankle | shoes | 발목에 힘이 없어 자주 접질려요 | shoes-court, ankle-brace |
+| weak-ankle | shoes | 발목에 힘이 없어 자주 접질려요 | shoes-mid, shoes-court |
 | running-shoes | shoes | 러닝화 신고 쳐도 돼요? | shoes-court |
 | wide-foot | shoes | 발볼이 넓어 코트화가 아파요 | shoes-wide |
 | sweat-eyes | sweat | 땀이 눈에 들어가요 | headband |
 | sweat-wrist | sweat | 손목 타고 땀이 흘러요 | wristband |
 | eye-guard | protect | 공에 맞을까 무서워요 | goggles |
+| knee | protect | 런지하면 무릎 앞쪽이 시큰해요 | knee-brace |
 | sore-calf | recovery | 다음 날 종아리가 뭉쳐요 | foam-roller |
 | dead-ball | recovery | 공이 안 튀어서 랠리가 안 돼요 | ball |
 
