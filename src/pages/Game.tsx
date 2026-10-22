@@ -15,8 +15,13 @@ const DIFF: { id: Difficulty; label: string }[] = [
   { id: 'hard', label: '어려움' },
 ]
 
+// 아래 메뉴가 보이는 폭(lg 미만)에서는 게임을 화면 전체로 띄운다
+const IMMERSIVE = '(max-width: 1023.98px)'
+
 export default function Game() {
+  const sectionRef = useRef<HTMLElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [immersive, setImmersive] = useState(false)
   const engineRef = useRef<Engine | null>(null)
   const [hud, setHud] = useState<HudState | null>(null)
   const [difficulty, setDifficulty] = useState<Difficulty>('normal')
@@ -79,6 +84,31 @@ export default function Game() {
       document.removeEventListener('dragstart', preventDrag)
     }
   }, [])
+
+  useEffect(() => {
+    if (!immersive) return
+    const root = document.documentElement
+    root.style.overflow = 'hidden'
+    return () => {
+      root.style.overflow = ''
+      if (document.fullscreenElement) void document.exitFullscreen().catch(() => {})
+    }
+  }, [immersive])
+
+  const enterImmersive = () => {
+    if (immersive || !window.matchMedia(IMMERSIVE).matches) return
+    setImmersive(true)
+    // 안드로이드는 주소창까지 숨긴다. 아이폰 사파리는 지원하지 않아 화면을 덮는 것으로 끝낸다
+    sectionRef.current?.requestFullscreen?.({ navigationUI: 'hide' }).catch(() => {})
+  }
+  const exitImmersive = () => {
+    activePointer.current = null
+    setRallyReport(null)
+    setReading(null)
+    setCoach(null)
+    engineRef.current?.quit()
+    setImmersive(false)
+  }
 
   const openCoach = () => {
     engineRef.current?.pause()
@@ -175,8 +205,23 @@ export default function Game() {
   )
 
   return (
-    <section className="mx-auto max-w-5xl px-0 md:px-4 md:pt-6" aria-label="스쿼시 게임">
-      <div className="relative h-[calc(100dvh-56px-76px-env(safe-area-inset-bottom))] min-h-[420px] overflow-hidden bg-ink md:h-[min(78vh,720px)] md:rounded-[28px]" style={blockDrag ? { userSelect: 'none', WebkitUserSelect: 'none' } : undefined} onDragStart={(e) => { if (blockDrag) e.preventDefault() }}>
+    <section
+      ref={sectionRef}
+      className={
+        immersive
+          ? 'fixed inset-0 z-50 flex flex-col bg-ink pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]'
+          : 'mx-auto max-w-5xl px-0 md:px-4 md:pt-6'
+      }
+      aria-label="스쿼시 게임"
+    >
+      {immersive && (
+        <div className="flex h-11 shrink-0 items-center px-2">
+          <button type="button" onClick={exitImmersive} className="flex min-h-11 items-center gap-1 rounded-full px-3 text-[14px] font-bold text-white/85 active:bg-white/10">
+            <span aria-hidden="true" className="text-[18px] leading-none">‹</span> 나가기
+          </button>
+        </div>
+      )}
+      <div className={immersive ? 'relative min-h-0 flex-1 overflow-hidden bg-ink' : 'relative h-[calc(100dvh-56px-76px-env(safe-area-inset-bottom))] min-h-[420px] overflow-hidden bg-ink md:h-[min(78vh,720px)] md:rounded-[28px]'} style={blockDrag ? { userSelect: 'none', WebkitUserSelect: 'none' } : undefined} onDragStart={(e) => { if (blockDrag) e.preventDefault() }}>
         <div className="contents" inert={coach !== null || rallyReport !== null}>
           <canvas
             ref={canvasRef}
@@ -372,6 +417,7 @@ export default function Game() {
                   onClick={() => {
                     // 누른 순간에 소리를 켠다(브라우저 정책)
                     engineRef.current?.unlockAudio()
+                    enterImmersive()
                     engineRef.current?.newMatch()
                   }}
                   className="mt-5 w-full rounded-2xl bg-teal py-3.5 text-[16px] font-bold text-white transition hover:bg-teal-deep active:scale-[0.99]"

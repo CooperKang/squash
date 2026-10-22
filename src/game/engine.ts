@@ -190,6 +190,17 @@ export class Engine {
     this.setupServe()
   }
 
+  /** 경기를 그만두고 시작 화면으로 돌아간다 */
+  quit() {
+    this.cancelCharge()
+    this.paused = false
+    this.hint = null
+    this.score = { you: 0, cpu: 0 }
+    this.rally = 0
+    this.phase = 'ready'
+    this.emit()
+  }
+
   /** 자동 테스트용: 지금 칠 수 있는 공의 화면 위치 */
   debugTarget() {
     const reach =
