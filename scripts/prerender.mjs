@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url'
 
 const DIST = 'dist'
 const ssr = await import(pathToFileURL(join(process.cwd(), 'dist-ssr/entry-server.js')).href)
-const { SEO_PAGES, SITE, REGION_SLUG: REGIONS, GLOSSARY, CATEGORIES, WARMUP, COOLDOWN, FOAM_ROLLER, render } = ssr
+const { SEO_PAGES, SITE, REGION_SLUG: REGIONS, GLOSSARY, CATEGORIES, WARMUP, COOLDOWN, FOAM_ROLLER, DISCLOSURE, render } = ssr
 
 const template = await readFile(join(DIST, 'index.html'), 'utf8')
 const courts = JSON.parse(await readFile(join(DIST, 'data/courts.json'), 'utf8'))
@@ -249,6 +249,26 @@ const full = [
     regionLinks.map((r) => `### ${r.ko} (${r.n}곳)\n주소: ${r.url}\n` + r.list.map((c) => `- ${courtRow(c).line}`).join('\n')).join('\n\n'),
 ].join('\n\n')
 await writeFile(join(DIST, 'llms-full.txt'), full + '\n')
+
+// 쿠팡 파트너스 경제적 이해관계 표시: 소모품 상담 페이지마다 문구가 첫 쿠팡 링크보다 앞에 있고, 쿠팡 링크는 모두 sponsored
+const disclosureErrors = []
+for (const page of SEO_PAGES.filter((p) => p.path.startsWith('kit/'))) {
+  const html = await readFile(join(DIST, page.path, 'index.html'), 'utf8')
+  // 첫 부분의 문구 상자(id="kit-disclosure")가 첫 상담과 첫 쿠팡 링크보다 앞에 있어야 한다
+  const box = html.indexOf('id="kit-disclosure"')
+  const text = html.indexOf(DISCLOSURE, box)
+  const firstTip = html.indexOf('<article')
+  const firstLink = html.indexOf('href="https://link.coupang.com/')
+  const before = (i) => i < 0 || text < i
+  if (box < 0 || text < 0 || text - box > 300 || !before(firstTip) || !before(firstLink))
+    disclosureErrors.push(`${page.path}: 첫 부분에 대가성 문구 상자가 없거나 상담·쿠팡 링크보다 뒤에 있어요`)
+  for (const a of html.match(/<a [^>]*href="https:\/\/link\.coupang\.com\/[^>]*>/g) ?? [])
+    if (!/rel="sponsored/.test(a)) disclosureErrors.push(`${page.path}: rel="sponsored"가 없는 쿠팡 링크 ${a}`)
+}
+if (disclosureErrors.length) {
+  console.error(disclosureErrors.join('\n'))
+  process.exit(1)
+}
 
 await rm('dist-ssr', { recursive: true, force: true })
 console.log(`정적 페이지 ${urls.length}개, llms-full ${Math.round(full.length / 1000)}k자`)

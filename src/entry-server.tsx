@@ -8,6 +8,7 @@ import { setSsrHash } from './router'
 export { SEO_PAGES, SITE, REGION_SLUG } from './seo'
 export { GLOSSARY, CATEGORIES } from './data/glossary'
 export { WARMUP, COOLDOWN, FOAM_ROLLER } from './data/stretches'
+export { DISCLOSURE } from './data/partners'
 
 /** 빌드할 때 화면 하나를 HTML로 그린다(검색엔진과 AI가 자바스크립트 없이 읽게) */
 export function render(hash: string, data: Record<string, unknown> = {}) {

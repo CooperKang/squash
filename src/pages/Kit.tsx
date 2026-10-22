@@ -35,7 +35,7 @@ export default function Kit() {
       </PageHead>
 
       <div className="mx-auto max-w-6xl px-4">
-        <p className="rounded-2xl border-2 border-teal bg-teal-soft px-4 py-3 text-[15.5px] leading-relaxed font-bold text-teal-deep">{DISCLOSURE}</p>
+        <p id="kit-disclosure" className="rounded-2xl border-2 border-teal bg-teal-soft px-4 py-3 text-[15.5px] leading-relaxed font-bold text-teal-deep">{DISCLOSURE}</p>
       </div>
 
       <Section kicker="I AM…" title="나는…">
