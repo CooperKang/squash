@@ -6,6 +6,7 @@ const PATHS: Record<Route, string> = {
   rules: 'M5 3h14v18H5zM5 9h14M12 9v12M5 15h7',
   gear: 'M9 3c3.3 0 6 2.9 6 6.5S12.3 16 9 16 3 13.1 3 9.5 5.7 3 9 3Zm2.6 12.4L19 21m-1.5-6a2.5 2.5 0 1 0 0 .01',
   finder: 'M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM15.5 15.5 20 20',
+  kit: 'M5 8h14l-1 12H6L5 8ZM9 8V6a3 3 0 0 1 6 0v2',
   live: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
   giyeok: 'M4 4h16v16h-7v-9H4z',
   shots: 'M4 20c3-9 8-14 16-16M16 4h4v4M4 14l3 3',

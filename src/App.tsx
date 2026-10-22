@@ -11,6 +11,7 @@ import Giyeok from './pages/Giyeok'
 import Shots from './pages/Shots'
 import Practice from './pages/Practice'
 import Courts from './pages/Courts'
+import Kit from './pages/Kit'
 
 const PAGES: Record<Route, () => React.JSX.Element> = {
   home: Home,
@@ -18,6 +19,7 @@ const PAGES: Record<Route, () => React.JSX.Element> = {
   rules: Rules,
   gear: Gear,
   finder: Finder,
+  kit: Kit,
   live: Live,
   game: Game,
   giyeok: Giyeok,

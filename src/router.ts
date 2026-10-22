@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 // GitHub Pages에서 새로고침해도 깨지지 않게 해시 주소(#/rules)로 화면을 나눈다
-export type Route = 'home' | 'about' | 'rules' | 'giyeok' | 'shots' | 'practice' | 'gear' | 'finder' | 'live' | 'courts' | 'game'
+export type Route = 'home' | 'about' | 'rules' | 'giyeok' | 'shots' | 'practice' | 'gear' | 'finder' | 'kit' | 'live' | 'courts' | 'game'
 
 // parent가 있는 화면은 메뉴 대신 그 섹션 위의 작은 탭으로 들어간다
 export const ROUTES: { id: Route; label: string; short: string; parent?: Route; desktopOnly?: boolean }[] = [
@@ -13,6 +13,7 @@ export const ROUTES: { id: Route; label: string; short: string; parent?: Route; 
   { id: 'practice', label: '혼자 연습', short: '연습', parent: 'shots' },
   { id: 'gear', label: '장비', short: '장비' },
   { id: 'finder', label: '라켓 찾기', short: '라켓', parent: 'gear' },
+  { id: 'kit', label: '소모품 상담', short: '소모품', parent: 'gear' },
   { id: 'live', label: '대회 현황', short: '현황' },
   { id: 'courts', label: '코트 찾기', short: '코트' },
   { id: 'game', label: '게임', short: '게임' },
