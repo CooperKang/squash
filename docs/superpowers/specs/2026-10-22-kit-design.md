@@ -62,12 +62,21 @@
 - `src/data/kit.ts`
   - `KIT_GROUPS`: `{ id: 'grip' | 'shoes' | 'sweat' | 'protect' | 'recovery'; label; path }`
   - `KIT_TIPS`: `{ id; group; chip; q; a; tries: string[]; look: string; links: PartnerKey[] }`
-- `src/data/partners.ts`
-  - `PARTNER_LINKS: Record<PartnerKey, string>`: 링크 키 → 쿠팡 파트너스가 만들어 준 짧은 링크(`https://link.coupang.com/...`).
-  - `PARTNER_LABELS: Record<PartnerKey, string>`: 버튼에 쓸 짧은 이름("타월 그립").
-  - `DISCLOSURE`: "이 글에는 쿠팡 파트너스 링크가 있어요. 링크로 구매하시면 일정액의 수수료를 받아요."
-  - 링크는 파트너스 사이트의 링크 생성으로 만든 것만 쓴다. 파트너스 코드로 주소를 직접 조립하지 않는다(추적이 보장되지 않음).
-  - 링크가 빈 문자열이면 버튼만 감추고 팁은 그대로 보여 준다.
+- `src/data/partners.json`: 사람이 직접 고치는 상품 목록. 코드를 몰라도 이 파일만 고치면 된다(GitHub 웹에서 고치면 배포까지 자동).
+  ```json
+  "grip-towel": {
+    "label": "타월 그립",            // 묶음 이름
+    "search": "스쿼시 타월 그립",     // 링크 만들 때 쓴 검색어(기록용, 화면에 안 나옴)
+    "items": [
+      { "name": "OO 타월 그립 3개입", "url": "https://link.coupang.com/...", "note": "땀 많은 날 2주면 갈아요" }
+    ]
+  }
+  ```
+  - 키 하나에 상품을 여러 개 넣을 수 있다. 상담 카드에는 상담에 걸린 키들의 상품을 순서대로 최대 3개까지 보여 준다.
+  - `note`는 선택. 있으면 상품 이름 아래 한 줄 코멘트로 보여 준다.
+  - `url`이 빈 항목은 화면에 안 나온다. 상담에 보여 줄 상품이 하나도 없으면 링크 묶음만 감추고 팁은 그대로 보여 준다.
+- `src/data/partners.ts`: JSON을 읽어 타입을 붙이고 빈 항목을 거른다. `DISCLOSURE` 문구("이 글에는 쿠팡 파트너스 링크가 있어요. 링크로 구매하시면 일정액의 수수료를 받아요.")도 여기 둔다.
+- 링크는 파트너스 사이트의 링크 생성으로 만든 것만 쓴다. 파트너스 코드로 주소를 직접 조립하지 않는다(추적이 보장되지 않음).
 
 ## 링크
 
@@ -83,10 +92,10 @@
 ## 테스트
 
 - `src/data/kit.test.ts`
-  - 모든 상담의 `links`가 `PARTNER_LINKS`에 있다.
+  - 모든 상담의 `links` 키가 `partners.json`에 있다.
   - 상담 id와 칩이 겹치지 않는다.
   - 모든 품목에 상담이 하나 이상 있고 `SEO_PAGES`에 품목 페이지가 있다.
-  - 비어 있지 않은 링크는 `https://link.coupang.com/`로 시작한다.
+  - `partners.json`에서 `url`이 있는 항목은 `name`도 있고, `url`은 `https://link.coupang.com/`로 시작한다(잘못 붙여 넣은 일반 쿠팡 주소를 잡는다).
 - `npm run build` 뒤 `dist/kit/index.html`에 대가성 문구와 `rel="sponsored`가 들어 있는지 확인.
 
 ## 범위 밖
