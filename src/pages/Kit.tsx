@@ -46,14 +46,14 @@ export default function Kit() {
       </div>
 
       <Section kicker="I AM…" title="나는…">
-        <div className="flex flex-wrap gap-2">
+        <div className="-mx-4 grid auto-cols-max grid-flow-col grid-rows-2 gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex sm:flex-wrap sm:overflow-visible sm:px-0">
           {KIT_TIPS.map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => pickTip(t)}
               aria-pressed={view.focus === t.id}
-              className="rounded-full border border-line bg-card px-3.5 py-2 text-[14.5px] font-bold transition hover:border-teal aria-pressed:border-teal aria-pressed:bg-teal aria-pressed:text-white"
+              className="shrink-0 rounded-full border border-line bg-card px-3.5 py-2 text-[14.5px] font-bold transition hover:border-teal aria-pressed:border-teal aria-pressed:bg-teal aria-pressed:text-white"
             >
               {t.chip}
             </button>
@@ -63,14 +63,14 @@ export default function Kit() {
 
       <div className="sticky top-14 z-20 border-b border-line/60 bg-court/90 backdrop-blur md:top-16">
         <div className="mx-auto max-w-6xl px-4 py-2.5">
-          <div className="flex flex-wrap gap-1.5" role="group" aria-label="품목">
+          <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0" role="group" aria-label="품목">
             {[{ id: 'all' as const, label: '전체' }, ...KIT_GROUPS].map((g) => (
               <button
                 key={g.id}
                 type="button"
                 aria-pressed={view.group === g.id}
                 onClick={() => pickGroup(g.id)}
-                className="rounded-xl border border-line bg-card px-3.5 py-2 text-[14.5px] font-bold text-muted transition aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-white"
+                className="shrink-0 rounded-xl border border-line bg-card px-3.5 py-2 text-[14.5px] font-bold text-muted transition aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-white"
               >
                 {g.label}
               </button>
@@ -106,7 +106,7 @@ export default function Kit() {
 function TipCard({ tip, focused }: { tip: KitTip; focused: boolean }) {
   const picks = picksFor(tip.links)
   return (
-    <article id={tip.id} className="scroll-mt-32">
+    <article id={tip.id} className="min-w-0 scroll-mt-32">
       <Card className={`h-full ${focused ? 'border-teal ring-2 ring-teal/20' : ''}`}>
         <p className="flex gap-2.5 text-[16.5px] leading-snug font-extrabold">
           <span className="grid size-7 shrink-0 place-items-center rounded-full bg-ink font-wide text-[12px] text-white" aria-hidden="true">Q</span>
@@ -140,11 +140,11 @@ function TipCard({ tip, focused }: { tip: KitTip; focused: boolean }) {
                     href={p.url}
                     target="_blank"
                     rel="sponsored nofollow noopener"
-                    className="group flex items-center justify-between gap-3 rounded-xl border border-line/80 bg-white px-3.5 py-2.5 transition hover:border-teal"
+                    className="group flex flex-col gap-1.5 rounded-xl border border-line/80 bg-white px-3.5 py-2.5 transition hover:border-teal min-[460px]:flex-row min-[460px]:items-center min-[460px]:justify-between min-[460px]:gap-3"
                   >
                     <span className="min-w-0">
-                      <span className="block truncate text-[14px] font-bold">{p.name}</span>
-                      {p.note && <span className="block text-[12.5px] text-muted">{p.note}</span>}
+                      <span className="line-clamp-2 block text-[14px] leading-snug font-bold">{p.name}</span>
+                      {p.note && <span className="mt-0.5 block text-[12.5px] leading-snug text-muted">{p.note}</span>}
                     </span>
                     <span className="inline-flex shrink-0 items-center gap-1 text-[12.5px] font-bold text-teal">
                       쿠팡에서 보기 <External className="size-3.5" />
