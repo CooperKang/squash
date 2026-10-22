@@ -33,8 +33,8 @@
     "label": "발목까지 잡아 주는 미드컷 인도어화",
     "search": "미즈노 모멘텀3 미드",
     "items": [
-      { "name": "미즈노 웨이브 모멘텀3 미드", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%AF%B8%EC%A6%88%EB%85%B8%20%EC%9B%A8%EC%9D%B4%EB%B8%8C%20%EB%AA%A8%EB%A9%98%ED%85%803%20%EB%AF%B8%EB%93%9C" },
-      { "name": "미즈노 사이클론 스피드4 미드 V1GA238557", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%AF%B8%EC%A6%88%EB%85%B8%20%EC%82%AC%EC%9D%B4%ED%81%B4%EB%A1%A0%20%EC%8A%A4%ED%94%BC%EB%93%9C4%20%EB%AF%B8%EB%93%9C%20V1GA238557" }
+      { "name": "미즈노 웨이브 모멘텀3 미드", "url": "https://link.coupang.com/a/h3nttPHFeK", "note": "배구화 계열 미드컷, 발목을 감싸 줘요" },
+      { "name": "미즈노 사이클론 스피드4 미드컷", "url": "https://link.coupang.com/a/h3nvqKxtAG", "note": "가격 부담이 적은 미드컷 인도어화" }
     ]
   },
   "shoes-wide": {
@@ -73,8 +73,8 @@
     "label": "무릎 보호대",
     "search": "슬개골 보호대",
     "items": [
-      { "name": "잠스트 JK-BAND 슬개골 밴드", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%9E%A0%EC%8A%A4%ED%8A%B8%20JK-BAND" },
-      { "name": "잠스트 JK-1 무릎 보호대", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%9E%A0%EC%8A%A4%ED%8A%B8%20JK-1%20%EB%AC%B4%EB%A6%8E%EB%B3%B4%ED%98%B8%EB%8C%80" }
+      { "name": "잠스트 JK-BAND 슬개골 밴드", "url": "https://link.coupang.com/a/h3nCJvFrQy", "note": "무릎뼈 아래 힘줄을 눌러 주는 밴드형" },
+      { "name": "통기성 무릎 보호대", "url": "https://link.coupang.com/a/h3nH1YBOXA", "note": "무릎 전체를 감싸는 슬리브형" }
     ]
   },
   "foam-roller": {
