@@ -3,30 +3,30 @@
     "label": "타월 그립",
     "search": "스쿼시 타월 그립",
     "items": [
-      { "name": "키모니 마이크로 파이버 극세사 쿠션 타월그립 KGT147 5p", "url": "https://link.coupang.com/a/h3j4Jqo3ga", "note": "" }
+      { "name": "키모니 마이크로 파이버 극세사 쿠션 타월그립 KGT147 5p", "url": "https://link.coupang.com/a/h3j4Jqo3ga", "note": "극세사 타월형이라 땀을 잘 먹어요. 5개 묶음" }
     ]
   },
   "grip-dry": {
     "label": "드라이 오버그립",
     "search": "드라이 오버그립 흡수",
     "items": [
-      { "name": "키모니 하이 소프트 EX 오버그립 KGT111 12p", "url": "https://link.coupang.com/a/h3ln1sSINM", "note": "" }
+      { "name": "키모니 하이 소프트 EX 오버그립 KGT111 12p", "url": "https://link.coupang.com/a/h3ln1sSINM", "note": "부드러운 드라이 오버그립, 12개라 자주 갈기 좋아요" }
     ]
   },
   "grip-tacky": {
     "label": "끈적한 오버그립",
     "search": "오버그립 택키",
     "items": [
-      { "name": "카라칼 PU 슈퍼 오리지날 어소티드 그립 6개입 테니스 스쿼시그립", "url": "https://link.coupang.com/a/h3k8MbLUeO", "note": "" }
+      { "name": "카라칼 PU 슈퍼 오리지날 어소티드 그립 6개입 테니스 스쿼시그립", "url": "https://link.coupang.com/a/h3k8MbLUeO", "note": "손에 붙는 PU 그립, 6개 묶음" }
     ]
   },
   "shoes-court": {
     "label": "스쿼시화",
     "search": "스쿼시화 논마킹",
     "items": [
-      { "name": "미즈노 웨이브 팡2 인도어화", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%AF%B8%EC%A6%88%EB%85%B8%20%EC%9B%A8%EC%9D%B4%EB%B8%8C%20%ED%8C%A12" },
-      { "name": "미즈노 사이클론 스피드4 인도어화", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%AF%B8%EC%A6%88%EB%85%B8%20%EC%82%AC%EC%9D%B4%ED%81%B4%EB%A1%A0%20%EC%8A%A4%ED%94%BC%EB%93%9C4" },
-      { "name": "요넥스 파워쿠션 88 다이얼", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%9A%94%EB%84%A5%EC%8A%A4%20%ED%8C%8C%EC%9B%8C%EC%BF%A0%EC%85%98%2088%20%EB%8B%A4%EC%9D%B4%EC%96%BC" }
+      { "name": "미즈노 웨이브 팡2 인도어화", "url": "https://link.coupang.com/a/h3mn7S3BN6", "note": "미즈노 실내 코트화, 배드민턴·스쿼시 겸용" },
+      { "name": "미즈노 사이클론 스피드 5 운동화", "url": "https://link.coupang.com/a/h3mutKUzYq", "note": "가볍고 가격 부담이 적은 입문용 인도어화" },
+      { "name": "요넥스 파워쿠션 88 다이얼", "url": "https://link.coupang.com/a/h3mwB4vKb6", "note": "다이얼로 조여 발을 단단히 잡아 줘요" }
     ]
   },
   "shoes-mid": {
@@ -41,33 +41,32 @@
     "label": "발볼 넓은 코트화",
     "search": "스쿼시화 와이드",
     "items": [
-      { "name": "미즈노 웨이브 클로 네오2 와이드", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%AF%B8%EC%A6%88%EB%85%B8%20%EC%9B%A8%EC%9D%B4%EB%B8%8C%20%ED%81%B4%EB%A1%9C%20%EB%84%A4%EC%98%A42%20%EC%99%80%EC%9D%B4%EB%93%9C" },
-      { "name": "요넥스 SHB-39WEX 와이드핏", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%9A%94%EB%84%A5%EC%8A%A4%20SHB-39WEX" },
-      { "name": "요넥스 스트라이더 플로우 와이드 SHB-SF1WEX", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%9A%94%EB%84%A5%EC%8A%A4%20SHB-SF1WEX" }
+      { "name": "미즈노 웨이브 클로 네오2 와이드", "url": "https://link.coupang.com/a/h3mBpbJAxU", "note": "발볼 넓은 와이드 버전" },
+      { "name": "요넥스 SHB-65Z4 와이드핏", "url": "https://link.coupang.com/a/h3mDP90toa", "note": "요넥스 대표 코트화의 와이드핏" },
+      { "name": "요넥스 스트라이더 플로우 배드민턴화 와이드형", "url": "https://link.coupang.com/a/h3mHseVl6a", "note": "가벼운 와이드형 코트화" }
     ]
   },
   "headband": {
     "label": "헤어밴드",
     "search": "스포츠 헤어밴드 땀밴드",
     "items": [
-      { "name": "나이키 스우시 헤드밴드", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%82%98%EC%9D%B4%ED%82%A4%20%EC%8A%A4%EC%9A%B0%EC%8B%9C%20%ED%97%A4%EB%93%9C%EB%B0%B4%EB%93%9C" },
-      { "name": "나이키 드라이핏 헤어밴드", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%82%98%EC%9D%B4%ED%82%A4%20%EB%93%9C%EB%9D%BC%EC%9D%B4%ED%95%8F%20%ED%97%A4%EC%96%B4%EB%B0%B4%EB%93%9C" }
+      { "name": "나이키 스우시 헤드밴드", "url": "https://link.coupang.com/a/h3mRz9IOHc", "note": "이마 땀을 막는 테리 헤드밴드" },
+      { "name": "나이키 드라이핏 헤어밴드", "url": "https://link.coupang.com/a/h3mSzk78Zo", "note": "얇고 빨리 마르는 헤어밴드" }
     ]
   },
   "wristband": {
     "label": "손목 밴드",
     "search": "손목 땀밴드",
     "items": [
-      { "name": "나이키 스우시 손목밴드", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%82%98%EC%9D%B4%ED%82%A4%20%EC%8A%A4%EC%9A%B0%EC%8B%9C%20%EC%86%90%EB%AA%A9%EB%B0%B4%EB%93%9C" },
-      { "name": "나이키 스우시 더블와이드 손목밴드", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%82%98%EC%9D%B4%ED%82%A4%20%EB%8D%94%EB%B8%94%EC%99%80%EC%9D%B4%EB%93%9C%20%EC%86%90%EB%AA%A9%EB%B0%B4%EB%93%9C" }
+      { "name": "나이키 스우시 손목밴드", "url": "https://link.coupang.com/a/h3mTXJDKDc", "note": "기본 폭 테리 손목밴드" },
+      { "name": "나이키 스우시 더블와이드 손목밴드", "url": "https://link.coupang.com/a/h3mUXAL62S", "note": "폭이 넓어 땀을 더 많이 받아요" }
     ]
   },
   "goggles": {
     "label": "보호안경",
     "search": "스쿼시 보호안경",
     "items": [
-      { "name": "던롭 I-Armor 스쿼시 고글", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%8D%98%EB%A1%AD%20%EC%8A%A4%EC%BF%BC%EC%8B%9C%20%EA%B3%A0%EA%B8%80" },
-      { "name": "스쿼시 보호안경", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%8A%A4%EC%BF%BC%EC%8B%9C%20%EB%B3%B4%ED%98%B8%EC%95%88%EA%B2%BD" }
+      { "name": "스쿼시 보호안경", "url": "https://link.coupang.com/a/h3mYK1CvUy", "note": "라켓 스포츠용인지 상세에서 꼭 확인하세요" }
     ]
   },
   "knee-brace": {
@@ -82,17 +81,16 @@
     "label": "폼롤러",
     "search": "폼롤러",
     "items": [
-      { "name": "큐잉 EVA 폼롤러 미니 45cm", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%ED%81%90%EC%9E%89%20EVA%20%ED%8F%BC%EB%A1%A4%EB%9F%AC%20%EB%AF%B8%EB%8B%88%2045cm" },
-      { "name": "스포틀러 EPP 폼롤러 고밀도", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%8A%A4%ED%8F%AC%ED%8B%80%EB%9F%AC%20EPP%20%ED%8F%BC%EB%A1%A4%EB%9F%AC" }
+      { "name": "큐잉 EVA 폼롤러 미니 45cm", "url": "https://link.coupang.com/a/h3m0WMoqOG", "note": "짧고 부드러운 EVA, 종아리용" },
+      { "name": "스포틀러 EPP 폼롤러 고밀도", "url": "https://link.coupang.com/a/h3m2mnTakS", "note": "단단한 고밀도 EPP, 익숙해진 뒤에" }
     ]
   },
   "ball": {
     "label": "스쿼시공",
     "search": "던롭 스쿼시공",
     "items": [
-      { "name": "던롭 프로 스쿼시볼(더블 옐로)", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%8D%98%EB%A1%AD%20%ED%94%84%EB%A1%9C%20%EC%8A%A4%EC%BF%BC%EC%8B%9C%EB%B3%BC" },
-      { "name": "던롭 프로그레스 스쿼시볼(레드)", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%8D%98%EB%A1%AD%20%EC%8A%A4%EC%BF%BC%EC%8B%9C%EB%B3%BC%20%EB%A0%88%EB%93%9C" },
-      { "name": "던롭 인트로 스쿼시볼(블루)", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%8D%98%EB%A1%AD%20%EC%8A%A4%EC%BF%BC%EC%8B%9C%EB%B3%BC%20%EB%B8%94%EB%A3%A8" }
+      { "name": "던롭 프로 스쿼시볼", "url": "https://link.coupang.com/a/h3m43rHG7o", "note": "점 두 개 대회 공, 잘 안 튀어요" },
+      { "name": "던롭 연습용 스쿼시볼", "url": "https://link.coupang.com/a/h3m8TXYhC8", "note": "더 잘 튀어서 랠리 연습에 좋아요" }
     ]
   }
 }
