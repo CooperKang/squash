@@ -24,7 +24,7 @@ export default function Game() {
   const [immersive, setImmersive] = useState(false)
   const engineRef = useRef<Engine | null>(null)
   const [hud, setHud] = useState<HudState | null>(null)
-  const [difficulty, setDifficulty] = useState<Difficulty>('normal')
+  const [difficulty, setDifficulty] = useState<Difficulty>('easy')
   const [mode, setMode] = useState<GameMode>('classic')
   const [coach, setCoach] = useState<number | null>(null)
   const [rallyReport, setRallyReport] = useState<MatchSummary | null>(null)

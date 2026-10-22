@@ -99,7 +99,7 @@ export class Engine {
   private playerPlanIn = 0
   private hudClock = 0
   private lastPower = 0
-  public difficulty: Difficulty = 'normal'
+  public difficulty: Difficulty = 'easy'
   public sound = true
   public askRules = true
 
