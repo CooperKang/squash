@@ -42,7 +42,7 @@
 | sweat-hand | grip | 손에 땀이 많아 라켓이 돌아요 | grip-towel, grip-dry |
 | thin-grip | grip | 얇게 쥐는 게 좋아요 | grip-dry |
 | thick-grip | grip | 손이 커서 그립이 가늘게 느껴져요 | grip-tacky |
-| grip-change | grip | 그립은 언제 갈아요? | grip-replacement |
+| new-racket | grip | 라켓을 새로 샀는데 원그립은 벗겨야 해요? | grip-dry, grip-tacky |
 | weak-ankle | shoes | 발목에 힘이 없어 자주 접질려요 | shoes-court, ankle-brace |
 | running-shoes | shoes | 러닝화 신고 쳐도 돼요? | shoes-court |
 | wide-foot | shoes | 발볼이 넓어 코트화가 아파요 | shoes-wide |
@@ -56,6 +56,7 @@
 - 땀이 많으면: 끈적(택키)형은 젖으면 오히려 미끄럽다. 타월형이나 드라이(흡수)형, 자주 교체.
 - 얇은 그립이 좋으면: 원그립(기본 그립)을 벗기고 얇은 그립이나 오버그립 한 겹만.
 - 두꺼운 그립이 좋으면: 원그립은 두고 그 위에 오버그립을 덧감는다.
+- 새 라켓: 원그립은 따로 팔지 않아 한 번 벗기면 되돌리기 어렵다. 바로 벗기지 말고 오버그립을 올려 몇 번 쳐 본 뒤, 두껍게 느껴지면 그때 벗기고 아니면 그대로 둔다. 오버그립 교체 주기(땀 많으면 2~3주)도 여기서 안내.
 
 ## 데이터
 
