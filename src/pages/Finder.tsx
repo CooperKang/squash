@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { External } from '../components/Icon'
+import { Arrow, External } from '../components/Icon'
 import { Card, PageHead, Section } from '../components/ui'
 import { won } from '../format'
 import { RACKETS, RACKETS_UPDATED } from '../data/rackets'
@@ -263,6 +263,9 @@ function Catalog() {
           <RacketCard key={r.id} r={r} />
         ))}
       </ul>
+      <a href="#/kit?g=grip" className="mt-5 inline-flex items-center gap-1.5 text-[14.5px] font-bold text-teal hover:text-teal-deep">
+        그립이 미끄럽거나 두께가 안 맞는다면: 그립 고민 상담 <Arrow className="size-3.5" />
+      </a>
     </Section>
   )
 }

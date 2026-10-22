@@ -152,18 +152,27 @@ export default function Gear() {
             <p className="mt-1.5 text-[14px] leading-relaxed text-muted">
               땀이 많으면 타월 그립, 얇게 쥐고 싶으면 오버그립 한 겹. 미끄러지기 시작하면 바로 바꿔요. 손이 작으면 기본 그립을 벗기고 오버그립만 감기도 해요.
             </p>
+            <a href="#/kit?g=grip" className="mt-3 inline-flex items-center gap-1.5 text-[14px] font-bold text-teal hover:text-teal-deep">
+              그립 고민 상담 <Arrow className="size-3.5" />
+            </a>
           </Card>
           <Card>
             <h3 className="font-extrabold">신발</h3>
             <p className="mt-1.5 text-[14px] leading-relaxed text-muted">
               바닥에 자국이 안 남는 논마킹 실내화가 필수예요. 옆으로 자주 멈추니 러닝화보다 접지력과 발목 지지가 좋은 코트화가 안전해요.
             </p>
+            <a href="#/kit?g=shoes" className="mt-3 inline-flex items-center gap-1.5 text-[14px] font-bold text-teal hover:text-teal-deep">
+              신발 고민 상담 <Arrow className="size-3.5" />
+            </a>
           </Card>
           <Card>
             <h3 className="font-extrabold">보호안경</h3>
             <p className="mt-1.5 text-[14px] leading-relaxed text-muted">
               공이 눈에 딱 맞는 크기라 맞으면 크게 다칠 수 있어요. 주니어 대회와 복식에서는 의무예요. 동호인도 쓰기를 권해요.
             </p>
+            <a href="#/kit?c=eye-guard" className="mt-3 inline-flex items-center gap-1.5 text-[14px] font-bold text-teal hover:text-teal-deep">
+              보호안경 고민 상담 <Arrow className="size-3.5" />
+            </a>
           </Card>
         </div>
         <a id="finder-cta" href={href('finder')} className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-teal px-5 py-3.5 text-[15px] font-bold text-white hover:bg-teal-deep">

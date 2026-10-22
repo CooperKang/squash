@@ -8,6 +8,7 @@ import { COOLDOWN, COOLDOWN_VIDEOS, FOAM_ROLLER, ROLLER_TIPS, WARMUP, WARMUP_VID
 import { MOVES } from '../data/stretchMoves'
 import { StretchFigure } from '../components/StretchFigure'
 import { buildSequence } from '../game/sequence'
+import { Arrow } from '../components/Icon'
 import { hashParam, href, setHashParams } from '../router'
 
 const RECORD_KEY = 'squash.drillRecords'
@@ -288,6 +289,9 @@ function Cooldown() {
         </ul>
         <FollowAlong items={FOAM_ROLLER} title="폼롤러 따라 하기" />
         <StretchList items={FOAM_ROLLER} />
+        <a href="#/kit?c=sore-calf" className="mt-4 inline-flex items-center gap-1.5 text-[14.5px] font-bold text-teal hover:text-teal-deep">
+          종아리가 자주 뭉친다면: 폼롤러 고르는 법 <Arrow className="size-3.5" />
+        </a>
       </Section>
       <Videos title="영상으로 따라 하기" videos={COOLDOWN_VIDEOS} />
     </>
