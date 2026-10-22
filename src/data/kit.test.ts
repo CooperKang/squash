@@ -56,3 +56,17 @@ describe('picksFor', () => {
     expect(picksFor([])).toEqual([])
   })
 })
+
+describe('상담 문구 사실 확인', () => {
+  const tip = (id: string) => KIT_TIPS.find((t) => t.id === id)!
+  const text = (id: string) => [tip(id).a, ...tip(id).tries, tip(id).look].join(' ')
+  it('교체용 그립은 판다(원그립을 못 구한다고 하지 않는다)', () => {
+    expect(text('new-racket')).not.toMatch(/따로 팔지 않/)
+  })
+  it('보호안경을 일반 안경 위에 쓰라고 하지 않는다', () => {
+    expect(text('eye-guard')).not.toMatch(/안경 위에/)
+  })
+  it('렛은 상대를 칠 위험이 있을 때 요청한다', () => {
+    expect(text('eye-guard')).not.toMatch(/내 몸 쪽으로/)
+  })
+})

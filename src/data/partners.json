@@ -24,67 +24,67 @@
     "label": "스쿼시화",
     "search": "스쿼시화 논마킹",
     "items": [
-      { "name": "미즈노 웨이브 팡2 인도어화", "url": "https://www.coupang.com/np/search?q=%EB%AF%B8%EC%A6%88%EB%85%B8%20%EC%9B%A8%EC%9D%B4%EB%B8%8C%20%ED%8C%A12", "note": "" },
-      { "name": "미즈노 사이클론 스피드4 인도어화", "url": "https://www.coupang.com/np/search?q=%EB%AF%B8%EC%A6%88%EB%85%B8%20%EC%82%AC%EC%9D%B4%ED%81%B4%EB%A1%A0%20%EC%8A%A4%ED%94%BC%EB%93%9C4", "note": "" },
-      { "name": "요넥스 파워쿠션 88 다이얼", "url": "https://www.coupang.com/np/search?q=%EC%9A%94%EB%84%A5%EC%8A%A4%20%ED%8C%8C%EC%9B%8C%EC%BF%A0%EC%85%98%2088%20%EB%8B%A4%EC%9D%B4%EC%96%BC", "note": "" }
+      { "name": "미즈노 웨이브 팡2 인도어화", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%AF%B8%EC%A6%88%EB%85%B8%20%EC%9B%A8%EC%9D%B4%EB%B8%8C%20%ED%8C%A12" },
+      { "name": "미즈노 사이클론 스피드4 인도어화", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%AF%B8%EC%A6%88%EB%85%B8%20%EC%82%AC%EC%9D%B4%ED%81%B4%EB%A1%A0%20%EC%8A%A4%ED%94%BC%EB%93%9C4" },
+      { "name": "요넥스 파워쿠션 88 다이얼", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%9A%94%EB%84%A5%EC%8A%A4%20%ED%8C%8C%EC%9B%8C%EC%BF%A0%EC%85%98%2088%20%EB%8B%A4%EC%9D%B4%EC%96%BC" }
     ]
   },
   "shoes-wide": {
     "label": "발볼 넓은 코트화",
     "search": "스쿼시화 와이드",
     "items": [
-      { "name": "미즈노 웨이브 클로 네오2 와이드", "url": "https://www.coupang.com/np/search?q=%EB%AF%B8%EC%A6%88%EB%85%B8%20%EC%9B%A8%EC%9D%B4%EB%B8%8C%20%ED%81%B4%EB%A1%9C%20%EB%84%A4%EC%98%A42%20%EC%99%80%EC%9D%B4%EB%93%9C", "note": "" },
-      { "name": "요넥스 SHB-39WEX 와이드핏", "url": "https://www.coupang.com/np/search?q=%EC%9A%94%EB%84%A5%EC%8A%A4%20SHB-39WEX", "note": "" },
-      { "name": "요넥스 스트라이더 플로우 와이드 SHB-SF1WEX", "url": "https://www.coupang.com/np/search?q=%EC%9A%94%EB%84%A5%EC%8A%A4%20SHB-SF1WEX", "note": "" }
+      { "name": "미즈노 웨이브 클로 네오2 와이드", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%AF%B8%EC%A6%88%EB%85%B8%20%EC%9B%A8%EC%9D%B4%EB%B8%8C%20%ED%81%B4%EB%A1%9C%20%EB%84%A4%EC%98%A42%20%EC%99%80%EC%9D%B4%EB%93%9C" },
+      { "name": "요넥스 SHB-39WEX 와이드핏", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%9A%94%EB%84%A5%EC%8A%A4%20SHB-39WEX" },
+      { "name": "요넥스 스트라이더 플로우 와이드 SHB-SF1WEX", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%9A%94%EB%84%A5%EC%8A%A4%20SHB-SF1WEX" }
     ]
   },
   "ankle-brace": {
     "label": "발목 보호대",
     "search": "발목 보호대 스포츠",
     "items": [
-      { "name": "잠스트 A1 발목 보호대", "url": "https://www.coupang.com/np/search?q=%EC%9E%A0%EC%8A%A4%ED%8A%B8%20A1%20%EB%B0%9C%EB%AA%A9%EB%B3%B4%ED%98%B8%EB%8C%80", "note": "" },
-      { "name": "잠스트 A1-S 발목 보호대", "url": "https://www.coupang.com/np/search?q=%EC%9E%A0%EC%8A%A4%ED%8A%B8%20A1-S", "note": "" }
+      { "name": "잠스트 A1 발목 보호대", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%9E%A0%EC%8A%A4%ED%8A%B8%20A1%20%EB%B0%9C%EB%AA%A9%EB%B3%B4%ED%98%B8%EB%8C%80" },
+      { "name": "잠스트 A1-S 발목 보호대", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%9E%A0%EC%8A%A4%ED%8A%B8%20A1-S" }
     ]
   },
   "headband": {
     "label": "헤어밴드",
     "search": "스포츠 헤어밴드 땀밴드",
     "items": [
-      { "name": "나이키 스우시 헤드밴드", "url": "https://www.coupang.com/np/search?q=%EB%82%98%EC%9D%B4%ED%82%A4%20%EC%8A%A4%EC%9A%B0%EC%8B%9C%20%ED%97%A4%EB%93%9C%EB%B0%B4%EB%93%9C", "note": "" },
-      { "name": "나이키 드라이핏 헤어밴드", "url": "https://www.coupang.com/np/search?q=%EB%82%98%EC%9D%B4%ED%82%A4%20%EB%93%9C%EB%9D%BC%EC%9D%B4%ED%95%8F%20%ED%97%A4%EC%96%B4%EB%B0%B4%EB%93%9C", "note": "" }
+      { "name": "나이키 스우시 헤드밴드", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%82%98%EC%9D%B4%ED%82%A4%20%EC%8A%A4%EC%9A%B0%EC%8B%9C%20%ED%97%A4%EB%93%9C%EB%B0%B4%EB%93%9C" },
+      { "name": "나이키 드라이핏 헤어밴드", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%82%98%EC%9D%B4%ED%82%A4%20%EB%93%9C%EB%9D%BC%EC%9D%B4%ED%95%8F%20%ED%97%A4%EC%96%B4%EB%B0%B4%EB%93%9C" }
     ]
   },
   "wristband": {
     "label": "손목 밴드",
     "search": "손목 땀밴드",
     "items": [
-      { "name": "나이키 스우시 손목밴드", "url": "https://www.coupang.com/np/search?q=%EB%82%98%EC%9D%B4%ED%82%A4%20%EC%8A%A4%EC%9A%B0%EC%8B%9C%20%EC%86%90%EB%AA%A9%EB%B0%B4%EB%93%9C", "note": "" },
-      { "name": "나이키 스우시 더블와이드 손목밴드", "url": "https://www.coupang.com/np/search?q=%EB%82%98%EC%9D%B4%ED%82%A4%20%EB%8D%94%EB%B8%94%EC%99%80%EC%9D%B4%EB%93%9C%20%EC%86%90%EB%AA%A9%EB%B0%B4%EB%93%9C", "note": "" }
+      { "name": "나이키 스우시 손목밴드", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%82%98%EC%9D%B4%ED%82%A4%20%EC%8A%A4%EC%9A%B0%EC%8B%9C%20%EC%86%90%EB%AA%A9%EB%B0%B4%EB%93%9C" },
+      { "name": "나이키 스우시 더블와이드 손목밴드", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%82%98%EC%9D%B4%ED%82%A4%20%EB%8D%94%EB%B8%94%EC%99%80%EC%9D%B4%EB%93%9C%20%EC%86%90%EB%AA%A9%EB%B0%B4%EB%93%9C" }
     ]
   },
   "goggles": {
     "label": "보호안경",
     "search": "스쿼시 보호안경",
     "items": [
-      { "name": "던롭 I-Armor 스쿼시 고글", "url": "https://www.coupang.com/np/search?q=%EB%8D%98%EB%A1%AD%20%EC%8A%A4%EC%BF%BC%EC%8B%9C%20%EA%B3%A0%EA%B8%80", "note": "" },
-      { "name": "스쿼시 보호안경", "url": "https://www.coupang.com/np/search?q=%EC%8A%A4%EC%BF%BC%EC%8B%9C%20%EB%B3%B4%ED%98%B8%EC%95%88%EA%B2%BD", "note": "" }
+      { "name": "던롭 I-Armor 스쿼시 고글", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%8D%98%EB%A1%AD%20%EC%8A%A4%EC%BF%BC%EC%8B%9C%20%EA%B3%A0%EA%B8%80" },
+      { "name": "스쿼시 보호안경", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%8A%A4%EC%BF%BC%EC%8B%9C%20%EB%B3%B4%ED%98%B8%EC%95%88%EA%B2%BD" }
     ]
   },
   "foam-roller": {
     "label": "폼롤러",
     "search": "폼롤러",
     "items": [
-      { "name": "큐잉 EVA 폼롤러 미니 45cm", "url": "https://www.coupang.com/np/search?q=%ED%81%90%EC%9E%89%20EVA%20%ED%8F%BC%EB%A1%A4%EB%9F%AC%20%EB%AF%B8%EB%8B%88%2045cm", "note": "" },
-      { "name": "스포틀러 EPP 폼롤러 고밀도", "url": "https://www.coupang.com/np/search?q=%EC%8A%A4%ED%8F%AC%ED%8B%80%EB%9F%AC%20EPP%20%ED%8F%BC%EB%A1%A4%EB%9F%AC", "note": "" }
+      { "name": "큐잉 EVA 폼롤러 미니 45cm", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%ED%81%90%EC%9E%89%20EVA%20%ED%8F%BC%EB%A1%A4%EB%9F%AC%20%EB%AF%B8%EB%8B%88%2045cm" },
+      { "name": "스포틀러 EPP 폼롤러 고밀도", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EC%8A%A4%ED%8F%AC%ED%8B%80%EB%9F%AC%20EPP%20%ED%8F%BC%EB%A1%A4%EB%9F%AC" }
     ]
   },
   "ball": {
     "label": "스쿼시공",
     "search": "던롭 스쿼시공",
     "items": [
-      { "name": "던롭 프로 스쿼시볼(더블 옐로)", "url": "https://www.coupang.com/np/search?q=%EB%8D%98%EB%A1%AD%20%ED%94%84%EB%A1%9C%20%EC%8A%A4%EC%BF%BC%EC%8B%9C%EB%B3%BC", "note": "" },
-      { "name": "던롭 프로그레스 스쿼시볼(레드)", "url": "https://www.coupang.com/np/search?q=%EB%8D%98%EB%A1%AD%20%EC%8A%A4%EC%BF%BC%EC%8B%9C%EB%B3%BC%20%EB%A0%88%EB%93%9C", "note": "" },
-      { "name": "던롭 인트로 스쿼시볼(블루)", "url": "https://www.coupang.com/np/search?q=%EB%8D%98%EB%A1%AD%20%EC%8A%A4%EC%BF%BC%EC%8B%9C%EB%B3%BC%20%EB%B8%94%EB%A3%A8", "note": "" }
+      { "name": "던롭 프로 스쿼시볼(더블 옐로)", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%8D%98%EB%A1%AD%20%ED%94%84%EB%A1%9C%20%EC%8A%A4%EC%BF%BC%EC%8B%9C%EB%B3%BC" },
+      { "name": "던롭 프로그레스 스쿼시볼(레드)", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%8D%98%EB%A1%AD%20%EC%8A%A4%EC%BF%BC%EC%8B%9C%EB%B3%BC%20%EB%A0%88%EB%93%9C" },
+      { "name": "던롭 인트로 스쿼시볼(블루)", "url": "", "note": "", "find": "https://www.coupang.com/np/search?q=%EB%8D%98%EB%A1%AD%20%EC%8A%A4%EC%BF%BC%EC%8B%9C%EB%B3%BC%20%EB%B8%94%EB%A3%A8" }
     ]
   }
 }

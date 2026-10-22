@@ -3,7 +3,8 @@
 import data from './partners.json'
 
 export type PartnerKey = keyof typeof data
-export type PartnerItem = { name: string; url: string; note: string }
+/** find: 아직 파트너스 링크로 바꾸지 않은 후보의 쿠팡 주소(기록용, 화면에 안 나옴) */
+export type PartnerItem = { name: string; url: string; note?: string; find?: string }
 
 export const PARTNERS: Record<PartnerKey, { label: string; search: string; items: PartnerItem[] }> = data
 

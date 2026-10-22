@@ -14,6 +14,13 @@ function setKitHash(values: Record<string, string>) {
 export default function Kit() {
   const [view, setView] = useState(() => kitView(hashParam('g'), hashParam('c')))
 
+  // 같은 화면 안에서 주소만 바뀌면(섹션 탭으로 #/kit 다시 누르기 등) 화면이 다시 그려지지 않으니 직접 맞춘다
+  useEffect(() => {
+    const onHash = () => setView(kitView(hashParam('g'), hashParam('c')))
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
   useEffect(() => {
     if (view.focus) document.getElementById(view.focus)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [view])
@@ -56,15 +63,14 @@ export default function Kit() {
 
       <div className="sticky top-14 z-20 border-b border-line/60 bg-court/90 backdrop-blur md:top-16">
         <div className="mx-auto max-w-6xl px-4 py-2.5">
-          <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="품목">
+          <div className="flex flex-wrap gap-1.5" role="group" aria-label="품목">
             {[{ id: 'all' as const, label: '전체' }, ...KIT_GROUPS].map((g) => (
               <button
                 key={g.id}
                 type="button"
-                role="tab"
-                aria-selected={view.group === g.id}
+                aria-pressed={view.group === g.id}
                 onClick={() => pickGroup(g.id)}
-                className="rounded-xl border border-line bg-card px-3.5 py-2 text-[14.5px] font-bold text-muted transition aria-selected:border-ink aria-selected:bg-ink aria-selected:text-white"
+                className="rounded-xl border border-line bg-card px-3.5 py-2 text-[14.5px] font-bold text-muted transition aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-white"
               >
                 {g.label}
               </button>
