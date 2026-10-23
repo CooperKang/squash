@@ -11,6 +11,7 @@ import Giyeok from './pages/Giyeok'
 import Shots from './pages/Shots'
 import Practice from './pages/Practice'
 import Courts from './pages/Courts'
+import { useUpdateAvailable } from './update'
 import Kit from './pages/Kit'
 
 const PAGES: Record<Route, () => React.JSX.Element> = {
@@ -31,8 +32,10 @@ const PAGES: Record<Route, () => React.JSX.Element> = {
 export default function App() {
   const route = useRoute()
   const Page = PAGES[route]
+  const updated = useUpdateAvailable()
   return (
     <div className="min-h-dvh pb-[calc(76px+env(safe-area-inset-bottom))] lg:pb-0">
+      {updated && <UpdateBadge />}
       <header className="sticky top-0 z-30 border-b border-line/70 bg-court/85 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 md:h-16">
           <a href={href('home')} className="flex items-center gap-2.5" aria-label="스쿼시 코트 처음 화면">
@@ -94,6 +97,19 @@ export default function App() {
         </ul>
       </nav>
     </div>
+  )
+}
+
+// 새 배포가 올라오면 헤더 아래 가운데에 떠서 새로고침을 권한다(게임 전체 화면보다 위)
+function UpdateBadge() {
+  return (
+    <button
+      type="button"
+      onClick={() => location.reload()}
+      className="fixed top-[calc(env(safe-area-inset-top)+66px)] left-1/2 z-[60] animate-drop rounded-full bg-teal px-4 py-2 text-[13px] font-bold whitespace-nowrap text-white shadow-lg shadow-teal/30 active:scale-[0.98] md:top-[74px]"
+    >
+      <span className="text-teal-bright">#</span> 새 기능 업데이트 · 눌러서 새로고침
+    </button>
   )
 }
 
