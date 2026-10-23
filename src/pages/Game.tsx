@@ -297,7 +297,8 @@ export default function Game() {
 
           {lastHint && (
             <div
-              className={`absolute inset-x-0 bottom-4 flex justify-center px-3 transition duration-500 ${asking ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'}`}
+              // 현실모드에서는 아래 가운데의 위치·체력 패널과 겹치지 않게 그 위에 띄운다
+              className={`absolute inset-x-0 flex justify-center px-3 transition duration-500 ${hud?.realism ? 'bottom-[104px] md:bottom-[176px]' : 'bottom-4'} ${asking ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'}`}
               aria-hidden={!asking}
             >
               <div className="flex items-center gap-1 rounded-full bg-white/95 py-1.5 pr-1.5 pl-4 text-[14px] text-ink shadow-xl">
